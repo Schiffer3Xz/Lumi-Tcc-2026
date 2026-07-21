@@ -32,6 +32,7 @@ Route::middleware(['auth', 'redirectPanel'])->group(function () {
     Route::get('admin/settings/verification', [AdminSettingsController::class, 'emailVerification'])->name('emailVerification');
 
     Route::get('admin/firstLogin', [AdminSettingsController::class, 'firstLogin'])->name('firstLogin');
+    
 });
 
 
@@ -46,6 +47,7 @@ Route::middleware(['auth', 'redirectPanel', 'verified'])->group(function () {
     Route::get('admin/catalog', [AdminCatalogController::class, 'index'])->name('catalog');
     //Rota index Settigns
     Route::get('admin/settings', [AdminSettingsController::class, 'index'])->name('settings');
+    Route::put('admin/catalog/book/update/{id}', [BookController::class, 'update'])->name('update.book');
     
     //Rota index Cadastro de Livro
     Route::get('admin/catalog/book', [BookController::class, 'index'])->name('book');
@@ -77,7 +79,17 @@ Route::middleware(['auth', 'redirectPanel', 'verified'])->group(function () {
     Route::put('admin/categories/availability/update/{id}', [AvailabilityController::class, 'update'])->name('update.availability');
     Route::delete('admin/categories/availability/destroy/{id}', [AvailabilityController::class, 'destroy'])->name('destroy.availability');
 
-    //Atualizar credenciais
+    //Configurações
+    Route::get('admin/email', [AdminSettingsController::class, 'editEmail'])->name('email.index');
+    // Processar alteração de e-mail
+    Route::put('admin/email', [AdminSettingsController::class, 'updateEmail'])->name('email.update');
+
+    // Exibir tela de alteração de senha
+    Route::get('admin/password', [AdminSettingsController::class, 'editPassword'])->name('password.index');
+    // Processar alteração de senha
+    Route::put('admin/password', [AdminSettingsController::class, 'updatePassword'])->name('password.update');
+
+    Route::put('admin/settings/credentials/update', [AdminSettingsController::class, 'updateProfile'])->name('update.profile');
 
 });
 

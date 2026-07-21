@@ -83,7 +83,9 @@
                 <h1 class="text-3xl font-black text-[#2d221b] mt-3 tracking-tight">Informações Pessoais</h1>
             </div>
 
-            <form class="space-y-8">
+            <form class="space-y-8" action="{{route('update.profile')}}" method="POST">
+                @csrf
+                @method('PUT')
 
             <!-- Seção Avatar (Substitua a parte do avatar no código anterior por esta) -->
                 <div class="panel-card rounded-2xl p-8 flex items-center justify-between">
@@ -107,16 +109,16 @@
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
                         <div>
                             <label class="text-[10px] font-bold text-[#8c7462] uppercase tracking-wider block mb-2">Nome Completo</label>
-                            <input type="text" class="w-full p-3 rounded-xl input-style text-xs">
+                            <input type="text" name="name"  value="{{ old('name', auth()->user()->name) }}" class="w-full p-3 rounded-xl input-style text-xs">
                         </div>
                         <div>
                             <label class="text-[10px] font-bold text-[#8c7462] uppercase tracking-wider block mb-2">Nickname</label>
-                            <input type="text" class="w-full p-3 rounded-xl input-style text-xs">
+                            <input type="text" name="nickname" value="{{ old('nickname', auth()->user()->nickname) }}" class="w-full p-3 rounded-xl input-style text-xs">
                         </div>
                     </div>
                     <div>
                         <label class="text-[10px] font-bold text-[#8c7462] uppercase tracking-wider block mb-2">Biografia</label>
-                        <textarea class="w-full p-3 rounded-xl input-style text-xs h-24"></textarea>
+                        <textarea name="description" class="w-full p-3 rounded-xl input-style text-xs h-24">{{ old('description', auth()->user()->description) }}</textarea>
                     </div>
                 </div>
 
@@ -126,14 +128,14 @@
                         <i class="fa-solid fa-lock text-[#b08968]"></i> Gerenciamento de Acesso
                     </h2>
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <button type="button" class="btn-action w-full p-4 rounded-xl text-xs font-bold flex items-center justify-between">
+                        <a href="{{ route('email.index') }}" class="btn-action w-full p-4 rounded-xl text-xs font-bold flex items-center justify-between">
                             <span>Alterar E-mail</span>
                             <i class="fa-solid fa-envelope"></i>
-                        </button>
-                        <button type="button" class="btn-action w-full p-4 rounded-xl text-xs font-bold flex items-center justify-between">
+                        </a>
+                        <a href="{{ route('password.index') }}" class="btn-action w-full p-4 rounded-xl text-xs font-bold flex items-center justify-between">
                             <span>Redefinir Senha</span>
                             <i class="fa-solid fa-key"></i>
-                        </button>
+                        </a>
                     </div>
                 </div>
 

@@ -25,6 +25,15 @@ use Illuminate\Http\Request;
         return view('admin/settings/emailVerification');
     }
 
+    public function editEmail(){
+        return view('admin/settings/editEmail');
+    }
+
+    public function editPassword(){
+        return view('admin/settings/editPassword');
+    }
+
+
     public function update(Request $request){
         $request->validate([
             'name' => 'required|string|max:255',
@@ -58,4 +67,53 @@ use Illuminate\Http\Request;
 
         return redirect()->route('adminPanel');
     }
+
+    public function updateProfile(Request $request){
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'nickname' => 'required|string|max:255|unique:users,nickname,' . auth()->id(),
+            'description' => 'required|string|max:255',
+        ]);
+
+         $user = auth()->user();
+
+        $user->name = $request->name;
+        $user->nickname = $request->nickname;
+        $user->description = $request->description;
+
+        $user->save();
+
+        return redirect()->route('adminPanel');
+    }
+
+    public function updateEmail(Request $request){
+         $request->validate([
+            'email' => 'required|email|max:255|unique:users,email,' . auth()->id(),
+            'current_password' => 'required|current_password',
+        ]);
+
+        $user = auth()->user();
+        $user->email = $request->email;
+        $user->email_verified_at = null;
+        
+        $user->save();
+
+        $user->sendEmailVerificationNotification();
+        return redirect()->route('verification.notice');
+    }
+
+    public function updatePassword(Request $request){
+         $request->validate([
+            'current_password' => 'required|current_password',
+            'password' => 'required|string|min:8|confirmed',
+        ]);
+
+        $user = auth()->user();
+        $user->password = Hash::make($request->password);
+        
+        $user->save();
+
+        return redirect()->route('adminPanel');
+    }
+    
 }
