@@ -30,8 +30,8 @@ class AdminMiddleware
             }
         }
 
-        if(auth()->user()->first_login && !$request->routeIs('update.credentials') && !$request->routeIs('update.settings')){
-                return redirect()->route('update.credentials');
+        if(auth()->user()->first_login && !$request->routeIs('firstLogin') && !$request->routeIs('update.settings')){
+                return redirect()->route('firstLogin');
             }
 
     return $next($request);

@@ -17,8 +17,12 @@ use Illuminate\Http\Request;
         return view('admin/settings/updateCredentials');
     }
 
+    public function firstLogin(){
+        return view('admin/settings/firstLoginSetup');
+    }
+
     public function emailVerification(){
-        return view('admin/settings/emailVerification/email');
+        return view('admin/settings/emailVerification');
     }
 
     public function update(Request $request){
@@ -49,6 +53,7 @@ use Illuminate\Http\Request;
 
         if ($firstLogin) {
             $user->sendEmailVerificationNotification();
+            return redirect()->route('emailVerification');
         }
 
         return redirect()->route('adminPanel');

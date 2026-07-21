@@ -30,6 +30,8 @@ Route::middleware(['auth', 'redirectPanel'])->group(function () {
     Route::post('admin/settings/credentials/update', [AdminSettingsController::class, 'update'])->name('update.settings');
 
     Route::get('admin/settings/verification', [AdminSettingsController::class, 'emailVerification'])->name('emailVerification');
+
+    Route::get('admin/firstLogin', [AdminSettingsController::class, 'firstLogin'])->name('firstLogin');
 });
 
 
