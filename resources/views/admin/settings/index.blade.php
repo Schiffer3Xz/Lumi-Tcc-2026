@@ -103,32 +103,32 @@
                     
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                        <!-- Card: Cadastrar Novo Admin -->
-<a href="#" class="group p-4 bg-white/60 border border-custom-card rounded-xl hover-card transition-all flex items-center justify-between gap-3">
-    <div class="flex items-center gap-3 min-w-0">
-        <div class="w-8 h-8 rounded-lg bg-[#3a5a40]/15 flex items-center justify-center text-[#3a5a40] shrink-0">
-            <i class="fa-solid fa-user-plus text-xs"></i>
-        </div>
-        <div class="min-w-0">
-            <h3 class="font-bold text-custom-title text-xs">Cadastrar Novo Admin</h3>
-            <p class="text-[10px] text-custom-body truncate">Adicionar novo operador</p>
-        </div>
-    </div>
-    <i class="fa-solid fa-arrow-right text-[10px] text-[#8c7462] group-hover:text-[#3a5a40] group-hover:translate-x-1 transition-all"></i>
-</a>
+                        <a href="{{route('create.admin.view')}}" class="group p-4 bg-white/60 border border-custom-card rounded-xl hover-card transition-all flex items-center justify-between gap-3">
+                            <div class="flex items-center gap-3 min-w-0">
+                                <div class="w-8 h-8 rounded-lg bg-[#3a5a40]/15 flex items-center justify-center text-[#3a5a40] shrink-0">
+                                    <i class="fa-solid fa-user-plus text-xs"></i>
+                                </div>
+                                <div class="min-w-0">
+                                    <h3 class="font-bold text-custom-title text-xs">Cadastrar Novo Admin</h3>
+                                    <p class="text-[10px] text-custom-body truncate">Adicionar novo operador</p>
+                                </div>
+                            </div>
+                            <i class="fa-solid fa-arrow-right text-[10px] text-[#8c7462] group-hover:text-[#3a5a40] group-hover:translate-x-1 transition-all"></i>
+                        </a>
 
-<!-- Card: Listar Administradores -->
-<a href="#" class="group p-4 bg-white/60 border border-custom-card rounded-xl hover-card transition-all flex items-center justify-between gap-3">
-    <div class="flex items-center gap-3 min-w-0">
-        <div class="w-8 h-8 rounded-lg bg-[#b08968]/15 flex items-center justify-center text-[#b08968] shrink-0">
-            <i class="fa-solid fa-users-gear text-xs"></i>
-        </div>
-        <div class="min-w-0">
-            <h3 class="font-bold text-custom-title text-xs">Listar Administradores</h3>
-            <p class="text-[10px] text-custom-body truncate">Ver todos os operadores</p>
-        </div>
-    </div>
-    <i class="fa-solid fa-arrow-right text-[10px] text-[#8c7462] group-hover:text-[#b08968] group-hover:translate-x-1 transition-all"></i>
-</a>
+                        <!-- Card: Listar Administradores -->
+                        <a href="#" class="group p-4 bg-white/60 border border-custom-card rounded-xl hover-card transition-all flex items-center justify-between gap-3">
+                            <div class="flex items-center gap-3 min-w-0">
+                                <div class="w-8 h-8 rounded-lg bg-[#b08968]/15 flex items-center justify-center text-[#b08968] shrink-0">
+                                    <i class="fa-solid fa-users-gear text-xs"></i>
+                                </div>
+                                <div class="min-w-0">
+                                    <h3 class="font-bold text-custom-title text-xs">Listar Administradores</h3>
+                                    <p class="text-[10px] text-custom-body truncate">Ver todos os operadores</p>
+                                </div>
+                            </div>
+                            <i class="fa-solid fa-arrow-right text-[10px] text-[#8c7462] group-hover:text-[#b08968] group-hover:translate-x-1 transition-all"></i>
+                        </a>
                     </div>
                 </div>
 

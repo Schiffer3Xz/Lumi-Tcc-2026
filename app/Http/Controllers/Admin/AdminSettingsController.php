@@ -33,6 +33,10 @@ use Illuminate\Http\Request;
         return view('admin/settings/editPassword');
     }
 
+    public function adminView(){
+        return view('admin/settings/createAdmin');
+    }
+
 
     public function update(Request $request){
         $request->validate([
@@ -114,6 +118,26 @@ use Illuminate\Http\Request;
         $user->save();
 
         return redirect()->route('adminPanel');
+    }
+
+    public function createAdmin(Request $request){
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'nickname' => 'required|string|max:255|unique:users,nickname,',
+            'email' => 'required|email|max:255|unique:users,email,' . auth()->id(),
+            'password' => 'required|string|min:8|',
+        ]);
+
+        User::create([
+            'name' => $request->name,
+            'nickname' => $request->nickname,
+            'email' => $request->email,
+            'password' => Hash::make($request->password),
+            'is_admin' => true,
+            'first_login' => true,
+        ]);
+        
+        return redirect()->route('adminPanel')->with('success', 'Administrador cadastrado com sucesso!');
     }
     
 }
