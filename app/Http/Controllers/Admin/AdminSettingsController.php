@@ -37,6 +37,12 @@ use Illuminate\Http\Request;
         return view('admin/settings/createAdmin');
     }
 
+    public function adminCount(){
+        $admins = User::where('is_admin', true)->get();
+        $totalAdmins = User::where('is_admin', true)->count();
+        return view('admin/settings/countAdmin', compact('totalAdmins', 'admins'));
+    }
+
 
     public function update(Request $request){
         $request->validate([

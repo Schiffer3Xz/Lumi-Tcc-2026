@@ -10,6 +10,7 @@ use App\Http\Controllers\Admin\Categories\GenreController;
 use App\Http\Controllers\Admin\Categories\AuthorController;
 use App\Http\Controllers\Admin\Categories\AvailabilityController;
 use App\Http\Controllers\Admin\Catalog\BookController;
+use App\Http\Controllers\User\DashboardController;
 
 
 Route::get('/', function () {return Inertia::render('welcome');})->name('home');
@@ -25,7 +26,7 @@ Route::middleware('auth')->group(function (){
 
         Route::middleware('redirectPanel')->group(function (){
                 //Rotas do Usuario
-                Route::get('dashboard', function () {return view ('user/dashboard');})->name('dashboard');
+                Route::get('dashboard', [DashboardController::class, 'list'])->name('dashboard');
         });
 
 
@@ -72,6 +73,7 @@ Route::middleware('auth')->group(function (){
 
 //================================================CONFIGURAÇÕES======================================================================
         Route::get('admin/settings/create', [AdminSettingsController::class, 'adminView'])->name('create.admin.view');
+        Route::get('admin/settings/list', [AdminSettingsController::class, 'adminCount'])->name('list.admin');
         Route::get('admin/email', [AdminSettingsController::class, 'editEmail'])->name('email.index');
         Route::get('admin/settings', [AdminSettingsController::class, 'index'])->name('settings');
         Route::get('admin/password', [AdminSettingsController::class, 'editPassword'])->name('password.index');

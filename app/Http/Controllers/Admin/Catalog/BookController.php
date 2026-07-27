@@ -30,7 +30,7 @@ class BookController extends Controller
     }
 
     public function store(Request $request){
-        $data = $request->validate([
+        $request->validate([
             'title' => 'required|string|max:150',
             'page_count' => 'required|integer|min:1',
 

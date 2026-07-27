@@ -117,7 +117,7 @@
                         </a>
 
                         <!-- Card: Listar Administradores -->
-                        <a href="#" class="group p-4 bg-white/60 border border-custom-card rounded-xl hover-card transition-all flex items-center justify-between gap-3">
+                        <a href="{{route('list.admin')}}" class="group p-4 bg-white/60 border border-custom-card rounded-xl hover-card transition-all flex items-center justify-between gap-3">
                             <div class="flex items-center gap-3 min-w-0">
                                 <div class="w-8 h-8 rounded-lg bg-[#b08968]/15 flex items-center justify-center text-[#b08968] shrink-0">
                                     <i class="fa-solid fa-users-gear text-xs"></i>
