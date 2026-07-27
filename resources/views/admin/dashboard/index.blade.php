@@ -41,10 +41,10 @@
                                 <i class="fa-solid fa-chevron-down text-[10px] text-[#8c7462] transition-transform duration-200" :class="open ? 'rotate-180 text-[#d4a373]' : ''"></i>
                             </button>
                             <div x-show="open" class="pl-10 pr-2 space-y-1.5 py-1.5">
-                                <a href="{{route('genres.store')}}" class="flex items-center gap-2.5 px-3.5 py-3 text-sm font-medium rounded-md text-[#c4ab99] hover:text-[#fbf9f6] hover:bg-[#382b22] transition-colors">
+                                <a href="{{ route('genres.store') }}" class="flex items-center gap-2.5 px-3.5 py-3 text-sm font-medium rounded-md text-[#c4ab99] hover:text-[#fbf9f6] hover:bg-[#382b22] transition-colors">
                                     <span class="w-2 h-2 rounded-full bg-[#b08968]"></span> Cadastrar gênero
                                 </a>
-                                <a href="{{route('author.store')}}" class="flex items-center gap-2.5 px-3.5 py-3 text-sm font-medium rounded-md text-[#c4ab99] hover:text-[#fbf9f6] hover:bg-[#382b22] transition-colors">
+                                <a href="{{ route('author.store') }}" class="flex items-center gap-2.5 px-3.5 py-3 text-sm font-medium rounded-md text-[#c4ab99] hover:text-[#fbf9f6] hover:bg-[#382b22] transition-colors">
                                     <span class="w-2 h-2 rounded-full bg-[#b08968]"></span> Cadastrar autor
                                 </a>
                             </div>
@@ -62,13 +62,13 @@
                                 <i class="fa-solid fa-chevron-down text-[10px] text-[#8c7462] transition-transform duration-200" :class="open ? 'rotate-180 text-[#d4a373]' : ''"></i>
                             </button>
                             <div x-show="open" class="pl-10 pr-2 space-y-1.5 py-1.5">
-                                <a href="{{route('book')}}" class="flex items-center gap-2.5 px-3.5 py-3 text-sm font-medium rounded-md text-[#c4ab99] hover:text-[#fbf9f6] hover:bg-[#382b22] transition-colors">
+                                <a href="{{ route('book') }}" class="flex items-center gap-2.5 px-3.5 py-3 text-sm font-medium rounded-md text-[#c4ab99] hover:text-[#fbf9f6] hover:bg-[#382b22] transition-colors">
                                     <span class="w-2 h-2 rounded-full bg-[#b08968]"></span> Cadastrar livro
                                 </a>
-                                <a href="{{route('books.list')}}" class="flex items-center gap-2.5 px-3.5 py-3 text-sm font-medium rounded-md text-[#c4ab99] hover:text-[#fbf9f6] hover:bg-[#382b22] transition-colors">
+                                <a href="{{ route('books.list') }}" class="flex items-center gap-2.5 px-3.5 py-3 text-sm font-medium rounded-md text-[#c4ab99] hover:text-[#fbf9f6] hover:bg-[#382b22] transition-colors">
                                     <span class="w-2 h-2 rounded-full bg-[#b08968]"></span> Listar Livros
                                 </a>
-                                <a href="{{route('update.view')}}" class="flex items-center gap-2.5 px-3.5 py-3 text-sm font-medium rounded-md text-[#c4ab99] hover:text-[#fbf9f6] hover:bg-[#382b22] transition-colors">
+                                <a href="{{ route('update.view') }}" class="flex items-center gap-2.5 px-3.5 py-3 text-sm font-medium rounded-md text-[#c4ab99] hover:text-[#fbf9f6] hover:bg-[#382b22] transition-colors">
                                     <span class="w-2 h-2 rounded-full bg-[#b08968]"></span> Atualizar disponibilidade
                                 </a>
                             </div>
@@ -107,10 +107,14 @@
                 </button>
 
                 <div x-show="open" @click.away="open = false" class="mt-2 bg-[#241b14] border border-[#3e3027] rounded-lg shadow-xl py-1 overflow-hidden">
-                    <a href="{{ route('settings') }}" class="flex items-center gap-2.5 px-4 py-2 text-xs font-medium text-[#d6c7b9] hover:bg-[#382b22] hover:text-white transition-colors"><i class="fa-solid fa-gear w-4 text-[#a38875]"></i> Configurações</a>
+                    <a href="{{ route('settings') }}" class="flex items-center gap-2.5 px-4 py-2 text-xs font-medium text-[#d6c7b9] hover:bg-[#382b22] hover:text-white transition-colors">
+                        <i class="fa-solid fa-gear w-4 text-[#a38875]"></i> Configurações
+                    </a>
                     <form action="{{ route('logout') }}" method="POST">
                         @csrf
-                        <button type="submit" class="w-full flex items-center gap-2.5 text-left px-4 py-2 text-xs font-medium text-[#bc6c25] hover:bg-[#382b22] hover:text-[#dda15e] transition-colors"><i class="fa-solid fa-right-from-bracket w-4"></i> Sair</button>
+                        <button type="submit" class="w-full flex items-center gap-2.5 text-left px-4 py-2 text-xs font-medium text-[#bc6c25] hover:bg-[#382b22] hover:text-[#dda15e] transition-colors">
+                            <i class="fa-solid fa-right-from-bracket w-4"></i> Sair
+                        </button>
                     </form>
                 </div>
             </div>
@@ -130,7 +134,7 @@
                         <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 pointer-events-none text-[#8c7462]">
                             <i class="fa-solid fa-magnifying-glass text-xs"></i>
                         </span>
-                        <input type="text" placeholder="Pesquisar no sistema..." class="w-full pl-10 pr-4 py-2 bg-[#ebdccb]/60 border border-[#d8c7b5] rounded-lg text-sm text-[#3b2f26] placeholder-[#8c7462] focus:outline-none focus:ring-1 focus:ring-[#b08968] focus:border-[#b08968] transition-all">
+                        <input type="text" name="search" placeholder="Pesquisar no sistema..." class="w-full pl-10 pr-4 py-2 bg-[#ebdccb]/60 border border-[#d8c7b5] rounded-lg text-sm text-[#3b2f26] placeholder-[#8c7462] focus:outline-none focus:ring-1 focus:ring-[#b08968] focus:border-[#b08968] transition-all">
                     </div>
                 </div>
 
@@ -142,60 +146,135 @@
             </header>
 
             <!-- Main Content Container -->
-            <main class="flex-1 overflow-y-auto p-10">
-                <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
-
-                    <div class="bg-[#f4ede2] rounded-xl border border-[#e6dccf] p-4 shadow-xs flex flex-col justify-between">
-                        <div class="flex items-center justify-between text-[#8c7462] mb-3">
-                            <span class="text-[11px] font-bold uppercase tracking-wider text-[#6b5848]">Livros</span>
-                            <div class="w-7 h-7 rounded-md bg-[#e6dccf]/60 flex items-center justify-center text-sm">📚</div>
+            <main class="flex-1 overflow-y-auto p-10 space-y-6">
+                <!-- Cards Grid -->
+                <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-3">
+                    <!-- Card 1: Livros -->
+                    <div class="bg-white rounded-xl border border-slate-200/80 px-3.5 py-3 shadow-2xs hover:border-amber-300 transition flex flex-col justify-between group">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 group-hover:text-amber-600 transition">Livros</span>
+                            <div class="w-6 h-6 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center text-xs shadow-2xs">📚</div>
                         </div>
-                        <span class="text-2xl font-black text-[#3b2f26] tracking-tight">{{ $totalBooks }}</span>
+                        <span class="text-lg font-black text-slate-900 tracking-tight">{{ $totalBooks }}</span>
                     </div>
 
-                    <div class="bg-[#f4ede2] rounded-xl border border-[#e6dccf] p-4 shadow-xs flex flex-col justify-between">
-                        <div class="flex items-center justify-between text-[#8c7462] mb-3">
-                            <span class="text-[11px] font-bold uppercase tracking-wider text-[#6b5848]">Autores</span>
-                            <div class="w-7 h-7 rounded-md bg-[#e6dccf]/60 flex items-center justify-center text-sm">👤</div>
+                    <!-- Card 2: Autores -->
+                    <div class="bg-white rounded-xl border border-slate-200/80 px-3.5 py-3 shadow-2xs hover:border-amber-300 transition flex flex-col justify-between group">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 group-hover:text-amber-600 transition">Autores</span>
+                            <div class="w-6 h-6 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center text-xs shadow-2xs">👤</div>
                         </div>
-                        <span class="text-2xl font-black text-[#3b2f26] tracking-tight">{{ $totalAuthors }}</span>
+                        <span class="text-lg font-black text-slate-900 tracking-tight">{{ $totalAuthors }}</span>
                     </div>
 
-                    <div class="bg-[#f4ede2] rounded-xl border border-[#e6dccf] p-4 shadow-xs flex flex-col justify-between">
-                        <div class="flex items-center justify-between text-[#8c7462] mb-3">
-                            <span class="text-[11px] font-bold uppercase tracking-wider text-[#6b5848]">Gêneros</span>
-                            <div class="w-7 h-7 rounded-md bg-[#e6dccf]/60 flex items-center justify-center text-sm">🏷️</div>
+                    <!-- Card 3: Gêneros -->
+                    <div class="bg-white rounded-xl border border-slate-200/80 px-3.5 py-3 shadow-2xs hover:border-amber-300 transition flex flex-col justify-between group">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 group-hover:text-amber-600 transition">Gêneros</span>
+                            <div class="w-6 h-6 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center text-xs shadow-2xs">🏷️</div>
                         </div>
-                        <span class="text-2xl font-black text-[#3b2f26] tracking-tight">{{ $totalGenres }}</span>
+                        <span class="text-lg font-black text-slate-900 tracking-tight">{{ $totalGenres }}</span>
                     </div>
 
-                    <div class="bg-[#f0f4f1] rounded-xl border border-[#d2e0d5] p-4 shadow-xs flex flex-col justify-between">
-                        <div class="flex items-center justify-between text-[#3a5a40] mb-3">
-                            <span class="text-[11px] font-bold uppercase tracking-wider text-[#3a5a40]">Disponíveis</span>
-                            <div class="w-7 h-7 rounded-md bg-[#d2e0d5]/60 flex items-center justify-center text-sm">✅</div>
+                    <!-- Card 4: Disponíveis -->
+                    <div class="bg-white rounded-xl border border-slate-200/80 px-3.5 py-3 shadow-2xs hover:border-emerald-300 transition flex flex-col justify-between group">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 group-hover:text-emerald-600 transition">Disponíveis</span>
+                            <div class="w-6 h-6 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center text-xs shadow-2xs">✅</div>
                         </div>
-                        <span class="text-2xl font-black text-[#2f4f35] tracking-tight">{{ $totalBooksAvailable }}</span>
+                        <span class="text-lg font-black text-slate-900 tracking-tight">{{ $totalBooksAvailable }}</span>
                     </div>
 
-                    <div class="bg-[#fcf3f2] rounded-xl border border-[#f0d4d2] p-4 shadow-xs flex flex-col justify-between">
-                        <div class="flex items-center justify-between text-[#bc6c25] mb-3">
-                            <span class="text-[11px] font-bold uppercase tracking-wider text-[#bc6c25]">Indisponíveis</span>
-                            <div class="w-7 h-7 rounded-md bg-[#f7d6d3]/60 flex items-center justify-center text-sm">❌</div>
+                    <!-- Card 5: Indisponíveis -->
+                    <div class="bg-white rounded-xl border border-slate-200/80 px-3.5 py-3 shadow-2xs hover:border-rose-300 transition flex flex-col justify-between group">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 group-hover:text-rose-600 transition">Indisponíveis</span>
+                            <div class="w-6 h-6 rounded-lg bg-rose-50 text-rose-600 flex items-center justify-center text-xs shadow-2xs">❌</div>
                         </div>
-                        <span class="text-2xl font-black text-[#9b5118] tracking-tight">{{ $totalBooksUnavailable }}</span>
+                        <span class="text-lg font-black text-slate-900 tracking-tight">{{ $totalBooksUnavailable }}</span>
                     </div>
 
-                    <div class="bg-[#f0f3f7] rounded-xl border border-[#d3d9e0] p-4 shadow-xs flex flex-col justify-between">
-                        <div class="flex items-center justify-between text-[#457b9d] mb-3">
-                            <span class="text-[11px] font-bold uppercase tracking-wider text-[#457b9d]">Emprestados</span>
-                            <div class="w-7 h-7 rounded-md bg-[#d3d9e0]/60 flex items-center justify-center text-sm">📖</div>
+                    <!-- Card 6: Emprestados -->
+                    <div class="bg-white rounded-xl border border-slate-200/80 px-3.5 py-3 shadow-2xs hover:border-sky-300 transition flex flex-col justify-between group">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 group-hover:text-sky-600 transition">Emprestados</span>
+                            <div class="w-6 h-6 rounded-lg bg-sky-50 text-sky-600 flex items-center justify-center text-xs shadow-2xs">📖</div>
                         </div>
-                        <span class="text-2xl font-black text-[#1d3557] tracking-tight">{{ $totalBooksBorrowed }}</span>
+                        <span class="text-lg font-black text-slate-900 tracking-tight">{{ $totalBooksBorrowed }}</span>
                     </div>
 
+                    <!-- Card 7: Cadastrados no Mês -->
+                    <div class="bg-white rounded-xl border border-slate-200/80 px-3.5 py-3 shadow-2xs hover:border-indigo-300 transition flex flex-col justify-between group col-span-2 sm:col-span-1">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 group-hover:text-indigo-600 transition truncate pr-1">Cadastrados (Mês)</span>
+                            <div class="w-6 h-6 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center text-xs shadow-2xs shrink-0">✨</div>
+                        </div>
+                        <span class="text-lg font-black text-slate-900 tracking-tight">{{ $totalBooksPerMonth }}</span>
+                    </div>
+                </div>
+
+                <!-- Chart Container -->
+                <div class="bg-white p-6 rounded-xl border border-slate-200/80 shadow-sm">
+                    <h2 class="font-bold text-slate-800 mb-4 text-base">
+                        Livros por Gênero
+                    </h2>
+                    <div class="relative h-80 w-full">
+                        <canvas id="booksGenreChart"></canvas>
+                    </div>
                 </div>
             </main>
         </div>
     </div>
+
+    <!-- Scripts -->
+    <script>
+        // Dados injetados pelo Laravel
+        const booksByGenre = @json($totalBooksByGenre);
+
+        // Inicialização do Gráfico
+        document.addEventListener('DOMContentLoaded', function () {
+            const ctx = document.getElementById('booksGenreChart').getContext('2d');
+
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: booksByGenre.map(item => item.name),
+                    datasets: [{
+                        label: 'Quantidade de livros',
+                        data: booksByGenre.map(item => item.books_count),
+                        backgroundColor: '#b08968',
+                        borderColor: '#856147',
+                        borderWidth: 1,
+                        borderRadius: 6,
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: {
+                                color: '#f1f5f9'
+                            },
+                            ticks: {
+                                precision: 0
+                            }
+                        },
+                        x: {
+                            grid: {
+                                display: false
+                            }
+                        }
+                    }
+                }
+            });
+        });
+    </script>
 </body>
 </html>
