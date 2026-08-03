@@ -1,5 +1,5 @@
 import { Head, useForm } from '@inertiajs/react';
-import { LoaderCircle, Mail, Lock, User, Eye, EyeOff, UserPlus, ShieldCheck, UserCheck, Shield } from 'lucide-react';
+import { LoaderCircle, Mail, Lock, User, Eye, EyeOff, UserPlus, ShieldCheck } from 'lucide-react';
 import { FormEventHandler, useState } from 'react';
 
 import InputError from '@/components/input-error';
@@ -44,35 +44,6 @@ export default function Register() {
             <div className="absolute -top-24 -left-24 w-96 h-96 rounded-full bg-blue-100/60 blur-3xl pointer-events-none" />
             <div className="absolute top-1/4 -right-20 w-80 h-80 rounded-full bg-indigo-100/40 blur-3xl pointer-events-none" />
             <div className="absolute -bottom-20 right-10 w-96 h-96 rounded-full bg-blue-200/30 blur-3xl pointer-events-none" />
-
-            {/* Seletor de Tipo de Acesso no Topo Direito */}
-            <div className="absolute top-6 right-6 hidden sm:flex items-center gap-2 bg-white/85 backdrop-blur-md px-4 py-2 rounded-full shadow-sm border border-slate-200/60 text-xs">
-                <span className="text-slate-500 font-medium mr-1">Tipo de Acesso:</span>
-                <button
-                    type="button"
-                    onClick={() => setData('accessType', 'aluno')}
-                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full transition-all font-medium ${
-                        data.accessType === 'aluno'
-                            ? 'bg-amber-300 text-slate-900 shadow-sm'
-                            : 'text-slate-600 hover:text-slate-900'
-                    }`}
-                >
-                    <UserCheck className="w-3.5 h-3.5" />
-                    Aluno
-                </button>
-                <button
-                    type="button"
-                    onClick={() => setData('accessType', 'administrador')}
-                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full transition-all font-medium ${
-                        data.accessType === 'administrador'
-                            ? 'bg-amber-300 text-slate-900 shadow-sm'
-                            : 'text-slate-600 hover:text-slate-900'
-                    }`}
-                >
-                    <Shield className="w-3.5 h-3.5" />
-                    Administrador
-                </button>
-            </div>
 
             {/* Card Principal */}
             <div className="w-full max-w-md bg-white/90 backdrop-blur-xl rounded-3xl shadow-[0_20px_50px_rgba(8_112_184|0.07)] border border-white/80 p-8 relative z-10 my-8">
