@@ -11,15 +11,15 @@
 </head>
 <body class="h-full bg-[#fbf9f6] font-sans text-[#4a3f35] antialiased">
 
-    <div class="flex h-screen overflow-hidden">
-        <!-- Sidebar rústica em tons de marrom e madeira -->
-        <aside class="w-72 bg-[#2d221b] text-[#d6c7b9] flex flex-col border-r border-[#3e3027] shadow-xl z-20">
+   <div class="flex h-screen overflow-hidden">
+        <!-- Sidebar em tons de azul escuro -->
+        <aside class="w-72 bg-[#1b2436] text-[#c3d0e0] flex flex-col border-r border-[#2e3b52] shadow-xl z-20">
             <!-- Logo / Header -->
-            <div class="flex items-center gap-3.5 px-6 h-20 border-b border-[#3e3027] bg-[#241b14]">
-                <div class="w-10 h-10 rounded-lg bg-[#6b4c35] flex items-center justify-center font-extrabold text-[#fbf9f6] shadow-md border border-[#856147]">A</div>
+            <div class="flex items-center gap-3.5 px-6 h-20 border-b border-[#2e3b52] bg-[#131a29]">
+                <div class="w-10 h-10 rounded-lg bg-[#2f4d73] flex items-center justify-center font-extrabold text-[#f6f9fc] shadow-md border border-[#3f6690]">A</div>
                 <div>
-                    <h1 class="font-bold text-[#fbf9f6] tracking-tight text-base">Admin Panel</h1>
-                    <p class="text-[10px] font-semibold uppercase tracking-wider text-[#b08968]">Painel de Controle</p>
+                    <h1 class="font-bold text-[#f6f9fc] tracking-tight text-base">Administrador</h1>
+                    <p class="text-[10px] font-semibold uppercase tracking-wider text-[#7fa8cc]">Painel de Controle</p>
                 </div>
             </div>
 
