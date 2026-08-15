@@ -25,7 +25,7 @@
                 </div>
             </div>
 
-            <form action="{{route('update.settings')}}" method="post">
+            <form action="{{route('admin.credentials.update')}}" method="post">
                 @csrf
                 
                 <div>

@@ -17,13 +17,13 @@
                 <h1 class="text-3xl font-extrabold text-slate-900 tracking-tight">Gestão de Disponibilidades</h1>
                 <p class="text-slate-500 mt-1">Cadastre e gerencie as disponibilidades do seu acervo.</p>
             </div>
-            <a href="{{ route('categories') }}" class="flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 rounded-xl text-sm font-semibold text-slate-600 hover:border-slate-300 hover:text-slate-900 transition-all shadow-sm">
+            <a href="{{ route('admin.categories.index') }}" class="flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 rounded-xl text-sm font-semibold text-slate-600 hover:border-slate-300 hover:text-slate-900 transition-all shadow-sm">
                 <i class="fa-solid fa-arrow-left"></i> Voltar
             </a>
         </div>
 
         <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 mb-8">
-            <form action="{{ route('availability.store') }}" method="POST" class="flex flex-col sm:flex-row gap-4">
+            <form action="{{ route('admin.availability.store') }}" method="POST" class="flex flex-col sm:flex-row gap-4">
                 @csrf
                 <div class="flex-1">
                     <label class="block text-sm font-bold text-slate-700 mb-2">Nome da Disponibilidade</label>
@@ -61,9 +61,9 @@
                             <tr class="hover:bg-slate-50/50 transition-colors">
                                 <td class="px-6 py-4 font-medium text-slate-800">{{ $availability->availability }}</td>
                                 <td class="px-6 py-4 text-right flex justify-end gap-3">
-                                    <a href="{{ route('edit.availability', $availability->id) }}" class="text-amber-600 hover:text-amber-900 font-semibold text-sm">Editar</a>
+                                    <a href="{{ route('admin.availability.edit', $availability->id) }}" class="text-amber-600 hover:text-amber-900 font-semibold text-sm">Editar</a>
 
-                                    <form action="{{ route('destroy.availability', $availability->id) }}" method="POST" onsubmit="return confirm('Tem certeza que deseja excluir?');">
+                                    <form action="{{ route('admin.availability.destroy', $availability->id) }}" method="POST" onsubmit="return confirm('Tem certeza que deseja excluir?');">
                                         @csrf
                                         @method('DELETE')
                                         <button type="submit" class="text-red-600 hover:text-red-800 font-semibold text-sm">Excluir</button>

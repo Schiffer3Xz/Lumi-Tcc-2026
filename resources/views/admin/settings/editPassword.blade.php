@@ -22,7 +22,7 @@
         </div>
 
         <!-- Form -->
-        <form class="space-y-5" action="{{route('password.update')}}" method="POST">
+        <form class="space-y-5" action="{{route('admin.settings.password.update')}}" method="POST">
             @csrf
             @method('PUT')
             <!-- Current Password -->

@@ -17,13 +17,13 @@
                 <h1 class="text-3xl font-extrabold text-slate-900 tracking-tight">Gestão de Autores</h1>
                 <p class="text-slate-500 mt-1">Cadastre e gerencie os autores do seu acervo.</p>
             </div>
-            <a href="{{ route('adminPanel') }}" class="flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 rounded-xl text-sm font-semibold text-slate-600 hover:border-slate-300 hover:text-slate-900 transition-all shadow-sm">
+            <a href="{{ route('admin.dashboard') }}" class="flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 rounded-xl text-sm font-semibold text-slate-600 hover:border-slate-300 hover:text-slate-900 transition-all shadow-sm">
                 <i class="fa-solid fa-arrow-left"></i> Voltar
             </a>
         </div>
 
         <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 mb-8">
-            <form action="{{ route('author.store') }}" method="POST" class="flex flex-col sm:flex-row gap-4">
+            <form action="{{ route('admin.authors.store') }}" method="POST" class="flex flex-col sm:flex-row gap-4">
                 @csrf
                 <div class="flex-1">
                     <label class="block text-sm font-bold text-slate-700 mb-2">Nome do Autor</label>
@@ -61,9 +61,9 @@
                             <tr class="hover:bg-slate-50/50 transition-colors">
                                 <td class="px-6 py-4 font-medium text-slate-800">{{ $author->name }}</td>
                                 <td class="px-6 py-4 text-right flex justify-end gap-3">
-                                    <a href="{{ route('edit.author', $author->id) }}" class="text-indigo-600 hover:text-indigo-900 font-semibold text-sm">Editar</a>
+                                    <a href="{{ route('admin.authors.edit', $author->id) }}" class="text-indigo-600 hover:text-indigo-900 font-semibold text-sm">Editar</a>
                                     
-                                    <form action="{{ route('destroy.author', $author->id) }}" method="POST" onsubmit="return confirm('Tem certeza que deseja excluir?');">
+                                    <form action="{{ route('admin.authors.destroy', $author->id) }}" method="POST" onsubmit="return confirm('Tem certeza que deseja excluir?');">
                                         @csrf
                                         @method('DELETE')
                                         <button type="submit" class="text-red-600 hover:text-red-800 font-semibold text-sm">Excluir</button>

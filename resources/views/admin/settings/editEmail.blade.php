@@ -22,7 +22,7 @@
         </div>
 
         <!-- Form -->
-        <form class="space-y-5" action="{{route('email.update')}}" method="POST">
+        <form class="space-y-5" action="{{route('admin.settings.email.update')}}" method="POST">
             @csrf
             @method('PUT')
             <!-- Current Email (Read-only) -->
@@ -45,7 +45,7 @@
 
             <!-- Action Buttons -->
             <div class="flex items-center space-x-3 pt-2">
-                <a href="{{ route('adminPanel') }}"
+                <a href="{{ route('admin.dashboard') }}"
                 class="w-1/2 px-4 py-3 rounded-lg border border-gray-300 text-gray-700 font-medium hover:bg-gray-50 transition text-sm text-center">
                     Cancelar
                 </a>

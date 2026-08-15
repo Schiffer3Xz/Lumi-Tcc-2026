@@ -34,13 +34,13 @@
             
             <!-- Ações do Topo -->
             <div class="flex flex-wrap items-center gap-3">
-                <a href="{{ route('book') }}" class="group inline-flex items-center gap-2.5 bg-indigo-600 hover:bg-indigo-500 text-white font-medium px-5 py-3 rounded-2xl shadow-lg shadow-indigo-600/25 hover:shadow-indigo-600/40 hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200 text-sm">
+                <a href="{{ route('admin.books.create') }}" class="group inline-flex items-center gap-2.5 bg-indigo-600 hover:bg-indigo-500 text-white font-medium px-5 py-3 rounded-2xl shadow-lg shadow-indigo-600/25 hover:shadow-indigo-600/40 hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200 text-sm">
                     <span class="w-5 h-5 rounded-full bg-white/20 flex items-center justify-center text-xs group-hover:rotate-90 transition-transform duration-300">
                         <i class="fa-solid fa-plus text-[10px]"></i>
                     </span>
                     Cadastrar Novo Livro
                 </a>
-                <a href="{{ route('adminPanel') }}" class="inline-flex items-center gap-2.5 bg-white hover:bg-slate-50 text-slate-700 font-medium px-5 py-3 rounded-2xl shadow-sm hover:shadow border border-slate-200/80 hover:border-slate-300 hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200 text-sm">
+                <a href="{{ route('admin.dashboard') }}" class="inline-flex items-center gap-2.5 bg-white hover:bg-slate-50 text-slate-700 font-medium px-5 py-3 rounded-2xl shadow-sm hover:shadow border border-slate-200/80 hover:border-slate-300 hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200 text-sm">
                     <i class="fa-solid fa-gauge-high text-slate-400 group-hover:text-indigo-600 transition-colors"></i>
                     <span>Voltar ao Painel</span>
                 </a>
@@ -51,7 +51,7 @@
         <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
             
             @forelse($books as $book)
-                <a href="{{ route('edit.book', $book->id) }}" 
+                <a href="{{ route('admin.books.edit', $book->id) }}" 
                    class="group relative bg-white/80 backdrop-blur-sm p-4 rounded-3xl shadow-sm border border-slate-200/70 hover:shadow-2xl hover:border-indigo-400/50 hover:bg-white hover:-translate-y-1.5 transition-all duration-300 flex flex-col justify-between">
                     
                     <div>
@@ -126,7 +126,7 @@
                     </div>
                     <h3 class="text-lg font-bold text-slate-800">Nenhum livro cadastrado</h3>
                     <p class="text-sm text-slate-500 max-w-md mx-auto mt-1 mb-6">Seu acervo está vazio no momento. Comece adicionando o primeiro título para gerenciá-lo por aqui.</p>
-                    <a href="{{ route('book') }}" class="inline-flex items-center gap-2 bg-indigo-600 hover:bg-indigo-500 text-white font-medium px-5 py-2.5 rounded-xl shadow-md transition-all text-sm">
+                    <a href="{{ route('admin.books.create') }}" class="inline-flex items-center gap-2 bg-indigo-600 hover:bg-indigo-500 text-white font-medium px-5 py-2.5 rounded-xl shadow-md transition-all text-sm">
                         <i class="fa-solid fa-plus text-xs"></i> Cadastrar Livro Agora
                     </a>
                 </div>

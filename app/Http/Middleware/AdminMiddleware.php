@@ -21,7 +21,7 @@ class AdminMiddleware
 
         if(auth()->user()->is_admin){
             if (!$request->is('admin*')) {
-                return redirect()->route('adminPanel');
+                return redirect()->route('admin.dashboard');
             }
             
         }else{
@@ -30,8 +30,8 @@ class AdminMiddleware
             }
         }
 
-        if(auth()->user()->first_login && !$request->routeIs('firstLogin') && !$request->routeIs('update.settings')){
-                return redirect()->route('firstLogin');
+        if(auth()->user()->first_login && !$request->routeIs('admin.first-login') && !$request->routeIs('admin.credentials.update')){
+                return redirect()->route('admin.first-login');
             }
 
     return $next($request);

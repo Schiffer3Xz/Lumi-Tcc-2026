@@ -31,7 +31,7 @@
                 <p class="text-sm text-slate-500 mt-1">Atualize as informações do título "{{ $book->title }}" no acervo.</p>
             </div>
 
-            <a href="{{ route('books.list') }}" 
+            <a href="{{ route('admin.books.list') }}" 
                class="inline-flex items-center gap-2 bg-white hover:bg-slate-50 text-slate-700 font-medium px-4 py-2.5 rounded-2xl shadow-sm hover:shadow border border-slate-200/80 transition-all text-sm w-fit">
                 <i class="fa-solid fa-arrow-left text-xs text-slate-400"></i>
                 Voltar à Lista
@@ -55,7 +55,7 @@
         @endif
 
         <div class="bg-white/80 backdrop-blur-sm rounded-3xl shadow-sm border border-slate-200/80 p-6 sm:p-8">
-            <form action="{{ route('update.book', $book->id) }}" method="POST" enctype="multipart/form-data" class="space-y-6">
+            <form action="{{ route('admin.books.update', $book->id) }}" method="POST" enctype="multipart/form-data" class="space-y-6">
                 @csrf
                 @method('PUT')
 
@@ -182,7 +182,7 @@
                 </div>
 
                 <div class="flex items-center justify-end gap-3 pt-6 border-t border-slate-100">
-                    <a href="{{ route('books.list') }}" 
+                    <a href="{{ route('admin.books.list') }}" 
                        class="px-5 py-2.5 rounded-xl border border-slate-200 hover:bg-slate-100 text-slate-700 font-medium text-sm transition-all">
                         Cancelar
                     </a>
@@ -199,7 +199,7 @@
                 <h4 class="font-bold text-slate-900 text-sm">Zona de Exclusão</h4>
                 <p class="text-xs text-slate-500 mt-0.5">Esta ação é irreversível e removerá permanentemente o livro do acervo.</p>
             </div>
-            <form action="{{ route('destroy.book', $book->id) }}" method="POST" class="w-full sm:w-auto flex justify-end">
+            <form action="{{ route('admin.books.destroy', $book->id) }}" method="POST" class="w-full sm:w-auto flex justify-end">
                 @csrf
                 @method('DELETE')
                 <button type="submit" 

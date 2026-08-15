@@ -41,10 +41,10 @@
                                 <i class="fa-solid fa-chevron-down text-[10px] text-[#8c7462] transition-transform duration-200" :class="open ? 'rotate-180 text-[#d4a373]' : ''"></i>
                             </button>
                             <div x-show="open" class="pl-10 pr-2 space-y-1.5 py-1.5">
-                                <a href="{{ route('genres.store') }}" class="flex items-center gap-2.5 px-3.5 py-3 text-sm font-medium rounded-md text-[#c4ab99] hover:text-[#fbf9f6] hover:bg-[#382b22] transition-colors">
+                                <a href="{{ route('admin.genres.store') }}" class="flex items-center gap-2.5 px-3.5 py-3 text-sm font-medium rounded-md text-[#c4ab99] hover:text-[#fbf9f6] hover:bg-[#382b22] transition-colors">
                                     <span class="w-2 h-2 rounded-full bg-[#b08968]"></span> Cadastrar gênero
                                 </a>
-                                <a href="{{ route('author.store') }}" class="flex items-center gap-2.5 px-3.5 py-3 text-sm font-medium rounded-md text-[#c4ab99] hover:text-[#fbf9f6] hover:bg-[#382b22] transition-colors">
+                                <a href="{{ route('admin.authors.store') }}" class="flex items-center gap-2.5 px-3.5 py-3 text-sm font-medium rounded-md text-[#c4ab99] hover:text-[#fbf9f6] hover:bg-[#382b22] transition-colors">
                                     <span class="w-2 h-2 rounded-full bg-[#b08968]"></span> Cadastrar autor
                                 </a>
                             </div>
@@ -62,13 +62,13 @@
                                 <i class="fa-solid fa-chevron-down text-[10px] text-[#8c7462] transition-transform duration-200" :class="open ? 'rotate-180 text-[#d4a373]' : ''"></i>
                             </button>
                             <div x-show="open" class="pl-10 pr-2 space-y-1.5 py-1.5">
-                                <a href="{{ route('book') }}" class="flex items-center gap-2.5 px-3.5 py-3 text-sm font-medium rounded-md text-[#c4ab99] hover:text-[#fbf9f6] hover:bg-[#382b22] transition-colors">
+                                <a href="{{ route('admin.books.store') }}" class="flex items-center gap-2.5 px-3.5 py-3 text-sm font-medium rounded-md text-[#c4ab99] hover:text-[#fbf9f6] hover:bg-[#382b22] transition-colors">
                                     <span class="w-2 h-2 rounded-full bg-[#b08968]"></span> Cadastrar livro
                                 </a>
-                                <a href="{{ route('books.list') }}" class="flex items-center gap-2.5 px-3.5 py-3 text-sm font-medium rounded-md text-[#c4ab99] hover:text-[#fbf9f6] hover:bg-[#382b22] transition-colors">
+                                <a href="{{ route('admin.books.list') }}" class="flex items-center gap-2.5 px-3.5 py-3 text-sm font-medium rounded-md text-[#c4ab99] hover:text-[#fbf9f6] hover:bg-[#382b22] transition-colors">
                                     <span class="w-2 h-2 rounded-full bg-[#b08968]"></span> Listar Livros
                                 </a>
-                                <a href="{{ route('update.view') }}" class="flex items-center gap-2.5 px-3.5 py-3 text-sm font-medium rounded-md text-[#c4ab99] hover:text-[#fbf9f6] hover:bg-[#382b22] transition-colors">
+                                <a href="{{ route('admin.books.create') }}" class="flex items-center gap-2.5 px-3.5 py-3 text-sm font-medium rounded-md text-[#c4ab99] hover:text-[#fbf9f6] hover:bg-[#382b22] transition-colors">
                                     <span class="w-2 h-2 rounded-full bg-[#b08968]"></span> Atualizar disponibilidade
                                 </a>
                             </div>
@@ -107,7 +107,7 @@
                 </button>
 
                 <div x-show="open" @click.away="open = false" class="mt-2 bg-[#241b14] border border-[#3e3027] rounded-lg shadow-xl py-1 overflow-hidden">
-                    <a href="{{ route('settings') }}" class="flex items-center gap-2.5 px-4 py-2 text-xs font-medium text-[#d6c7b9] hover:bg-[#382b22] hover:text-white transition-colors">
+                                <a href="{{ route('admin.settings.index') }}" class="flex items-center gap-2.5 px-4 py-2 text-xs font-medium text-[#d6c7b9] hover:bg-[#382b22] hover:text-white transition-colors">
                         <i class="fa-solid fa-gear w-4 text-[#a38875]"></i> Configurações
                     </a>
                     <form action="{{ route('logout') }}" method="POST">

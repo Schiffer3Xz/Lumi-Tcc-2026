@@ -31,7 +31,7 @@
                 <p class="text-sm text-slate-500 mt-1">Preencha os dados abaixo para adicionar uma nova obra ao acervo.</p>
             </div>
             
-            <a href="{{ route('adminPanel') }}" class="inline-flex items-center gap-2 bg-white hover:bg-slate-50 text-slate-700 font-medium px-4 py-2.5 rounded-2xl shadow-sm hover:shadow border border-slate-200/80 transition-all text-sm w-fit">
+            <a href="{{ route('admin.dashboard') }}" class="inline-flex items-center gap-2 bg-white hover:bg-slate-50 text-slate-700 font-medium px-4 py-2.5 rounded-2xl shadow-sm hover:shadow border border-slate-200/80 transition-all text-sm w-fit">
                 <i class="fa-solid fa-arrow-left text-xs text-slate-400"></i>
                 Voltar ao Catálogo
             </a>
@@ -53,7 +53,7 @@
             </div>
         @endif
 
-        <form action="{{ route('book.store') }}" method="POST" enctype="multipart/form-data" 
+          <form action="{{ route('admin.books.store') }}" method="POST" enctype="multipart/form-data" 
               class="bg-white/80 backdrop-blur-sm p-6 sm:p-10 rounded-3xl shadow-sm border border-slate-200/80 grid grid-cols-1 md:grid-cols-12 gap-8">
             @csrf
             

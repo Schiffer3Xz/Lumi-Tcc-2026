@@ -19,7 +19,7 @@
                 <h1 class="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">Gestão de Acervo</h1>
                 <p class="text-slate-500 mt-1 text-base">Selecione uma operação para o gerenciamento de livros</p>
             </div>
-            <a href="{{ route('adminPanel') }}" class="inline-flex self-start sm:self-auto items-center gap-2 px-5 py-2.5 bg-white border border-slate-200/80 rounded-2xl font-semibold text-slate-600 hover:border-slate-300 hover:bg-slate-50 hover:text-slate-900 transition-all shadow-sm">
+            <a href="{{ route('admin.dashboard') }}" class="inline-flex self-start sm:self-auto items-center gap-2 px-5 py-2.5 bg-white border border-slate-200/80 rounded-2xl font-semibold text-slate-600 hover:border-slate-300 hover:bg-slate-50 hover:text-slate-900 transition-all shadow-sm">
                 <i class="fa-solid fa-arrow-left text-sm"></i> Voltar
             </a>
         </div>
@@ -28,7 +28,7 @@
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             
             <!-- Cadastrar Livro -->
-            <a href="{{ route('book') }}" class="group p-8 bg-white/80 backdrop-blur-xl border border-slate-200/80 rounded-[2rem] shadow-sm hover:shadow-2xl hover:shadow-indigo-500/10 hover:border-indigo-500 transition-all duration-300 flex flex-col items-center text-center relative overflow-hidden">
+            <a href="{{ route('admin.books.create') }}" class="group p-8 bg-white/80 backdrop-blur-xl border border-slate-200/80 rounded-[2rem] shadow-sm hover:shadow-2xl hover:shadow-indigo-500/10 hover:border-indigo-500 transition-all duration-300 flex flex-col items-center text-center relative overflow-hidden">
                 <div class="absolute top-0 right-0 w-24 h-24 bg-indigo-50 rounded-bl-full -mr-6 -mt-6 group-hover:scale-125 transition-transform duration-300 opacity-60"></div>
                 <div class="w-16 h-16 mb-5 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center text-2xl group-hover:bg-indigo-600 group-hover:text-white transition-all shadow-sm relative z-10">
                     <i class="fa-solid fa-plus"></i>
@@ -38,7 +38,7 @@
             </a>
 
             <!-- Editar Credenciais -->
-            <a href="{{ route('books.list') }}" class="group p-8 bg-white/80 backdrop-blur-xl border border-slate-200/80 rounded-[2rem] shadow-sm hover:shadow-2xl hover:shadow-blue-500/10 hover:border-blue-500 transition-all duration-300 flex flex-col items-center text-center relative overflow-hidden">
+            <a href="{{ route('admin.books.list') }}" class="group p-8 bg-white/80 backdrop-blur-xl border border-slate-200/80 rounded-[2rem] shadow-sm hover:shadow-2xl hover:shadow-blue-500/10 hover:border-blue-500 transition-all duration-300 flex flex-col items-center text-center relative overflow-hidden">
                 <div class="absolute top-0 right-0 w-24 h-24 bg-blue-50 rounded-bl-full -mr-6 -mt-6 group-hover:scale-125 transition-transform duration-300 opacity-60"></div>
                 <div class="w-16 h-16 mb-5 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center text-2xl group-hover:bg-blue-600 group-hover:text-white transition-all shadow-sm relative z-10">
                     <i class="fa-solid fa-pen-to-square"></i>

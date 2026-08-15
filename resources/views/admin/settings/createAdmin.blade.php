@@ -18,7 +18,7 @@
             </p>
         </div>
 
-        <form class="mt-8 space-y-6" action="{{route('create.admin')}}" method="POST">
+        <form class="mt-8 space-y-6" action="{{route('admin.admins.store')}}" method="POST">
             @csrf
             <div class="space-y-4 rounded-md shadow-sm">
                 <div>

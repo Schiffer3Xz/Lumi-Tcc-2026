@@ -17,7 +17,7 @@
                 <p class="text-slate-500 mt-1">Atualize as informações do seu registro no sistema.</p>
             </div>
 
-            <form action="{{ route('update.genres', $genre->id) }}" method="POST" class="space-y-6">
+            <form action="{{ route('admin.genres.update', $genre->id) }}" method="POST" class="space-y-6">
                 @csrf
                 @method('PUT')
 
@@ -40,7 +40,7 @@
                 </div>
 
                 <div class="flex flex-col sm:flex-row gap-3 pt-4">
-                    <a href="{{ route('categories') }}" 
+                    <a href="{{ route('admin.categories.index') }}"
                        class="w-full sm:w-auto px-6 py-3 text-center text-slate-600 font-medium hover:bg-slate-100 rounded-xl transition-colors">
                         Cancelar
                     </a>

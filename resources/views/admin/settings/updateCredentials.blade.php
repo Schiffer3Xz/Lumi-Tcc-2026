@@ -83,7 +83,7 @@
                 <h1 class="text-3xl font-black text-[#2d221b] mt-3 tracking-tight">Informações Pessoais</h1>
             </div>
 
-            <form class="space-y-8" action="{{route('update.profile')}}" method="POST">
+            <form class="space-y-8" action="{{route('admin.settings.profile.update')}}" method="POST">
                 @csrf
                 @method('PUT')
 
@@ -128,11 +128,11 @@
                         <i class="fa-solid fa-lock text-[#b08968]"></i> Gerenciamento de Acesso
                     </h2>
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <a href="{{ route('email.index') }}" class="btn-action w-full p-4 rounded-xl text-xs font-bold flex items-center justify-between">
+                        <a href="{{ route('admin.settings.email.edit') }}" class="btn-action w-full p-4 rounded-xl text-xs font-bold flex items-center justify-between">
                             <span>Alterar E-mail</span>
                             <i class="fa-solid fa-envelope"></i>
                         </a>
-                        <a href="{{ route('password.index') }}" class="btn-action w-full p-4 rounded-xl text-xs font-bold flex items-center justify-between">
+                        <a href="{{ route('admin.settings.password.edit') }}" class="btn-action w-full p-4 rounded-xl text-xs font-bold flex items-center justify-between">
                             <span>Redefinir Senha</span>
                             <i class="fa-solid fa-key"></i>
                         </a>
@@ -140,7 +140,7 @@
                 </div>
 
                 <div class="flex justify-end gap-3 pt-4">
-                   <a href="{{route('settings')}}" class="px-6 py-3 rounded-xl text-xs font-bold text-[#8c7462] hover:text-[#2d221b] transition-all text-center">
+                   <a href="{{route('admin.settings.index')}}" class="px-6 py-3 rounded-xl text-xs font-bold text-[#8c7462] hover:text-[#2d221b] transition-all text-center">
                         Voltar as Configurações
                     </a>
                     <button type="submit" class="px-8 py-3 rounded-xl text-xs font-bold bg-[#2d221b] text-[#d6c7b9] hover:bg-[#b08968] transition-all shadow-lg shadow-[#2d221b]/20">Salvar Alterações</button>

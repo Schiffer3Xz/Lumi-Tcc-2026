@@ -28,7 +28,7 @@
                     <i class="fa-solid fa-magnifying-glass absolute left-4 top-3.5 text-slate-400 group-focus-within:text-indigo-500 transition-colors"></i>
                     <input type="text" placeholder="Buscar título..." class="pl-12 pr-4 py-3 rounded-2xl border border-slate-200 bg-white shadow-sm focus:ring-4 focus:ring-indigo-100 focus:border-indigo-400 outline-none w-full lg:w-72 transition-all">
                 </div>
-                <a href="{{ route('adminPanel') }}" class="flex items-center gap-2 bg-white px-5 py-3 rounded-2xl border border-slate-200 text-slate-600 font-semibold hover:bg-slate-50 hover:border-slate-300 transition-all">
+                <a href="{{ route('admin.dashboard') }}" class="flex items-center gap-2 bg-white px-5 py-3 rounded-2xl border border-slate-200 text-slate-600 font-semibold hover:bg-slate-50 hover:border-slate-300 transition-all">
                     <i class="fa-solid fa-arrow-left"></i> Voltar
                 </a>
             </div>

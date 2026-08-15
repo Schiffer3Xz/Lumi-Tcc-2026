@@ -57,7 +57,7 @@ class BookController extends Controller
             'cover_url' => $path,
         ]);
 
-        return redirect()->route('book')->with('success', 'Livro cadastrado com sucesso!');
+        return redirect()->route('admin.books.create')->with('success', 'Livro cadastrado com sucesso!');
     }
 
     public function list()
@@ -115,12 +115,12 @@ class BookController extends Controller
             'cover_url' => $path,
         ]);
 
-        return redirect()->route('books.list')->with('success', 'Livro atualizado com sucesso!');
+        return redirect()->route('admin.books.list')->with('success', 'Livro atualizado com sucesso!');
     }
 
     public function destroy($id){
         Book::where('id', $id)->delete();
 
-        return redirect()->route('books.list')->with('success', 'Livro deletado com sucesso!');
+        return redirect()->route('admin.books.list')->with('success', 'Livro deletado com sucesso!');
     }
 }

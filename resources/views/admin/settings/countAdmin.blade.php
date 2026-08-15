@@ -46,7 +46,7 @@
 
         <!-- Rodapé da Sidebar com Botão Voltar -->
         <div class="p-4 border-t border-[#382b22] bg-[#1c140f]">
-            <a href="{{ route('adminPanel') }}" class="flex items-center gap-2 text-xs text-[#a38875] hover:text-[#d6c7b9] transition-colors">
+            <a href="{{ route('admin.dashboard') }}" class="flex items-center gap-2 text-xs text-[#a38875] hover:text-[#d6c7b9] transition-colors">
                 <i class="fa-solid fa-arrow-left"></i> Voltar ao painel
             </a>
         </div>

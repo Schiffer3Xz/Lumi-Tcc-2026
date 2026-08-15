@@ -72,10 +72,10 @@ use Illuminate\Http\Request;
 
         if ($firstLogin) {
             $user->sendEmailVerificationNotification();
-            return redirect()->route('emailVerification');
+            return redirect()->route('admin.email-verification');
         }
 
-        return redirect()->route('adminPanel');
+        return redirect()->route('admin.dashboard');
     }
 
     public function updateProfile(Request $request){
@@ -93,7 +93,7 @@ use Illuminate\Http\Request;
 
         $user->save();
 
-        return redirect()->route('adminPanel');
+        return redirect()->route('admin.dashboard');
     }
 
     public function updateEmail(Request $request){
@@ -123,7 +123,7 @@ use Illuminate\Http\Request;
         
         $user->save();
 
-        return redirect()->route('adminPanel');
+        return redirect()->route('admin.dashboard');
     }
 
     public function createAdmin(Request $request){
@@ -143,7 +143,7 @@ use Illuminate\Http\Request;
             'first_login' => true,
         ]);
         
-        return redirect()->route('adminPanel')->with('success', 'Administrador cadastrado com sucesso!');
+        return redirect()->route('admin.dashboard')->with('success', 'Administrador cadastrado com sucesso!');
     }
     
 }

@@ -64,7 +64,7 @@
                     <h1 class="text-2xl font-black text-custom-title tracking-tight">Configurações Gerais</h1>
                     <p class="text-xs text-custom-body mt-0.5">Central de controle de perfil, acessos e auditoria da conta</p>
                 </div>
-                <a href="{{route('adminPanel')}}" class="inline-flex items-center justify-center gap-2 px-3.5 py-2 bg-custom-card border border-custom-card rounded-xl text-xs font-semibold text-[#2d221b] hover:bg-[#ebdccb] transition-all shadow-2xs">
+                <a href="{{route('admin.dashboard')}}" class="inline-flex items-center justify-center gap-2 px-3.5 py-2 bg-custom-card border border-custom-card rounded-xl text-xs font-semibold text-[#2d221b] hover:bg-[#ebdccb] transition-all shadow-2xs">
                     <i class="fa-solid fa-arrow-left text-[10px]"></i> Voltar ao Painel
                 </a>
             </div>
@@ -79,7 +79,7 @@
                         </div>
                     </div>
                     
-                    <a href="{{route('update.credentials')}}" class="group p-4 bg-white/60 border border-custom-card rounded-xl hover-card transition-all flex items-center justify-between gap-4">
+                    <a href="{{route('admin.credentials.edit')}}" class="group p-4 bg-white/60 border border-custom-card rounded-xl hover-card transition-all flex items-center justify-between gap-4">
                         <div class="flex items-center gap-3.5 min-w-0">
                             <div class="w-9 h-9 rounded-lg bg-[#b08968]/15 flex items-center justify-center text-[#b08968] shrink-0 group-hover:scale-105 transition-transform">
                                 <i class="fa-solid fa-user-pen text-xs"></i>
@@ -103,7 +103,7 @@
                     
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                        <!-- Card: Cadastrar Novo Admin -->
-                        <a href="{{route('create.admin.view')}}" class="group p-4 bg-white/60 border border-custom-card rounded-xl hover-card transition-all flex items-center justify-between gap-3">
+                        <a href="{{route('admin.admins.create')}}" class="group p-4 bg-white/60 border border-custom-card rounded-xl hover-card transition-all flex items-center justify-between gap-3">
                             <div class="flex items-center gap-3 min-w-0">
                                 <div class="w-8 h-8 rounded-lg bg-[#3a5a40]/15 flex items-center justify-center text-[#3a5a40] shrink-0">
                                     <i class="fa-solid fa-user-plus text-xs"></i>
@@ -117,7 +117,7 @@
                         </a>
 
                         <!-- Card: Listar Administradores -->
-                        <a href="{{route('list.admin')}}" class="group p-4 bg-white/60 border border-custom-card rounded-xl hover-card transition-all flex items-center justify-between gap-3">
+                        <a href="{{route('admin.admins.index')}}" class="group p-4 bg-white/60 border border-custom-card rounded-xl hover-card transition-all flex items-center justify-between gap-3">
                             <div class="flex items-center gap-3 min-w-0">
                                 <div class="w-8 h-8 rounded-lg bg-[#b08968]/15 flex items-center justify-center text-[#b08968] shrink-0">
                                     <i class="fa-solid fa-users-gear text-xs"></i>
