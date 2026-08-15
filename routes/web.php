@@ -47,19 +47,26 @@ Route::middleware('auth')->group(function () {
 
     Route::get('dashboard', function () {
         return Inertia::render('home', [
-                'books' => Book::with([
+            'books' => Book::with([
                 'author',
                 'genre',
                 'availability'
-                ])->get()->map(function ($book) {
-                $book->cover_url = $book->image
-                        ? asset('storage/' . $book->image)
-                        : null;
-
-                return $book;
-                }),
+            ])->get()->map(function ($book) {
+                return [
+                    'id' => $book->id,
+                    'title' => $book->title,
+                    'description' => $book->description,
+                    'rating' => $book->rating ?? 0,
+                    'cover_url' => $book->cover_url
+                        ? asset('storage/' . $book->cover_url)
+                        : null,
+                    'author' => $book->author,
+                    'genre' => $book->genre,
+                    'availability' => $book->availability,
+                ];
+            }),
         ]);
-        })->name('dashboard');
+    })->name('dashboard');
 
 
     Route::middleware(['redirectPanel', 'verified'])->group(function () {

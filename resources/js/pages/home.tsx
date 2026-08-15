@@ -1,18 +1,37 @@
-import React, { useState, useRef, useEffect } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Head, Link } from "@inertiajs/react";
 
-export default function Home({ books = [], auth }) {
+type Book = {
+  id: number;
+  title: string;
+  cover_url?: string | null;
+  rating?: number | string | null;
+};
+
+type AuthUser = {
+  name?: string;
+  email?: string;
+};
+
+type HomeProps = {
+  books?: Book[];
+  auth?: {
+    user?: AuthUser | null;
+  };
+};
+
+export default function Home({ books = [], auth }: HomeProps) {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [generoAtivo, setGeneroAtivo] = useState("Todos");
   const [profileOpen, setProfileOpen] = useState(false);
-  
-  const profileRef = useRef(null);
-  const user = auth?.user || { name: "Usuário", email: "" };
+
+  const profileRef = useRef<HTMLDivElement | null>(null);
+  const user = auth?.user ?? { name: "Usuário", email: "" };
 
   // Fecha o dropdown ao clicar fora dele
   useEffect(() => {
-    function handleClickOutside(event) {
-      if (profileRef.current && !profileRef.current.contains(event.target)) {
+    function handleClickOutside(event: MouseEvent) {
+      if (profileRef.current && !profileRef.current.contains(event.target as Node)) {
         setProfileOpen(false);
       }
     }
@@ -31,8 +50,8 @@ export default function Home({ books = [], auth }) {
 
   const NAV_ITEMS = [
     { id: "home", label: "Home", icon: "fa-solid fa-house", active: true },
-    { id: "biblioteca", label: "Biblioteca", icon: "fa-solid fa-book-open" },
-    { id: "usuarios", label: "Usuários", icon: "fa-solid fa-users" },
+    { id: "biblioteca", label: "Catálogo", icon: "fa-solid fa-book-open" },
+    { id: "usuarios", label: "Social", icon: "fa-solid fa-users" },
     { id: "config", label: "Config", icon: "fa-solid fa-gear" },
   ];
 
@@ -44,7 +63,7 @@ export default function Home({ books = [], auth }) {
 
   // 4 livros melhores avaliados — ordena por rating decrescente
   const topRatedBooks = [...books]
-    .sort((a, b) => (b.rating || 0) - (a.rating || 0))
+    .sort((a, b) => Number(b.rating || 0) - Number(a.rating || 0))
     .slice(0, 4);
 
   return (
@@ -114,23 +133,15 @@ export default function Home({ books = [], auth }) {
                 </button>
                 <div>
                   <h1 className="text-xl sm:text-2xl font-bold text-gray-800">
-                    Sala de Leitura
+                    Lumi, Seu catálogo está aqui!
                   </h1>
                   <p className="text-xs sm:text-sm text-gray-400 hidden sm:block">
-                    Plataforma Escolar Web
+                    Etec João Belarmino
                   </p>
                 </div>
               </div>
               
               <div className="flex items-center gap-3 sm:gap-4">
-                {/* Status */}
-                <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 bg-gray-100 rounded-full">
-                  <i className="fa-solid fa-trophy text-yellow-500 text-xs" />
-                  <span className="text-xs font-medium text-gray-700">
-                    Estado: Usuário Logado
-                  </span>
-                  <i className="fa-solid fa-chevron-down text-[10px] text-gray-400" />
-                </div>
                 
                 {/* Notificações */}
                 <button className="relative p-2 rounded-lg hover:bg-gray-100 text-gray-600 transition-colors">
@@ -161,6 +172,14 @@ export default function Home({ books = [], auth }) {
                         <p className="text-sm font-semibold text-gray-800 truncate">{user.name}</p>
                       </div>
                       
+                     <Link
+                        href={route('profile.edit')}
+                        className="w-full text-left flex items-center gap-2 px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-100 transition-colors font-medium rounded-lg"
+                      >
+                        <i className="fa-solid fa-gear text-xs text-slate-500" />
+                        Configurações
+                      </Link>
+
                       <Link
                         href={route('logout')}
                         method="post"
@@ -256,7 +275,7 @@ export default function Home({ books = [], auth }) {
                     Ver todos
                   </a>
                 </div>
-                {topRatedBooks.length > 0 ? (
+                {books.length > 0 ? (
                   <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 mb-8">
                     {topRatedBooks.map((book) => (
                       <div
@@ -270,7 +289,6 @@ export default function Home({ books = [], auth }) {
                             className="w-full h-full object-cover"
                           />
                         ) : (
-                          /* Placeholder elegante caso o livro não possua capa cadastrada */
                           <div className="w-full h-full flex flex-col items-center justify-center p-4 text-center bg-gradient-to-b from-[#1A2332] to-[#253248]">
                             <i className="fa-solid fa-book text-3xl text-yellow-300/40 mb-2" />
                             <span className="text-xs font-semibold text-white/80 line-clamp-3 px-2">
