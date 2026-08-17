@@ -1,37 +1,18 @@
 import { useEffect, useRef, useState } from "react";
 import { Head, Link } from "@inertiajs/react";
 
-type Book = {
-  id: number;
-  title: string;
-  cover_url?: string | null;
-  rating?: number | string | null;
-};
-
-type AuthUser = {
-  name?: string;
-  email?: string;
-};
-
-type HomeProps = {
-  books?: Book[];
-  auth?: {
-    user?: AuthUser | null;
-  };
-};
-
-export default function Home({ books = [], auth }: HomeProps) {
+export default function Home({ books = [], auth }) {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [generoAtivo, setGeneroAtivo] = useState("Todos");
   const [profileOpen, setProfileOpen] = useState(false);
 
-  const profileRef = useRef<HTMLDivElement | null>(null);
+  const profileRef = useRef(null);
   const user = auth?.user ?? { name: "Usuário", email: "" };
 
   // Fecha o dropdown ao clicar fora dele
   useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
-      if (profileRef.current && !profileRef.current.contains(event.target as Node)) {
+    function handleClickOutside(event) {
+      if (profileRef.current && !profileRef.current.contains(event.target)) {
         setProfileOpen(false);
       }
     }
@@ -49,10 +30,10 @@ export default function Home({ books = [], auth }: HomeProps) {
   ];
 
   const NAV_ITEMS = [
-    { id: "home", label: "Home", icon: "fa-solid fa-house", active: true },
-    { id: "biblioteca", label: "Catálogo", icon: "fa-solid fa-book-open" },
-    { id: "usuarios", label: "Social", icon: "fa-solid fa-users" },
-    { id: "config", label: "Config", icon: "fa-solid fa-gear" },
+    { id: "home", label: "Home", icon: "fa-solid fa-house", href: route("dashboard"), active: true },
+    { id: "biblioteca", label: "Catálogo", icon: "fa-solid fa-book-open", href: route("catalogo") },
+    { id: "usuarios", label: "Social", icon: "fa-solid fa-users", href: route("teste") },
+    { id: "config", label: "Config", icon: "fa-solid fa-gear", href: route("catalogo") },
   ];
 
   const QUICK_ACCESS = [
@@ -96,8 +77,9 @@ export default function Home({ books = [], auth }: HomeProps) {
           {/* Navegação */}
           <nav className="flex flex-col gap-3 flex-1">
             {NAV_ITEMS.map((item) => (
-              <button
+              <Link
                 key={item.id}
+                href={item.href}
                 className={`relative flex flex-col items-center gap-1 p-3 rounded-xl transition-all duration-200 ${
                   item.active
                     ? "bg-yellow-300/10 text-yellow-300"
@@ -110,7 +92,7 @@ export default function Home({ books = [], auth }: HomeProps) {
                 )}
                 <i className={`${item.icon} text-lg`} />
                 <span className="text-[10px] font-medium">{item.label}</span>
-              </button>
+              </Link>
             ))}
           </nav>
           {/* Config no rodapé */}
@@ -172,7 +154,7 @@ export default function Home({ books = [], auth }: HomeProps) {
                         <p className="text-sm font-semibold text-gray-800 truncate">{user.name}</p>
                       </div>
                       
-                     <Link
+                      <Link
                         href={route('profile.edit')}
                         className="w-full text-left flex items-center gap-2 px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-100 transition-colors font-medium rounded-lg"
                       >

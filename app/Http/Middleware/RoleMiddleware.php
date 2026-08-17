@@ -6,7 +6,7 @@ use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class AdminMiddleware
+class RoleMiddleware
 {
     /**
      * Handle an incoming request.
@@ -29,11 +29,6 @@ class AdminMiddleware
                 return redirect()->route('dashboard');
             }
         }
-
-        if(auth()->user()->first_login && !$request->routeIs('admin.first-login') && !$request->routeIs('admin.credentials.update')){
-                return redirect()->route('admin.first-login');
-            }
-
     return $next($request);
     }
 }

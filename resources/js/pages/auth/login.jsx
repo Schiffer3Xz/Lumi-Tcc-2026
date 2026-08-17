@@ -1,6 +1,6 @@
-import { Head, useForm } from '@inertiajs/react';
+import { Head, Link, useForm } from '@inertiajs/react';
 import { LoaderCircle, Mail, Lock, Eye, EyeOff, LogIn, ShieldCheck } from 'lucide-react';
-import { FormEventHandler, useState } from 'react';
+import { useState } from 'react';
 
 import InputError from '@/components/input-error';
 import TextLink from '@/components/text-link';
@@ -9,28 +9,16 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 
-interface LoginForm {
-    email: string;
-    password: string;
-    remember: boolean;
-    [key: string]: string | boolean;
-}
-
-interface LoginProps {
-    status?: string;
-    canResetPassword: boolean;
-}
-
-export default function Login({ status, canResetPassword }: LoginProps) {
+export default function Login({ status, canResetPassword }) {
     const [showPassword, setShowPassword] = useState(false);
-    
-    const { data, setData, post, processing, errors, reset } = useForm<LoginForm>({
+
+    const { data, setData, post, processing, errors, reset } = useForm({
         email: '',
         password: '',
         remember: false,
     });
 
-    const submit: FormEventHandler = (e) => {
+    const submit = (e) => {
         e.preventDefault();
         post(route('login'), {
             onFinish: () => reset('password'),
@@ -41,15 +29,11 @@ export default function Login({ status, canResetPassword }: LoginProps) {
         <div className="min-h-screen w-full flex items-center justify-center bg-gradient-to-br from-slate-100 via-blue-50/50 to-slate-200 relative overflow-hidden p-4">
             <Head title="Log in" />
 
-            {/* Elementos decorativos de fundo */}
             <div className="absolute -top-24 -left-24 w-96 h-96 rounded-full bg-blue-100/60 blur-3xl pointer-events-none" />
             <div className="absolute top-1/4 -right-20 w-80 h-80 rounded-full bg-indigo-100/40 blur-3xl pointer-events-none" />
             <div className="absolute -bottom-20 right-10 w-96 h-96 rounded-full bg-blue-200/30 blur-3xl pointer-events-none" />
 
-            {/* Card Principal Centralizado */}
             <div className="w-full max-w-md bg-white/90 backdrop-blur-xl rounded-3xl shadow-[0_20px_50px_rgba(8_112_184|0.07)] border border-white/80 p-8 relative z-10 my-8">
-                
-                {/* Logo e Cabeçalho */}
                 <div className="flex flex-col items-center text-center mb-8">
                     <div className="w-14 h-14 rounded-2xl bg-gradient-to-tr from-blue-600 to-indigo-600 flex items-center justify-center shadow-lg shadow-blue-500/20 text-white mb-4">
                         <svg className="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -60,7 +44,6 @@ export default function Login({ status, canResetPassword }: LoginProps) {
                     <p className="text-sm text-slate-500 mt-0.5">Plataforma Escolar Web</p>
                 </div>
 
-                {/* Abas Alternativas (Entrar / Criar Conta) */}
                 <div className="flex bg-slate-100/80 p-1 rounded-full mb-6">
                     <button
                         type="button"
@@ -83,8 +66,6 @@ export default function Login({ status, canResetPassword }: LoginProps) {
                 )}
 
                 <form className="flex flex-col gap-5" onSubmit={submit}>
-                    
-                    {/* Campo de E-mail */}
                     <div className="grid gap-1.5">
                         <Label htmlFor="email" className="text-xs font-semibold text-slate-700">
                             E-mail Escolar
@@ -109,7 +90,6 @@ export default function Login({ status, canResetPassword }: LoginProps) {
                         <InputError message={errors.email} />
                     </div>
 
-                    {/* Campo de Senha */}
                     <div className="grid gap-1.5">
                         <div className="flex items-center justify-between">
                             <Label htmlFor="password" className="text-xs font-semibold text-slate-700">
@@ -147,7 +127,6 @@ export default function Login({ status, canResetPassword }: LoginProps) {
                         <InputError message={errors.password} />
                     </div>
 
-                    {/* Lembrar-me */}
                     <div className="flex items-center space-x-2 pt-1">
                         <Checkbox id="remember" name="remember" tabIndex={3} className="rounded border-slate-300 text-blue-600 focus:ring-blue-500" />
                         <Label htmlFor="remember" className="text-xs text-slate-600 font-normal cursor-pointer">
@@ -155,7 +134,6 @@ export default function Login({ status, canResetPassword }: LoginProps) {
                         </Label>
                     </div>
 
-                    {/* Botão de Entrar Estilizado */}
                     <Button
                         type="submit"
                         className="mt-2 w-full h-11 bg-amber-300 hover:bg-amber-400 text-slate-900 font-semibold rounded-xl shadow-[0_4px_20px_rgba(252,211,77,0.4)] transition-all flex items-center justify-center gap-2"
@@ -173,7 +151,6 @@ export default function Login({ status, canResetPassword }: LoginProps) {
                     </Button>
                 </form>
 
-                {/* Cadastre-se */}
                 <div className="text-center text-xs text-slate-500 mt-6">
                     Não tem uma conta?{' '}
                     <TextLink href={route('register')} className="text-slate-900 font-semibold underline underline-offset-2" tabIndex={5}>
@@ -181,7 +158,6 @@ export default function Login({ status, canResetPassword }: LoginProps) {
                     </TextLink>
                 </div>
 
-                {/* Divisor */}
                 <div className="relative my-6">
                     <div className="absolute inset-0 flex items-center">
                         <div className="w-full border-t border-slate-200/80" />
@@ -191,22 +167,21 @@ export default function Login({ status, canResetPassword }: LoginProps) {
                     </div>
                 </div>
 
-                {/* Botão Secundário / Conexão Segura */}
                 <div className="flex flex-col gap-3">
-                    <button
+                    <Link
                         type="button"
+                        href={route('dashboard')}
                         className="w-full h-10 border border-slate-200 hover:bg-slate-50 text-slate-700 text-xs font-medium rounded-xl transition-all flex items-center justify-center gap-2"
                     >
                         <Eye className="w-3.5 h-3.5 text-slate-400" />
                         Entrar sem conta
-                    </button>
+                    </Link>
 
                     <div className="flex items-center justify-center gap-1.5 text-[11px] text-slate-400 pt-2">
                         <ShieldCheck className="w-3.5 h-3.5 text-emerald-500" />
                         <span>Conexão Segura e Dados Protegidos (LGPD)</span>
                     </div>
                 </div>
-
             </div>
         </div>
     );

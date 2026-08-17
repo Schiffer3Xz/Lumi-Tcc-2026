@@ -44,6 +44,7 @@ use Illuminate\Http\Request;
     }
 
 
+    //Update do first Access
     public function update(Request $request){
         $request->validate([
             'name' => 'required|string|max:255',
@@ -78,6 +79,8 @@ use Illuminate\Http\Request;
         return redirect()->route('admin.dashboard');
     }
 
+
+    //Update do Perfil ja logado
     public function updateProfile(Request $request){
         $request->validate([
             'name' => 'required|string|max:255',

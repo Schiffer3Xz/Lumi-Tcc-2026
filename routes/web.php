@@ -22,7 +22,38 @@ Route::get('/', function () {
 })->name('home');
 
 
+
+Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
+
+
+
+Route::get('catalogo', function () {
+    $books = Book::with(['author', 'genre', 'availability'])
+        ->get()
+        ->map(function ($book) {
+            return [
+                'id' => $book->id,
+                'title' => $book->title,
+                'description' => $book->description,
+                'rating' => $book->rating ?? 0,
+                'cover_url' => $book->cover_url ? asset('storage/' . $book->cover_url) : null,
+                'author' => $book->author,
+                'genre' => $book->genre,
+                'availability' => $book->availability,
+            ];
+        });
+
+    return Inertia::render('catalogo', [
+        'books' => $books,
+    ]);
+})->name('catalogo'); 
+
+
+
 Route::middleware('auth')->group(function () {
+
+    Route::get('teste', [DashboardController::class, 'teste'])->name('teste');
+
 
     // ============================================================
     // FIRST ACCESS
@@ -34,9 +65,6 @@ Route::middleware('auth')->group(function () {
     Route::get('admin/verification', [AdminSettingsController::class, 'emailVerification'])
         ->name('admin.email-verification');
 
-    Route::get('admin/credentials', [AdminSettingsController::class, 'create'])
-        ->name('admin.credentials.edit');
-
     Route::post('admin/credentials', [AdminSettingsController::class, 'update'])
         ->name('admin.credentials.update');
 
@@ -45,34 +73,11 @@ Route::middleware('auth')->group(function () {
     // USER
     // ============================================================
 
-    Route::get('dashboard', function () {
-        return Inertia::render('home', [
-            'books' => Book::with([
-                'author',
-                'genre',
-                'availability'
-            ])->get()->map(function ($book) {
-                return [
-                    'id' => $book->id,
-                    'title' => $book->title,
-                    'description' => $book->description,
-                    'rating' => $book->rating ?? 0,
-                    'cover_url' => $book->cover_url
-                        ? asset('storage/' . $book->cover_url)
-                        : null,
-                    'author' => $book->author,
-                    'genre' => $book->genre,
-                    'availability' => $book->availability,
-                ];
-            }),
-        ]);
-    })->name('dashboard');
-
 
     Route::middleware(['redirectPanel', 'verified'])->group(function () {
 
         // ========================================================
-        // DASHBOARD
+        // ADMINISTRATOR
         // ========================================================
 
         Route::get('admin/dashboard', [AdminDashboardController::class, 'index'])
@@ -208,6 +213,9 @@ Route::middleware('auth')->group(function () {
         // Profile
         Route::put('admin/settings/profile', [AdminSettingsController::class, 'updateProfile'])
             ->name('admin.settings.profile.update');
+
+        Route::get('admin/settings/profile', [AdminSettingsController::class, 'create'])
+        ->name('admin.credentials.edit');
     });
 });
 
