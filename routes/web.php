@@ -21,8 +21,24 @@ Route::get('/', function () {
     return Inertia::render('welcome');
 })->name('home');
 
+// ============================================================
+// FIRST ACCESS
+// ============================================================
 
-Route::middleware(['redirectPanel'])->group(function () {
+
+Route::middleware('auth')->group(function () {
+    Route::get('admin/first-login', [AdminSettingsController::class, 'firstLogin'])
+        ->name('admin.first-login');
+
+    Route::get('admin/verification', [AdminSettingsController::class, 'emailVerification'])
+        ->name('admin.email-verification');
+
+    Route::post('admin/credentials', [AdminSettingsController::class, 'update'])
+        ->name('admin.credentials.update');
+});
+
+
+Route::middleware(['RoleMiddleware'])->group(function () {
     Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
 
@@ -55,21 +71,6 @@ Route::middleware(['redirectPanel'])->group(function () {
 
 
         // ============================================================
-        // FIRST ACCESS
-        // ============================================================
-
-
-        Route::get('admin/first-login', [AdminSettingsController::class, 'firstLogin'])
-            ->name('admin.first-login');
-
-        Route::get('admin/verification', [AdminSettingsController::class, 'emailVerification'])
-            ->name('admin.email-verification');
-
-        Route::post('admin/credentials', [AdminSettingsController::class, 'update'])
-            ->name('admin.credentials.update');
-
-
-        // ============================================================
         // USER
         // ============================================================
 
@@ -83,7 +84,7 @@ Route::middleware(['redirectPanel'])->group(function () {
         // ========================================================
 
 
-        Route::middleware(['firstLogin', 'verified'])->group(function () {
+        Route::middleware(['FirstLoginMiddleware', 'verified'])->group(function () {
 
             Route::get('admin/dashboard', [AdminDashboardController::class, 'index'])
                 ->name('admin.dashboard');
