@@ -22,203 +22,209 @@ Route::get('/', function () {
 })->name('home');
 
 
-
-Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
-
-
-
-Route::get('catalogo', function () {
-    $books = Book::with(['author', 'genre', 'availability'])
-        ->get()
-        ->map(function ($book) {
-            return [
-                'id' => $book->id,
-                'title' => $book->title,
-                'description' => $book->description,
-                'rating' => $book->rating ?? 0,
-                'cover_url' => $book->cover_url ? asset('storage/' . $book->cover_url) : null,
-                'author' => $book->author,
-                'genre' => $book->genre,
-                'availability' => $book->availability,
-            ];
-        });
-
-    return Inertia::render('catalogo', [
-        'books' => $books,
-    ]);
-})->name('catalogo'); 
+Route::middleware(['redirectPanel'])->group(function () {
+    Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
 
+    Route::get('catalogo', function () {
+        $books = Book::with(['author', 'genre', 'availability'])
+            ->get()
+            ->map(function ($book) {
+                return [
+                    'id' => $book->id,
+                    'title' => $book->title,
+                    'description' => $book->description,
+                    'rating' => $book->rating ?? 0,
+                    'cover_url' => $book->cover_url ? asset('storage/' . $book->cover_url) : null,
+                    'author' => $book->author,
+                    'genre' => $book->genre,
+                    'availability' => $book->availability,
+                ];
+            });
 
-Route::middleware('auth')->group(function () {
-
-    Route::get('teste', [DashboardController::class, 'teste'])->name('teste');
-
-
-    // ============================================================
-    // FIRST ACCESS
-    // ============================================================
-
-    Route::get('admin/first-login', [AdminSettingsController::class, 'firstLogin'])
-        ->name('admin.first-login');
-
-    Route::get('admin/verification', [AdminSettingsController::class, 'emailVerification'])
-        ->name('admin.email-verification');
-
-    Route::post('admin/credentials', [AdminSettingsController::class, 'update'])
-        ->name('admin.credentials.update');
-
-
-    // ============================================================
-    // USER
-    // ============================================================
+        return Inertia::render('catalogo', [
+            'books' => $books,
+        ]);
+    })->name('catalogo');
 
 
-    Route::middleware(['redirectPanel', 'verified'])->group(function () {
+
+    Route::middleware('auth')->group(function () {
+
+        Route::get('teste', [DashboardController::class, 'teste'])->name('teste');
+
+
+        // ============================================================
+        // FIRST ACCESS
+        // ============================================================
+
+
+        Route::get('admin/first-login', [AdminSettingsController::class, 'firstLogin'])
+            ->name('admin.first-login');
+
+        Route::get('admin/verification', [AdminSettingsController::class, 'emailVerification'])
+            ->name('admin.email-verification');
+
+        Route::post('admin/credentials', [AdminSettingsController::class, 'update'])
+            ->name('admin.credentials.update');
+
+
+        // ============================================================
+        // USER
+        // ============================================================
+
+        //Todo
+
+
+
 
         // ========================================================
         // ADMINISTRATOR
         // ========================================================
 
-        Route::get('admin/dashboard', [AdminDashboardController::class, 'index'])
-            ->name('admin.dashboard');
+
+        Route::middleware(['firstLogin', 'verified'])->group(function () {
+
+            Route::get('admin/dashboard', [AdminDashboardController::class, 'index'])
+                ->name('admin.dashboard');
 
 
-        // ========================================================
-        // CATEGORIES
-        // ========================================================
+            // ========================================================
+            // CATEGORIES
+            // ========================================================
 
-        // Categories
-        Route::get('admin/categories', [AdminCategoriesController::class, 'index'])
-            ->name('admin.categories.index');
-
-
-        // Genres
-        Route::get('admin/categories/genres', [GenreController::class, 'index'])
-            ->name('admin.genres.index');
-
-        Route::get('admin/categories/genres/{id}/edit', [GenreController::class, 'edit'])
-            ->name('admin.genres.edit');
-
-        Route::post('admin/categories/genres', [GenreController::class, 'store'])
-            ->name('admin.genres.store');
-
-        Route::put('admin/categories/genres/{id}', [GenreController::class, 'update'])
-            ->name('admin.genres.update');
-
-        Route::delete('admin/categories/genres/{id}', [GenreController::class, 'destroy'])
-            ->name('admin.genres.destroy');
+            // Categories
+            Route::get('admin/categories', [AdminCategoriesController::class, 'index'])
+                ->name('admin.categories.index');
 
 
-        // Authors
-        Route::get('admin/categories/authors', [AuthorController::class, 'index'])
-            ->name('admin.authors.index');
+            // Genres
+            Route::get('admin/categories/genres', [GenreController::class, 'index'])
+                ->name('admin.genres.index');
 
-        Route::get('admin/categories/authors/{id}/edit', [AuthorController::class, 'edit'])
-            ->name('admin.authors.edit');
+            Route::get('admin/categories/genres/{id}/edit', [GenreController::class, 'edit'])
+                ->name('admin.genres.edit');
 
-        Route::post('admin/categories/authors', [AuthorController::class, 'store'])
-            ->name('admin.authors.store');
+            Route::post('admin/categories/genres', [GenreController::class, 'store'])
+                ->name('admin.genres.store');
 
-        Route::put('admin/categories/authors/{id}', [AuthorController::class, 'update'])
-            ->name('admin.authors.update');
+            Route::put('admin/categories/genres/{id}', [GenreController::class, 'update'])
+                ->name('admin.genres.update');
 
-        Route::delete('admin/categories/authors/{id}', [AuthorController::class, 'destroy'])
-            ->name('admin.authors.destroy');
-
-
-        // Availability
-        Route::get('admin/categories/availability', [AvailabilityController::class, 'index'])
-            ->name('admin.availability.index');
-
-        Route::get('admin/categories/availability/{id}/edit', [AvailabilityController::class, 'edit'])
-            ->name('admin.availability.edit');
-
-        Route::post('admin/categories/availability', [AvailabilityController::class, 'store'])
-            ->name('admin.availability.store');
-
-        Route::put('admin/categories/availability/{id}', [AvailabilityController::class, 'update'])
-            ->name('admin.availability.update');
-
-        Route::delete('admin/categories/availability/{id}', [AvailabilityController::class, 'destroy'])
-            ->name('admin.availability.destroy');
+            Route::delete('admin/categories/genres/{id}', [GenreController::class, 'destroy'])
+                ->name('admin.genres.destroy');
 
 
-        // ========================================================
-        // CATALOG
-        // ========================================================
+            // Authors
+            Route::get('admin/categories/authors', [AuthorController::class, 'index'])
+                ->name('admin.authors.index');
 
-        // Catalog
-        Route::get('admin/catalog', [AdminCatalogController::class, 'index'])
-            ->name('admin.catalog.index');
+            Route::get('admin/categories/authors/{id}/edit', [AuthorController::class, 'edit'])
+                ->name('admin.authors.edit');
 
+            Route::post('admin/categories/authors', [AuthorController::class, 'store'])
+                ->name('admin.authors.store');
 
-        // Books
-        Route::get('admin/catalog/books', [BookController::class, 'index'])
-            ->name('admin.books.index');
+            Route::put('admin/categories/authors/{id}', [AuthorController::class, 'update'])
+                ->name('admin.authors.update');
 
-        Route::get('admin/catalog/books/create', [BookController::class, 'updateView'])
-            ->name('admin.books.create');
-
-        Route::get('admin/catalog/books/list', [BookController::class, 'list'])
-            ->name('admin.books.list');
-
-        Route::get('admin/catalog/books/{id}/edit', [BookController::class, 'edit'])
-            ->name('admin.books.edit');
-
-        Route::post('admin/catalog/books', [BookController::class, 'store'])
-            ->name('admin.books.store');
-
-        Route::put('admin/catalog/books/{id}', [BookController::class, 'update'])
-            ->name('admin.books.update');
-
-        Route::delete('admin/catalog/books/{id}', [BookController::class, 'destroy'])
-            ->name('admin.books.destroy');
+            Route::delete('admin/categories/authors/{id}', [AuthorController::class, 'destroy'])
+                ->name('admin.authors.destroy');
 
 
-        // ========================================================
-        // SETTINGS
-        // ========================================================
+            // Availability
+            Route::get('admin/categories/availability', [AvailabilityController::class, 'index'])
+                ->name('admin.availability.index');
 
-        Route::get('admin/settings', [AdminSettingsController::class, 'index'])
-            ->name('admin.settings.index');
+            Route::get('admin/categories/availability/{id}/edit', [AvailabilityController::class, 'edit'])
+                ->name('admin.availability.edit');
 
-        // Admin management
-        Route::get('admin/settings/admins/create', [AdminSettingsController::class, 'adminView'])
-            ->name('admin.admins.create');
+            Route::post('admin/categories/availability', [AvailabilityController::class, 'store'])
+                ->name('admin.availability.store');
 
-        Route::get('admin/settings/admins', [AdminSettingsController::class, 'adminCount'])
-            ->name('admin.admins.index');
+            Route::put('admin/categories/availability/{id}', [AvailabilityController::class, 'update'])
+                ->name('admin.availability.update');
 
-        Route::post('admin/settings/admins', [AdminSettingsController::class, 'createAdmin'])
-            ->name('admin.admins.store');
-
-
-        // Email
-        Route::get('admin/settings/email', [AdminSettingsController::class, 'editEmail'])
-            ->name('admin.settings.email.edit');
-
-        Route::put('admin/settings/email', [AdminSettingsController::class, 'updateEmail'])
-            ->name('admin.settings.email.update');
+            Route::delete('admin/categories/availability/{id}', [AvailabilityController::class, 'destroy'])
+                ->name('admin.availability.destroy');
 
 
-        // Password
-        Route::get('admin/settings/password', [AdminSettingsController::class, 'editPassword'])
-            ->name('admin.settings.password.edit');
+            // ========================================================
+            // CATALOG
+            // ========================================================
 
-        Route::put('admin/settings/password', [AdminSettingsController::class, 'updatePassword'])
-            ->name('admin.settings.password.update');
+            // Catalog
+            Route::get('admin/catalog', [AdminCatalogController::class, 'index'])
+                ->name('admin.catalog.index');
 
 
-        // Profile
-        Route::put('admin/settings/profile', [AdminSettingsController::class, 'updateProfile'])
-            ->name('admin.settings.profile.update');
+            // Books
+            Route::get('admin/catalog/books', [BookController::class, 'index'])
+                ->name('admin.books.index');
 
-        Route::get('admin/settings/profile', [AdminSettingsController::class, 'create'])
-        ->name('admin.credentials.edit');
+            Route::get('admin/catalog/books/create', [BookController::class, 'updateView'])
+                ->name('admin.books.create');
+
+            Route::get('admin/catalog/books/list', [BookController::class, 'list'])
+                ->name('admin.books.list');
+
+            Route::get('admin/catalog/books/{id}/edit', [BookController::class, 'edit'])
+                ->name('admin.books.edit');
+
+            Route::post('admin/catalog/books', [BookController::class, 'store'])
+                ->name('admin.books.store');
+
+            Route::put('admin/catalog/books/{id}', [BookController::class, 'update'])
+                ->name('admin.books.update');
+
+            Route::delete('admin/catalog/books/{id}', [BookController::class, 'destroy'])
+                ->name('admin.books.destroy');
+
+
+            // ========================================================
+            // SETTINGS
+            // ========================================================
+
+            Route::get('admin/settings', [AdminSettingsController::class, 'index'])
+                ->name('admin.settings.index');
+
+            // Admin management
+            Route::get('admin/settings/admins/create', [AdminSettingsController::class, 'adminView'])
+                ->name('admin.admins.create');
+
+            Route::get('admin/settings/admins', [AdminSettingsController::class, 'adminCount'])
+                ->name('admin.admins.index');
+
+            Route::post('admin/settings/admins', [AdminSettingsController::class, 'createAdmin'])
+                ->name('admin.admins.store');
+
+
+            // Email
+            Route::get('admin/settings/email', [AdminSettingsController::class, 'editEmail'])
+                ->name('admin.settings.email.edit');
+
+            Route::put('admin/settings/email', [AdminSettingsController::class, 'updateEmail'])
+                ->name('admin.settings.email.update');
+
+
+            // Password
+            Route::get('admin/settings/password', [AdminSettingsController::class, 'editPassword'])
+                ->name('admin.settings.password.edit');
+
+            Route::put('admin/settings/password', [AdminSettingsController::class, 'updatePassword'])
+                ->name('admin.settings.password.update');
+
+
+            // Profile
+            Route::put('admin/settings/profile', [AdminSettingsController::class, 'updateProfile'])
+                ->name('admin.settings.profile.update');
+
+            Route::get('admin/settings/profile', [AdminSettingsController::class, 'create'])
+                ->name('admin.credentials.edit');
+        });
     });
 });
 
 
-require __DIR__.'/settings.php';
-require __DIR__.'/auth.php';
+require __DIR__ . '/settings.php';
+require __DIR__ . '/auth.php';

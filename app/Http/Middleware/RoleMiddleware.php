@@ -29,7 +29,7 @@ class RoleMiddleware
                 return redirect()->route('dashboard');
             }
         }
-    return $next($request);
+        
+        return $next($request);
     }
 }
-

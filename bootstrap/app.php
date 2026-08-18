@@ -19,6 +19,7 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
         $middleware->alias([
             'redirectPanel' => \App\Http\Middleware\RoleMiddleware::class,
+            'firstLogin' => \App\Http\Middleware\FirstLoginMiddleware::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
