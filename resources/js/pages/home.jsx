@@ -32,8 +32,8 @@ export default function Home({ books = [], auth }) {
   const NAV_ITEMS = [
     { id: "home", label: "Home", icon: "fa-solid fa-house", href: route("dashboard"), active: true },
     { id: "biblioteca", label: "Catálogo", icon: "fa-solid fa-book-open", href: route("catalogo") },
-    { id: "usuarios", label: "Social", icon: "fa-solid fa-users", href: route("teste") },
-    { id: "config", label: "Config", icon: "fa-solid fa-gear", href: route("catalogo") },
+    { id: "usuarios", label: "Social", icon: "fa-solid fa-users", href: route("list") },
+    { id: "config", label: "Config", icon: "fa-solid fa-gear", href: route("profile") },
   ];
 
   const QUICK_ACCESS = [
@@ -115,10 +115,10 @@ export default function Home({ books = [], auth }) {
                 </button>
                 <div>
                   <h1 className="text-xl sm:text-2xl font-bold text-gray-800">
-                    Lumi, Seu catálogo está aqui!
+                    Descubra sua próxima história.
                   </h1>
                   <p className="text-xs sm:text-sm text-gray-400 hidden sm:block">
-                    Etec João Belarmino
+                    Explore nosso catálogo e encontre livros que combinam com você.
                   </p>
                 </div>
               </div>
@@ -218,13 +218,7 @@ export default function Home({ books = [], auth }) {
                     </button>
                   ))}
                 </div>
-                {/* ==================== POPULARES + CARD DE PROGRESSO ==================== */}
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-lg font-bold text-gray-800">Populares</h3>
-                  <a href="#" className="text-sm font-medium text-[#81A9D4] hover:text-[#6B9AC4] transition-colors">
-                    Ver todos
-                  </a>
-                </div>
+                {/* ==================== CARD DE PROGRESSO ==================== */}
                 {/* Card de Progresso Atual */}
                 <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-[#81A9D4] to-[#6B9AC4] p-6 sm:p-8 shadow-lg mb-8">
                   <div className="absolute -right-8 -top-8 w-32 h-32 rounded-full bg-white/10" />
@@ -253,7 +247,7 @@ export default function Home({ books = [], auth }) {
                 {/* ==================== 4 LIVROS MELHORES AVALIADOS ==================== */}
                 <div className="flex items-center justify-between mb-4">
                   <h3 className="text-lg font-bold text-gray-800">Melhores Avaliados</h3>
-                  <a href="#" className="text-sm font-medium text-[#81A9D4] hover:text-[#6B9AC4] transition-colors">
+                  <a href="route('catalogo')" className="text-sm font-medium text-[#81A9D4] hover:text-[#6B9AC4] transition-colors">
                     Ver todos
                   </a>
                 </div>

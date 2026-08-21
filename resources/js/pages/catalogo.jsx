@@ -26,15 +26,15 @@ export default function Home({ books = [], auth }) {
     { label: "Ficção", icon: "fa-solid fa-khanda" },
     { label: "Romance", icon: "fa-solid fa-heart" },
     { label: "Fantasia", icon: "fa-solid fa-chess-rook" },
-    { label: "Mangá", icon: "fa-solid fa-torii-gate" },
+    { label: "Terror", icon: "fa-solid fa-torii-gate" },
     { label: "História", icon: "fa-solid fa-scroll" },
   ];
 
   const NAV_ITEMS = [
     { id: "home", label: "Home", icon: "fa-solid fa-house", href: route("dashboard") },
     { id: "biblioteca", label: "Catálogo", icon: "fa-solid fa-book-open", href: route("catalogo"), active: true },
-    { id: "usuarios", label: "Social", icon: "fa-solid fa-users", href: route("catalogo") },
-    { id: "config", label: "Config", icon: "fa-solid fa-gear", href: route("catalogo") },
+    { id: "usuarios", label: "Social", icon: "fa-solid fa-users", href: route("list") },
+    { id: "config", label: "Config", icon: "fa-solid fa-gear", href: route("profile") },
   ];
 
   // Helper para extrair o nome do gênero com suporte a objeto ou string

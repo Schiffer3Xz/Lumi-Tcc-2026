@@ -33,11 +33,7 @@ class DashboardController extends Controller
         ]);
     }
 
-    public function teste(){
-        return Inertia::render('teste');
-    }
-
-
+    
     public function list(){
         $books = Book::with(['author', 'genre', 'availability'])->latest()->get();
         return view('user/dashboard', compact('books'));

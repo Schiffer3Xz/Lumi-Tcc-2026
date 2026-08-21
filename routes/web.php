@@ -8,6 +8,7 @@ use App\Http\Controllers\Admin\AdminDashboardController;
 use App\Http\Controllers\Admin\AdminCategoriesController;
 use App\Http\Controllers\Admin\AdminSettingsController;
 use App\Http\Controllers\Admin\AdminCatalogController;
+use App\Http\Controllers\SocialController;
 
 use App\Http\Controllers\Admin\Categories\GenreController;
 use App\Http\Controllers\Admin\Categories\AuthorController;
@@ -67,15 +68,13 @@ Route::middleware(['RoleMiddleware'])->group(function () {
 
     Route::middleware('auth')->group(function () {
 
-        Route::get('teste', [DashboardController::class, 'teste'])->name('teste');
-
 
         // ============================================================
         // USER
         // ============================================================
-
-        //Todo
-
+        Route::get('/social', [SocialController::class, 'index'])->name('list');
+        
+        Route::get('profile', [SocialController::class, 'profile'])->name('profile');
 
 
 
