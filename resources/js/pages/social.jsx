@@ -1,5 +1,6 @@
 import { Head, Link } from '@inertiajs/react';
 import { useEffect, useRef, useState } from 'react';
+import { router } from '@inertiajs/react';
 
 export default function Feed({ auth, users }) {
     const [mobileOpen, setMobileOpen] = useState(false);
@@ -349,6 +350,7 @@ export default function Feed({ auth, users }) {
                                         {users.map((user) => (
                                             <div
                                                 key={user.id}
+                                                  onClick={() => router.get(`people/${user.id}`)}
                                                 className="flex cursor-pointer items-center gap-3 rounded-xl border border-transparent p-2.5 transition-all hover:border-slate-100 hover:bg-slate-50"
                                             >
                                                 <div className="relative flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full bg-blue-100 text-xs font-bold text-blue-700 shadow-xs">

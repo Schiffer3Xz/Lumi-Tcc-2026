@@ -1,6 +1,6 @@
 import { Head, useForm } from '@inertiajs/react';
 import { LoaderCircle, Mail, Lock, User, Eye, EyeOff, UserPlus, ShieldCheck } from 'lucide-react';
-import { FormEventHandler, useState } from 'react';
+import { useState } from 'react';
 
 import InputError from '@/components/input-error';
 import TextLink from '@/components/text-link';
@@ -8,20 +8,11 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 
-interface RegisterForm {
-    name: string;
-    email: string;
-    password: string;
-    password_confirmation: string;
-    accessType: 'aluno' | 'administrador';
-    [key: string]: string | boolean;
-}
-
 export default function Register() {
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
-    const { data, setData, post, processing, errors, reset } = useForm<RegisterForm>({
+    const { data, setData, post, processing, errors, reset } = useForm({
         name: '',
         email: '',
         password: '',
@@ -29,7 +20,7 @@ export default function Register() {
         accessType: 'aluno',
     });
 
-    const submit: FormEventHandler = (e) => {
+    const submit = (e) => {
         e.preventDefault();
         post(route('register'), {
             onFinish: () => reset('password', 'password_confirmation'),

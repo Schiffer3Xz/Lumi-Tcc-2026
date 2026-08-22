@@ -76,6 +76,8 @@ Route::middleware(['RoleMiddleware'])->group(function () {
         
         Route::get('profile', [SocialController::class, 'profile'])->name('profile');
 
+        Route::get('people/{id}', [SocialController::class, 'people'])->name('people');
+
 
 
         // ========================================================

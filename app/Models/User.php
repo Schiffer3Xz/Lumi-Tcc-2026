@@ -49,4 +49,13 @@ class User extends Authenticatable implements MustVerifyEmail
             'password' => 'hashed',
         ];
     }
+
+    public function friend(){
+        return $this->belongsToMany(
+            User::class,
+            'friendships',
+            'fk_user_id',
+            'fk_friend_id'
+        );
+    }
 }

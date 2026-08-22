@@ -23,6 +23,10 @@ return new class extends Migration
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
             $table->boolean('is_admin')->default(false);
+            $table->integer('read_books')->default(0);
+            $table->integer('reading_books')->default(0);
+            $table->integer('shelf_books')->default(0); 
+            $table->integer('rated_books')->default(0);
             $table->rememberToken();
             $table->timestamps();
         });

@@ -114,5 +114,5 @@
         },
         "jsx": "react-jsx"
     },
-    "include": ["resources/js/**/*.ts", "resources/js/**/*.tsx", "resources/js/pages/home.jsx", "resources/js/pages/catalogo.jsx", "resources/js/pages/auth/login.tsx"]
+    "include": ["resources/js/**/*.ts", "resources/js/**/*.tsx", "resources/js/pages/home.jsx", "resources/js/pages/catalogo.jsx", "resources/js/pages/auth/login.tsx", "resources/js/pages/auth/register.jsx"]
 }
