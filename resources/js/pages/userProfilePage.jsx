@@ -1,7 +1,8 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Head, Link, router } from '@inertiajs/react';
 
-export default function UserProfilePage({ auth, targetUser, users = [] }) {
+export default function UserProfilePage({ auth, targetUser, users = [], isFollowing: initialIsFollowing = false }) {
+    const [isFollowing, setIsFollowing] = useState(initialIsFollowing);
     const [mobileOpen, setMobileOpen] = useState(false);
     const [profileOpen, setProfileOpen] = useState(false);
     const profileRef = useRef(null);
@@ -36,8 +37,6 @@ export default function UserProfilePage({ auth, targetUser, users = [] }) {
         ...readBooks.map((b) => ({ ...b, status: 'Lido' })),
         ...shelfBooks.map((b) => ({ ...b, status: 'Na Estante' })),
     ];
-
-    const [isFollowing, setIsFollowing] = useState(false);
 
     useEffect(() => {
         function handleClickOutside(event) {
@@ -257,15 +256,30 @@ export default function UserProfilePage({ auth, targetUser, users = [] }) {
                                         </p>
                                     </div>
                                 </div>
-                                <button
-                                    onClick={() => setIsFollowing(!isFollowing)}
+                               <button
+                                    onClick={() => {
+                                        if (isFollowing) {
+                                            router.delete(route('follow.destroy', targetUser.id), {
+                                                onSuccess: () => setIsFollowing(false),
+                                            });
+                                        } else {
+                                            router.post(route('follow.store', targetUser.id), {}, {
+                                                onSuccess: () => setIsFollowing(true),
+                                            });
+                                        }
+                                    }}
                                     className={`flex items-center gap-1.5 text-xs px-4 py-2 rounded-xl font-medium transition-colors ${
                                         isFollowing
                                             ? 'bg-slate-100 hover:bg-slate-200 text-slate-700'
                                             : 'bg-blue-600 hover:bg-blue-700 text-white'
                                     }`}
                                 >
-                                    <i className={`fa-solid ${isFollowing ? 'fa-user-check' : 'fa-user-plus'} text-xs`} />
+                                    <i
+                                        className={`fa-solid ${
+                                            isFollowing ? 'fa-user-check' : 'fa-user-plus'
+                                        } text-xs`}
+                                    />
+
                                     {isFollowing ? 'Seguindo' : 'Seguir'}
                                 </button>
                             </div>

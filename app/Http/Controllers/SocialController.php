@@ -5,13 +5,17 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use App\Models\User;
+use App\Models\Follow;
 
 class SocialController extends Controller
 {
     public function index()
     {
+        $user = User::find(auth()->id());
+        $followingIds = $user->follows->pluck('id');
+
         return Inertia::render("social", [
-            "users" => User::where('id', '!=', auth()->id())->where('is_admin', false)->limit(5)->get()->map(function ($user) {
+            "users" => User::where('id', '!=', auth()->id())->where('is_admin', false)->whereNotIn('id', $followingIds)->limit(5)->get()->map(function ($user) {
                 return [
                     "id" => $user->id,
                     "name" => $user->name,
@@ -44,7 +48,23 @@ class SocialController extends Controller
             }),
 
             "targetUser" => $targetUser,
+            "isFollowing" => Follow::where('fk_follower_id', auth()->id())
+                ->where('fk_followed_id', $id)
+                ->exists(),
 
         ]);
+    }
+
+    public function follow($id){
+        Follow::firstOrCreate([
+            "fk_follower_id" => auth()->id(),
+            "fk_followed_id" => $id,
+        ]);
+    }
+
+    public function unfollow($id){
+        Follow::where('fk_follower_id', auth()->id())
+            ->where('fk_followed_id', $id)
+            ->delete();
     }
 }

@@ -78,6 +78,9 @@ Route::middleware(['RoleMiddleware'])->group(function () {
 
         Route::get('people/{id}', [SocialController::class, 'people'])->name('people');
 
+        Route::post('people/{id}/follow', [SocialController::class, 'follow'])->name('follow.store');
+        Route::delete('people/{id}/follow', [SocialController::class, 'unfollow'])->name('follow.destroy');
+
 
 
         // ========================================================
