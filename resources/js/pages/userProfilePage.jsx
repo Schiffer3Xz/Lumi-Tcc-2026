@@ -264,6 +264,8 @@ export default function UserProfilePage({ auth, targetUser, users = [], isFollow
                                             });
                                         } else {
                                             router.post(route('follow.store', targetUser.id), {}, {
+                                                preserveScroll: true,
+                                                preserveState: true,
                                                 onSuccess: () => setIsFollowing(true),
                                             });
                                         }

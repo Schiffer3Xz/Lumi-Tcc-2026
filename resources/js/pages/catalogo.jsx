@@ -26,7 +26,7 @@ export default function Home({ books = [], auth }) {
     { label: "Ficção", icon: "fa-solid fa-khanda" },
     { label: "Romance", icon: "fa-solid fa-heart" },
     { label: "Fantasia", icon: "fa-solid fa-chess-rook" },
-    { label: "Terror", icon: "fa-solid fa-torii-gate" },
+    { label: "Terror", icon: "fa-solid fa-ghost" },
     { label: "História", icon: "fa-solid fa-scroll" },
   ];
 

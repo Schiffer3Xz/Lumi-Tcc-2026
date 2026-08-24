@@ -1,10 +1,11 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useMemo } from "react";
 import { Head, Link } from "@inertiajs/react";
 
 export default function Home({ books = [], auth }) {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [generoAtivo, setGeneroAtivo] = useState("Todos");
   const [profileOpen, setProfileOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
 
   const profileRef = useRef(null);
   const user = auth?.user ?? { name: "Usuário", email: "" };
@@ -25,7 +26,7 @@ export default function Home({ books = [], auth }) {
     { label: "Ficção", icon: "fa-solid fa-khanda" },
     { label: "Romance", icon: "fa-solid fa-heart" },
     { label: "Fantasia", icon: "fa-solid fa-chess-rook" },
-    { label: "Mangá", icon: "fa-solid fa-torii-gate" },
+    { label: "Terror", icon: "fa-solid fa-ghost" },
     { label: "História", icon: "fa-solid fa-scroll" },
   ];
 
@@ -42,10 +43,39 @@ export default function Home({ books = [], auth }) {
     { label: "Configurações de Privacidade", icon: "fa-solid fa-shield-halved" },
   ];
 
-  // 4 livros melhores avaliados — ordena por rating decrescente
-  const topRatedBooks = [...books]
-    .sort((a, b) => Number(b.rating || 0) - Number(a.rating || 0))
-    .slice(0, 4);
+  const getTextValue = (value) => {
+    if (!value) return "";
+    return typeof value === "object" ? value.name || "" : String(value);
+  };
+
+  // Lógica de filtragem combinada por busca textual e gênero ativo
+  const filteredBooks = useMemo(() => {
+    return books.filter((book) => {
+      const title = getTextValue(book.title).toLowerCase();
+      const author = getTextValue(book.author).toLowerCase();
+      const genre = getTextValue(book.genre).toLowerCase();
+      const query = searchQuery.toLowerCase();
+
+      const titleMatch = title.includes(query);
+      const authorMatch = author.includes(query);
+      const genreTextMatch = genre.includes(query);
+
+      const matchesSearch = titleMatch || authorMatch || genreTextMatch;
+
+      const matchesGenre =
+        generoAtivo === "Todos" ||
+        genre === generoAtivo.toLowerCase();
+
+      return matchesSearch && matchesGenre;
+    });
+  }, [books, searchQuery, generoAtivo]);
+
+  // 4 livros melhores avaliados dentro dos livros filtrados
+  const topRatedBooks = useMemo(() => {
+    return [...filteredBooks]
+      .sort((a, b) => Number(b.rating || 0) - Number(a.rating || 0))
+      .slice(0, 4);
+  }, [filteredBooks]);
 
   return (
     <>
@@ -124,7 +154,6 @@ export default function Home({ books = [], auth }) {
               </div>
               
               <div className="flex items-center gap-3 sm:gap-4">
-                
                 {/* Notificações */}
                 <button className="relative p-2 rounded-lg hover:bg-gray-100 text-gray-600 transition-colors">
                   <i className="fa-solid fa-bell text-lg" />
@@ -184,7 +213,7 @@ export default function Home({ books = [], auth }) {
                 {/* Saudação */}
                 <p className="text-sm text-gray-500 mb-3">
                   Olá, <span className="font-semibold text-gray-700">{user.name}</span>! —{" "}
-                  {books.length} {books.length === 1 ? "livro aguarda" : "livros aguardam"} você
+                  {filteredBooks.length} {filteredBooks.length === 1 ? "livro encontrado" : "livros encontrados"}
                 </p>
                 {/* Barra de busca */}
                 <div className="flex flex-col sm:flex-row gap-3 mb-4">
@@ -192,6 +221,8 @@ export default function Home({ books = [], auth }) {
                     <i className="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-sm" />
                     <input
                       type="text"
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
                       placeholder="Pesquise por livros, autores, gêneros..."
                       className="w-full pl-12 pr-4 py-3 bg-white border border-gray-200 rounded-xl text-sm text-gray-700 placeholder-gray-400 shadow-sm focus:outline-none focus:ring-2 focus:ring-yellow-400/50 focus:border-yellow-400 transition-all"
                     />
@@ -219,7 +250,6 @@ export default function Home({ books = [], auth }) {
                   ))}
                 </div>
                 {/* ==================== CARD DE PROGRESSO ==================== */}
-                {/* Card de Progresso Atual */}
                 <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-[#81A9D4] to-[#6B9AC4] p-6 sm:p-8 shadow-lg mb-8">
                   <div className="absolute -right-8 -top-8 w-32 h-32 rounded-full bg-white/10" />
                   <div className="absolute -right-4 -bottom-12 w-24 h-24 rounded-full bg-white/5" />
@@ -247,11 +277,11 @@ export default function Home({ books = [], auth }) {
                 {/* ==================== 4 LIVROS MELHORES AVALIADOS ==================== */}
                 <div className="flex items-center justify-between mb-4">
                   <h3 className="text-lg font-bold text-gray-800">Melhores Avaliados</h3>
-                  <a href="route('catalogo')" className="text-sm font-medium text-[#81A9D4] hover:text-[#6B9AC4] transition-colors">
+                  <Link href={route('catalogo')} className="text-sm font-medium text-[#81A9D4] hover:text-[#6B9AC4] transition-colors">
                     Ver todos
-                  </a>
+                  </Link>
                 </div>
-                {books.length > 0 ? (
+                {topRatedBooks.length > 0 ? (
                   <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 mb-8">
                     {topRatedBooks.map((book) => (
                       <div
@@ -273,7 +303,6 @@ export default function Home({ books = [], auth }) {
                           </div>
                         )}
                         
-                        {/* Badge de avaliação sutil sobreposta no canto superior direito */}
                         <div className="absolute top-3 right-3 flex items-center gap-1 bg-[#1A2332]/85 backdrop-blur-sm px-2.5 py-1 rounded-lg">
                           <i className="fa-solid fa-star text-yellow-400 text-[10px]" />
                           <span className="text-xs font-bold text-white">
@@ -293,7 +322,7 @@ export default function Home({ books = [], auth }) {
                         Nenhum livro encontrado
                       </h5>
                       <p className="text-xs text-gray-400">
-                        Não há livros cadastrados no momento.
+                        Não encontramos resultados para os filtros selecionados.
                       </p>
                     </div>
                   </div>
@@ -302,7 +331,7 @@ export default function Home({ books = [], auth }) {
               {/* ==================== SIDEBAR DIREITA ==================== */}
               <div className="hidden lg:block">
                 <div className="sticky top-6">
-                  <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-5">
+                  <div className="bg-[#FFFFFF] rounded-2xl border border-gray-200 shadow-sm p-5">
                     <h3 className="text-base font-bold text-gray-800 mb-4 flex items-center gap-2">
                       <span className="w-1 h-5 bg-yellow-300 rounded-full" />
                       Acesso Rápido
