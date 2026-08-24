@@ -8,9 +8,40 @@ export default function ConfigPage({ auth }) {
     const [friendRequests, setFriendRequests] = useState(false);
     const [mobileOpen, setMobileOpen] = useState(false);
     const [profileOpen, setProfileOpen] = useState(false);
+    const [drawerOpen, setDrawerOpen] = useState(false);
+    const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+    const [viewMode, setViewMode] = useState('grid'); // 'grid' | 'feed'
+
     const profileRef = useRef(null);
 
-    const user = auth?.user ?? { name: 'Usuário', email: 'usuario@exemplo.com' };
+    const user = auth?.user ?? {
+        name: 'Schiffer3Xz',
+        email: 'ramon@gmail.com',
+        bio: 'Apaixonado por literatura, tecnologia e novos conhecimentos. Lendo um livro por vez!',
+        followers: '1.2k',
+        following: '480',
+        friends: '150'
+    };
+
+    // Imagens de teste estilo Instagram
+    const mockPosts = [
+        {
+            id: 1,
+            imageUrl: 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&w=800&q=80',
+            caption: 'Finalizada a leitura da semana! Recomendação 10/10 para quem curte suspense. 📚✨',
+            likes: 142,
+            comments: 18,
+            time: '2h atrás'
+        },
+        {
+            id: 2,
+            imageUrl: 'https://images.unsplash.com/photo-1512820790803-83ca734da794?auto=format&fit=crop&w=800&q=80',
+            caption: 'Cantinho de estudos atualizado. Organizando os próximos livros da estante!',
+            likes: 89,
+            comments: 7,
+            time: '1 dia atrás'
+        }
+    ];
 
     useEffect(() => {
         function handleClickOutside(event) {
@@ -53,7 +84,7 @@ export default function ConfigPage({ auth }) {
 
     return (
         <>
-            <Head title="Sala de Leitura - Configurações" />
+            <Head title="Sala de Leitura - Perfil & Configurações" />
 
             <link
                 rel="stylesheet"
@@ -61,11 +92,19 @@ export default function ConfigPage({ auth }) {
             />
 
             <div className="flex min-h-screen bg-[#F4F6F9] font-sans text-slate-700">
-                {/* OVERLAY MOBILE */}
+                {/* OVERLAY MOBILE SIDEBAR */}
                 {mobileOpen && (
                     <div
                         className="fixed inset-0 z-40 bg-black/50 lg:hidden"
                         onClick={() => setMobileOpen(false)}
+                    />
+                )}
+
+                {/* OVERLAY PREFERÊNCIAS */}
+                {drawerOpen && (
+                    <div
+                        className="fixed inset-0 z-40 bg-black/50"
+                        onClick={() => setDrawerOpen(false)}
                     />
                 )}
 
@@ -133,7 +172,15 @@ export default function ConfigPage({ auth }) {
                             </div>
                         </div>
 
-                        <div className="flex items-center gap-4">
+                        <div className="flex items-center gap-3">
+                            <button
+                                onClick={() => setDrawerOpen(true)}
+                                className="flex items-center gap-2 rounded-xl border border-slate-200 bg-slate-50 px-3 py-1.5 text-xs font-semibold text-slate-700 transition-colors hover:bg-slate-100"
+                            >
+                                <i className="fa-solid fa-sliders text-xs" />
+                                <span>Preferências</span>
+                            </button>
+
                             <button className="relative rounded-full p-2.5 text-slate-600 transition-colors hover:bg-slate-100">
                                 <i className="fa-regular fa-bell text-lg" />
                                 <span className="absolute top-1.5 right-1.5 h-2 w-2 rounded-full bg-red-500 ring-2 ring-white" />
@@ -188,50 +235,189 @@ export default function ConfigPage({ auth }) {
 
                     {/* ÁREA DE CONTEÚDO E SIDEBAR DIREITA */}
                     <div className="flex flex-1 overflow-hidden">
-                        {/* CONTEÚDO PRINCIPAL DE CONFIGURAÇÕES */}
-                        <main className="flex-1 overflow-y-auto p-6 lg:p-8 space-y-6">
-                            <div>
-                                <span className="text-[10px] font-bold tracking-wider text-slate-400 uppercase">
-                                    SALA DE LEITURA
-                                </span>
-                                <h2 className="text-2xl font-bold text-slate-900">Configurações</h2>
-                            </div>
-
+                        {/* CONTEÚDO PRINCIPAL */}
+                        <main className="flex-1 overflow-y-auto p-4 md:p-8 space-y-6">
+                            
                             {/* CARTÃO DE PERFIL */}
-                            <div className="bg-white rounded-2xl p-6 border border-slate-200/80 flex items-center justify-between shadow-xs">
-                                <div className="flex items-center gap-4">
-                                    <div className="relative">
-                                        <div className="w-16 h-16 rounded-full bg-blue-100 text-blue-800 font-bold text-xl flex items-center justify-center border border-blue-200">
-                                            {user.name.charAt(0).toUpperCase()}
+                            <div className="bg-white rounded-2xl p-6 border border-slate-200/80 shadow-xs space-y-5">
+                                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                                    <div className="flex items-center gap-5">
+                                        <div className="relative shrink-0">
+                                            <div className="w-20 h-20 rounded-full bg-gradient-to-tr from-amber-400 to-indigo-600 p-[2px]">
+                                                <div className="w-full h-full rounded-full bg-white p-[2px]">
+                                                    <div className="w-full h-full rounded-full bg-slate-800 text-white font-bold text-2xl flex items-center justify-center">
+                                                        {user.name.charAt(0).toUpperCase()}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <span className="w-4 h-4 bg-emerald-500 border-2 border-white rounded-full absolute bottom-1 right-1" />
                                         </div>
-                                        <span className="w-3.5 h-3.5 bg-emerald-500 border-2 border-white rounded-full absolute bottom-0 right-0" />
+                                        <div>
+                                            <div className="flex flex-wrap items-center gap-2">
+                                                <h2 className="font-bold text-xl text-slate-900">{user.name}</h2>
+                                                <span className="text-[10px] bg-blue-50 text-blue-600 px-2 py-0.5 rounded-full font-medium border border-blue-100">
+                                                    🛡️ Aluno Verificado
+                                                </span>
+                                            </div>
+                                            <p className="text-xs text-slate-400">{user.email}</p>
+                                        </div>
                                     </div>
-                                    <div>
-                                        <div className="flex items-center gap-2">
-                                            <h3 className="font-bold text-lg text-slate-900">{user.name}</h3>
-                                            <span className="text-[10px] bg-blue-50 text-blue-600 px-2 py-0.5 rounded-full font-medium border border-blue-100">
-                                                🛡️ Aluno Verificado
-                                            </span>
-                                        </div>
-                                        <p className="text-xs text-slate-400">{user.email}</p>
+
+                                    <Link
+                                        href={route('profile.edit')}
+                                        className="flex items-center justify-center gap-2 text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 px-4 py-2.5 rounded-xl font-semibold transition-colors shrink-0 w-full sm:w-auto"
+                                    >
+                                        <i className="fa-solid fa-pen-to-square text-xs" />
+                                        Editar Perfil
+                                    </Link>
+                                </div>
+
+                                {/* BIO */}
+                                <p className="text-xs text-slate-600 leading-relaxed max-w-2xl">
+                                    "{user.bio}"
+                                </p>
+
+                                {/* CONTADORES SOCIAIS */}
+                                <div className="flex items-center gap-8 pt-3 border-t border-slate-100 text-xs">
+                                    <div className="flex items-center gap-1.5">
+                                        <span className="font-bold text-slate-900 text-sm">{user.followers}</span>
+                                        <span className="text-slate-500">Seguidores</span>
+                                    </div>
+                                    <div className="flex items-center gap-1.5">
+                                        <span className="font-bold text-slate-900 text-sm">{user.following}</span>
+                                        <span className="text-slate-500">Seguindo</span>
+                                    </div>
+                                    <div className="flex items-center gap-1.5">
+                                        <span className="font-bold text-slate-900 text-sm">{user.friends}</span>
+                                        <span className="text-slate-500">Amigos</span>
                                     </div>
                                 </div>
-                                <Link
-                                    href={route('profile.edit')}
-                                    className="flex items-center gap-1.5 text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 px-4 py-2 rounded-xl font-medium transition-colors"
-                                >
-                                    <i className="fa-solid fa-pen-to-square text-xs" />
-                                    Editar Perfil
-                                </Link>
                             </div>
 
                             {/* MÉTRICAS DA CONTA */}
                             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                                <StatCard icon="fa-book-open" count="14" label="Livros Lidos" />
-                                <StatCard icon="fa-book-bookmark" count="2" label="Em Leitura" />
-                                <StatCard icon="fa-bookmark" count="7" label="Na Estante" />
-                                <StatCard icon="fa-star" count="9" label="Avaliações" />
+                                <StatCard icon="fa-book-open" count="2" label="Livros Lidos" />
+                                <StatCard icon="fa-book-bookmark" count="7" label="Em Leitura" />
+                                <StatCard icon="fa-bookmark" count="9" label="Na Estante" />
+                                <StatCard icon="fa-star" count="12" label="Avaliações" />
                             </div>
+
+                            {/* CABEÇALHO DO FEED + BOTÃO DE NOVO POST */}
+                            <div className="flex items-center justify-between border-b border-slate-200/80 pb-3 pt-2">
+                                <div className="flex items-center gap-4">
+                                    <button
+                                        onClick={() => setViewMode('grid')}
+                                        className={`flex items-center gap-2 text-xs font-bold uppercase tracking-wider pb-1 transition-colors ${
+                                            viewMode === 'grid'
+                                                ? 'text-blue-600 border-b-2 border-blue-600'
+                                                : 'text-slate-400 hover:text-slate-600'
+                                        }`}
+                                    >
+                                        <i className="fa-solid fa-border-all" />
+                                        <span>Publicações</span>
+                                    </button>
+                                    <button
+                                        onClick={() => setViewMode('feed')}
+                                        className={`flex items-center gap-2 text-xs font-bold uppercase tracking-wider pb-1 transition-colors ${
+                                            viewMode === 'feed'
+                                                ? 'text-blue-600 border-b-2 border-blue-600'
+                                                : 'text-slate-400 hover:text-slate-600'
+                                        }`}
+                                    >
+                                        <i className="fa-solid fa-list" />
+                                        <span>Feed</span>
+                                    </button>
+                                </div>
+
+                                <button
+                                    onClick={() => setIsCreateModalOpen(true)}
+                                    className="flex items-center gap-1.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold px-3 py-1.5 rounded-xl transition-colors shadow-xs"
+                                >
+                                    <i className="fa-solid fa-plus text-[10px]" />
+                                    <span>Novo Post</span>
+                                </button>
+                            </div>
+
+                            {/* FEED / GRADE COM IMAGENS COMPACTAS */}
+                            {viewMode === 'grid' ? (
+                                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+                                    {mockPosts.map((post) => (
+                                        <div
+                                            key={post.id}
+                                            className="group relative aspect-square max-w-xs mx-auto w-full bg-slate-900 rounded-xl overflow-hidden shadow-xs cursor-pointer"
+                                        >
+                                            <img
+                                                src={post.imageUrl}
+                                                alt="Post"
+                                                className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                                            />
+                                            {/* OVERLAY HOVER */}
+                                            <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-4 text-white font-bold text-xs">
+                                                <div className="flex items-center gap-1">
+                                                    <i className="fa-solid fa-heart" />
+                                                    <span>{post.likes}</span>
+                                                </div>
+                                                <div className="flex items-center gap-1">
+                                                    <i className="fa-solid fa-comment" />
+                                                    <span>{post.comments}</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            ) : (
+                                <div className="max-w-sm mx-auto space-y-5">
+                                    {mockPosts.map((post) => (
+                                        <div
+                                            key={post.id}
+                                            className="bg-white rounded-2xl border border-slate-200/80 shadow-xs overflow-hidden"
+                                        >
+                                            <div className="p-3 flex items-center justify-between">
+                                                <div className="flex items-center gap-2.5">
+                                                    <div className="w-7 h-7 rounded-full bg-slate-800 text-white font-bold text-[11px] flex items-center justify-center">
+                                                        {user.name.charAt(0).toUpperCase()}
+                                                    </div>
+                                                    <div>
+                                                        <h4 className="text-xs font-bold text-slate-900 leading-none">{user.name}</h4>
+                                                        <p className="text-[10px] text-slate-400 mt-0.5">{post.time}</p>
+                                                    </div>
+                                                </div>
+                                                <button className="text-slate-400 hover:text-slate-600">
+                                                    <i className="fa-solid fa-ellipsis text-xs" />
+                                                </button>
+                                            </div>
+
+                                            {/* CONTAINER DE IMAGEM REDUZIDO */}
+                                            <div className="w-full h-80 bg-slate-100">
+                                                <img
+                                                    src={post.imageUrl}
+                                                    alt="Post"
+                                                    className="w-full h-full object-cover"
+                                                />
+                                            </div>
+
+                                            <div className="p-3 space-y-1.5">
+                                                <div className="flex items-center gap-3 text-slate-700 text-base">
+                                                    <button className="hover:text-red-500 transition-colors">
+                                                        <i className="fa-regular fa-heart" />
+                                                    </button>
+                                                    <button className="hover:text-blue-500 transition-colors">
+                                                        <i className="fa-regular fa-comment" />
+                                                    </button>
+                                                    <button className="hover:text-amber-500 transition-colors ml-auto">
+                                                        <i className="fa-regular fa-bookmark" />
+                                                    </button>
+                                                </div>
+                                                <p className="text-xs font-bold text-slate-900">{post.likes} curtidas</p>
+                                                <p className="text-xs text-slate-600">
+                                                    <span className="font-bold text-slate-900 mr-1">{user.name}</span>
+                                                    {post.caption}
+                                                </p>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
 
                             {/* BANNER DE REGRAS */}
                             <div className="bg-[#EFEAE1] border border-[#E3DCCE] rounded-2xl p-6 text-slate-800 space-y-4">
@@ -266,12 +452,24 @@ export default function ConfigPage({ auth }) {
                         </main>
 
                         {/* PAINEL DIREITO - PREFERÊNCIAS */}
-                        <aside className="hidden lg:block w-80 bg-white border-l border-slate-200/80 p-6 space-y-6 overflow-y-auto">
-                            <div>
-                                <span className="text-[10px] font-bold tracking-wider text-slate-400 uppercase">
-                                    CONTA
-                                </span>
-                                <h3 className="text-base font-bold text-slate-900">Preferências</h3>
+                        <aside
+                            className={`fixed lg:relative top-0 right-0 z-50 lg:z-auto h-screen lg:h-auto w-80 bg-white border-l border-slate-200/80 p-6 space-y-6 overflow-y-auto transition-transform duration-300 ease-in-out ${
+                                drawerOpen ? 'translate-x-0' : 'translate-x-full lg:translate-x-0'
+                            } ${!drawerOpen && 'hidden lg:block'}`}
+                        >
+                            <div className="flex items-center justify-between">
+                                <div>
+                                    <span className="text-[10px] font-bold tracking-wider text-slate-400 uppercase">
+                                        CONTA
+                                    </span>
+                                    <h3 className="text-base font-bold text-slate-900">Preferências</h3>
+                                </div>
+                                <button
+                                    onClick={() => setDrawerOpen(false)}
+                                    className="p-2 text-slate-400 hover:text-slate-600 lg:hidden"
+                                >
+                                    <i className="fa-solid fa-xmark text-lg" />
+                                </button>
                             </div>
 
                             {/* PRIVACIDADE */}
@@ -328,6 +526,52 @@ export default function ConfigPage({ auth }) {
                     </div>
                 </div>
             </div>
+
+            {/* MODAL PEQUENO PARA CRIAR POST */}
+            {isCreateModalOpen && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60">
+                    <div className="bg-white w-full max-w-sm rounded-2xl p-5 space-y-4 shadow-xl">
+                        <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+                            <h3 className="font-bold text-sm text-slate-900">Nova Publicação</h3>
+                            <button
+                                onClick={() => setIsCreateModalOpen(false)}
+                                className="text-slate-400 hover:text-slate-600"
+                            >
+                                <i className="fa-solid fa-xmark text-base" />
+                            </button>
+                        </div>
+
+                        <div className="border-2 border-dashed border-slate-200 rounded-xl p-4 text-center hover:bg-slate-50 transition-colors cursor-pointer space-y-1">
+                            <div className="w-8 h-8 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center mx-auto text-sm">
+                                <i className="fa-solid fa-image" />
+                            </div>
+                            <p className="text-xs font-semibold text-slate-700">Escolha uma imagem</p>
+                            <p className="text-[10px] text-slate-400">PNG, JPG até 5MB</p>
+                        </div>
+
+                        <textarea
+                            rows="2"
+                            placeholder="Escreva uma legenda..."
+                            className="w-full text-xs rounded-xl border border-slate-200 p-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 resize-none placeholder:text-slate-400"
+                        />
+
+                        <div className="flex justify-end gap-2 pt-1">
+                            <button
+                                onClick={() => setIsCreateModalOpen(false)}
+                                className="px-3 py-1.5 text-xs font-semibold text-slate-600 hover:bg-slate-100 rounded-xl transition-colors"
+                            >
+                                Cancelar
+                            </button>
+                            <button
+                                onClick={() => setIsCreateModalOpen(false)}
+                                className="px-3 py-1.5 text-xs font-semibold bg-blue-600 hover:bg-blue-700 text-white rounded-xl transition-colors"
+                            >
+                                Publicar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </>
     );
 }
