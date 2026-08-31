@@ -14,7 +14,7 @@ class UserSeeder extends Seeder
     public function run(): void
     {
         for ($i = 0; $i < 5; $i++) {
-            User::create([
+            User::firstOrCreate([
                 'name' => fake()->name(),
                 'nickname' => fake()->unique()->userName(),
                 'email' => fake()->unique()->safeEmail(),
@@ -28,5 +28,35 @@ class UserSeeder extends Seeder
                 'is_admin' => false,
             ]);
         }
+
+        User::firstOrCreate([
+            'name' => 'ramon',
+            'email' => 'ramon@gmail.com',
+            'password' => 11111111,
+        ]);
+
+        User::firstOrCreate([
+            'name' => 'Ramon Admin',
+            'email' => 'zuluramon09@gmail.com',
+            'password' => 11111111,
+            'is_admin' => true,
+            'email_verified_at' => now(),
+        ]);
+
+        User::firstOrCreate([
+            'name' => 'Eduardo Admin',
+            'email' => 'eduar.gomes.d.costa@gmail.com',
+            'password' => 11111111,
+            'is_admin' => true,
+            'email_verified_at' => now(),
+        ]);
+
+        User::firstOrCreate([
+            'name' => 'Eddu',
+            'email' => 'eddugomescst.dk@gmail.com',
+            'password' => 11111111,
+            'is_admin' => true,
+            'email_verified_at' => now(),
+        ]);
     }
 }
