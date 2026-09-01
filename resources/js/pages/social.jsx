@@ -1,95 +1,18 @@
 import { Head, Link, router } from '@inertiajs/react';
 import { useEffect, useRef, useState } from 'react';
 
-// Mock de posts realistas para a comunidade literária escolar
-const MOCK_POSTS = [
-    {
-        id: 1,
-        author: {
-            name: 'Lara Mendonça',
-            username: 'lara.leitora',
-            avatar: 'LM',
-            bg: 'bg-gradient-to-tr from-blue-600 to-indigo-600',
-        },
-        time: 'há 12 minutos',
-        content:
-            'Terminei "O Alquimista" hoje de manhã e fiquei reflexiva sobre a jornada do Santiago. A metáfora sobre seguir os próprios sonhos no deserto se encaixa perfeitamente na nossa fase de vestibular! ✨',
-        book: {
-            title: 'O Alquimista',
-            author: 'Paulo Coelho',
-            coverBg: 'bg-amber-700',
-            badge: 'Leitura Concluída',
-        },
-        image: 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&w=1000&q=80',
-        likesCount: 24,
-        commentsCount: 3,
-        comments: [
-            {
-                id: 101,
-                user: 'Carlos Silva',
-                avatar: 'CS',
-                bg: 'bg-emerald-100 text-emerald-700',
-                time: 'há 8 minutos',
-                text: 'Essa leitura também me marcou muito ano passado! Recomendo engatar em "O Diário de um Mago" agora.',
-            },
-        ],
-    },
-    {
-        id: 2,
-        author: {
-            name: 'Prof. Henrique Costa',
-            username: 'henrique.lit',
-            avatar: 'HC',
-            bg: 'bg-gradient-to-tr from-amber-500 to-orange-600',
-        },
-        time: 'há 2 horas',
-        content:
-            'Pessoal do 3º ano: lembrete de que o debate sobre "Dom Casmurro" acontece na próxima quinta-feira no auditório. Preparem seus argumentos sobre a dúvida do Bentinho! 📚✍️',
-        book: {
-            title: 'Dom Casmurro',
-            author: 'Machado de Assis',
-            coverBg: 'bg-emerald-800',
-            badge: 'Leitura Obrigatória',
-        },
-        likesCount: 45,
-        commentsCount: 12,
-        comments: [
-            {
-                id: 102,
-                user: 'Beatriz Lima',
-                avatar: 'BL',
-                bg: 'bg-purple-100 text-purple-700',
-                time: 'há 1 hora',
-                text: 'Já tenho 3 páginas de anotações prontas para provar que a Capitu era inocente! 🧐',
-            },
-        ],
-    },
-    {
-        id: 3,
-        author: {
-            name: 'Gabriel Torres',
-            username: 'gtorres.dev',
-            avatar: 'GT',
-            bg: 'bg-gradient-to-tr from-teal-500 to-emerald-600',
-        },
-        time: 'há 5 horas',
-        content:
-            'Achei esse sebo incrível no centro da cidade ontem. Consegui essa edição antiga de "1984" por um preço inacreditável. O cheiro de livro antigo é surreal!',
-        image: 'https://images.unsplash.com/photo-1512820790803-83ca734da794?auto=format&fit=crop&w=1000&q=80',
-        likesCount: 18,
-        commentsCount: 2,
-        comments: [],
-    },
-];
-
-export default function Feed({ auth, users = [] }) {
+export default function Feed({ auth, users = [], posts = [] }) {
     const [mobileOpen, setMobileOpen] = useState(false);
     const [profileOpen, setProfileOpen] = useState(false);
-    const [posts, setPosts] = useState(MOCK_POSTS);
+    const [currentPosts, setCurrentPosts] = useState(posts);
     const [likedPosts, setLikedPosts] = useState({});
     const profileRef = useRef(null);
 
     const user = auth?.user ?? { name: 'Estudante', email: '' };
+
+    useEffect(() => {
+        setCurrentPosts(posts);
+    }, [posts]);
 
     useEffect(() => {
         function handleClickOutside(event) {
@@ -97,46 +20,73 @@ export default function Feed({ auth, users = [] }) {
                 setProfileOpen(false);
             }
         }
+
         document.addEventListener('mousedown', handleClickOutside);
+
         return () => document.removeEventListener('mousedown', handleClickOutside);
     }, []);
 
     const toggleLike = (postId) => {
         setLikedPosts((prev) => {
             const isLiked = !!prev[postId];
-            const updated = { ...prev, [postId]: !isLiked };
-            
-            setPosts((currentPosts) =>
-                currentPosts.map((p) =>
-                    p.id === postId
-                        ? { ...p, likesCount: p.likesCount + (isLiked ? -1 : 1) }
-                        : p
-                )
+
+            const updated = {
+                ...prev,
+                [postId]: !isLiked,
+            };
+
+            setCurrentPosts((currentPosts) =>
+                currentPosts.map((post) =>
+                    post.id === postId
+                        ? {
+                              ...post,
+                              likesCount: post.likesCount + (isLiked ? -1 : 1),
+                          }
+                        : post,
+                ),
             );
+
             return updated;
         });
     };
 
     const NAV_ITEMS = [
-        { id: 'home', label: 'Home', icon: 'fa-solid fa-house', href: route('dashboard') },
-        { id: 'biblioteca', label: 'Catálogo', icon: 'fa-solid fa-book-open', href: route('catalogo') },
-        { id: 'usuarios', label: 'Social', icon: 'fa-solid fa-users', href: route('list'), active: true },
-        { id: 'config', label: 'Config', icon: 'fa-solid fa-gear', href: route('profile') },
+        {
+            id: 'home',
+            label: 'Home',
+            icon: 'fa-solid fa-house',
+            href: route('dashboard'),
+        },
+        {
+            id: 'biblioteca',
+            label: 'Catálogo',
+            icon: 'fa-solid fa-book-open',
+            href: route('catalogo'),
+        },
+        {
+            id: 'usuarios',
+            label: 'Social',
+            icon: 'fa-solid fa-users',
+            href: route('list'),
+            active: true,
+        },
+        {
+            id: 'config',
+            label: 'Config',
+            icon: 'fa-solid fa-gear',
+            href: route('profile'),
+        },
     ];
 
     return (
         <>
             <Head title="Sala de Leitura - Feed da Comunidade" />
+
             <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
 
             <div className="flex min-h-screen bg-[#F8FAFC] font-sans text-slate-700">
                 {/* OVERLAY MOBILE */}
-                {mobileOpen && (
-                    <div
-                        className="fixed inset-0 z-40 bg-slate-900/40 backdrop-blur-xs lg:hidden"
-                        onClick={() => setMobileOpen(false)}
-                    />
-                )}
+                {mobileOpen && <div className="fixed inset-0 z-40 bg-slate-900/40 backdrop-blur-xs lg:hidden" onClick={() => setMobileOpen(false)} />}
 
                 {/* SIDEBAR ESQUERDA */}
                 <aside
@@ -154,15 +104,12 @@ export default function Feed({ auth, users = [] }) {
                                 key={item.id}
                                 href={item.href}
                                 className={`relative flex flex-col items-center gap-1 rounded-xl p-3 transition-all duration-200 ${
-                                    item.active
-                                        ? 'bg-yellow-300/10 text-yellow-300'
-                                        : 'text-slate-400 hover:bg-white/5 hover:text-white'
+                                    item.active ? 'bg-yellow-300/10 text-yellow-300' : 'text-slate-400 hover:bg-white/5 hover:text-white'
                                 }`}
                                 title={item.label}
                             >
-                                {item.active && (
-                                    <span className="absolute top-1/2 left-0 h-8 w-1 -translate-y-1/2 rounded-r-full bg-amber-400" />
-                                )}
+                                {item.active && <span className="absolute top-1/2 left-0 h-8 w-1 -translate-y-1/2 rounded-r-full bg-amber-400" />}
+
                                 <i className={`${item.icon} text-lg`} />
                                 <span className="text-[10px] font-medium">{item.label}</span>
                             </Link>
@@ -179,10 +126,7 @@ export default function Feed({ auth, users = [] }) {
                     {/* TOPBAR */}
                     <header className="sticky top-0 z-30 flex h-16 flex-shrink-0 items-center justify-between border-b border-slate-200/80 bg-white/90 px-6 backdrop-blur-md">
                         <div className="flex items-center gap-3">
-                            <button
-                                onClick={() => setMobileOpen(true)}
-                                className="rounded-lg p-2 text-slate-600 hover:bg-slate-100 lg:hidden"
-                            >
+                            <button onClick={() => setMobileOpen(true)} className="rounded-lg p-2 text-slate-600 hover:bg-slate-100 lg:hidden">
                                 <i className="fa-solid fa-bars text-xl" />
                             </button>
 
@@ -190,8 +134,10 @@ export default function Feed({ auth, users = [] }) {
                                 <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-blue-600 text-base font-bold text-white shadow-xs">
                                     <i className="fa-solid fa-book-open" />
                                 </div>
+
                                 <div>
-                                    <h1 className="text-sm font-bold leading-tight text-slate-800">Sala de Leitura</h1>
+                                    <h1 className="text-sm leading-tight font-bold text-slate-800">Sala de Leitura</h1>
+
                                     <p className="text-[11px] font-medium text-slate-400">Plataforma Escolar Web</p>
                                 </div>
                             </div>
@@ -212,7 +158,9 @@ export default function Feed({ auth, users = [] }) {
                                     <div className="flex h-8 w-8 items-center justify-center rounded-full bg-slate-800 text-xs font-bold text-white">
                                         {user.name.charAt(0).toUpperCase()}
                                     </div>
+
                                     <span className="hidden text-xs font-semibold text-slate-700 sm:block">{user.name}</span>
+
                                     <i className="fa-solid fa-chevron-down text-[10px] text-slate-400" />
                                 </button>
 
@@ -220,8 +168,10 @@ export default function Feed({ auth, users = [] }) {
                                     <div className="absolute right-0 z-50 mt-2 w-52 rounded-2xl border border-slate-100 bg-white py-1.5 shadow-xl">
                                         <div className="border-b border-slate-100 px-4 py-2.5">
                                             <p className="text-[10px] font-bold tracking-wider text-slate-400 uppercase">Conta</p>
+
                                             <p className="truncate text-xs font-bold text-slate-800">{user.name}</p>
                                         </div>
+
                                         <Link
                                             href={route('profile.edit')}
                                             className="flex w-full items-center gap-2.5 px-4 py-2 text-xs font-medium text-slate-600 transition-colors hover:bg-slate-50"
@@ -229,6 +179,7 @@ export default function Feed({ auth, users = [] }) {
                                             <i className="fa-solid fa-gear text-slate-400" />
                                             Configurações
                                         </Link>
+
                                         <Link
                                             href={route('logout')}
                                             method="post"
@@ -255,6 +206,7 @@ export default function Feed({ auth, users = [] }) {
                                         <span className="mb-0.5 block text-[10px] font-bold tracking-widest text-blue-600 uppercase">
                                             COMUNIDADE LITERÁRIA
                                         </span>
+
                                         <h2 className="text-lg font-bold text-slate-800">Atividades e Publicações</h2>
                                     </div>
 
@@ -265,8 +217,9 @@ export default function Feed({ auth, users = [] }) {
                                 </div>
 
                                 {/* LISTA DE POSTS */}
-                                {posts.map((post) => {
+                                {currentPosts.map((post) => {
                                     const isLiked = !!likedPosts[post.id];
+
                                     return (
                                         <article
                                             key={post.id}
@@ -276,15 +229,20 @@ export default function Feed({ auth, users = [] }) {
                                             <div className="flex items-center justify-between">
                                                 <div className="flex items-center gap-3">
                                                     <div
-                                                        className={`flex h-10 w-10 items-center justify-center rounded-full text-xs font-bold text-white shadow-xs ${post.author.bg}`}
+                                                        className={`flex h-10 w-10 items-center justify-center rounded-full text-xs font-bold text-white shadow-xs ${
+                                                            post.author?.bg ?? 'bg-slate-800'
+                                                        }`}
                                                     >
-                                                        {post.author.avatar}
+                                                        {post.author?.avatar ?? post.author?.name?.charAt(0).toUpperCase()}
                                                     </div>
+
                                                     <div>
                                                         <div className="flex items-center gap-1.5">
-                                                            <h3 className="text-xs font-bold text-slate-800">{post.author.name}</h3>
-                                                            <span className="text-[11px] text-slate-400">@{post.author.username}</span>
+                                                            <h3 className="text-xs font-bold text-slate-800">{post.author?.name}</h3>
+
+                                                            <span className="text-[11px] text-slate-400">@{post.author?.username}</span>
                                                         </div>
+
                                                         <p className="text-[10px] text-slate-400">{post.time}</p>
                                                     </div>
                                                 </div>
@@ -305,13 +263,14 @@ export default function Feed({ auth, users = [] }) {
                                                     >
                                                         📖
                                                     </div>
+
                                                     <div className="min-w-0">
                                                         <span className="rounded-md bg-amber-100 px-2 py-0.5 text-[9px] font-bold tracking-wider text-amber-800 uppercase">
                                                             {post.book.badge}
                                                         </span>
-                                                        <p className="mt-1 truncate text-xs font-bold text-slate-800">
-                                                            {post.book.title}
-                                                        </p>
+
+                                                        <p className="mt-1 truncate text-xs font-bold text-slate-800">{post.book.title}</p>
+
                                                         <p className="text-[10px] text-slate-500">{post.book.author}</p>
                                                     </div>
                                                 </div>
@@ -337,12 +296,13 @@ export default function Feed({ auth, users = [] }) {
                                                     }`}
                                                 >
                                                     <i className={`${isLiked ? 'fa-solid' : 'fa-regular'} fa-heart text-sm`} />
-                                                    <span>{post.likesCount}</span>
+
+                                                    <span>{post.likesCount ?? 0}</span>
                                                 </button>
 
                                                 <button className="flex items-center gap-1.5 transition-colors hover:text-blue-600">
                                                     <i className="fa-regular fa-comment text-sm" />
-                                                    <span>{post.commentsCount}</span>
+                                                    <span>{post.commentsCount ?? 0}</span>
                                                 </button>
 
                                                 <button className="flex items-center gap-1.5 transition-colors hover:text-blue-600">
@@ -362,36 +322,39 @@ export default function Feed({ auth, users = [] }) {
                                                     <div className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full bg-slate-800 text-[10px] font-bold text-white">
                                                         {user.name.charAt(0).toUpperCase()}
                                                     </div>
+
                                                     <div className="relative flex-1">
                                                         <input
                                                             type="text"
                                                             placeholder="Escreva um comentário..."
                                                             className="w-full rounded-xl border border-slate-200/80 bg-slate-50 px-3 py-1.5 pr-8 text-xs text-slate-700 transition-all outline-none focus:border-blue-400 focus:bg-white"
                                                         />
+
                                                         <button className="absolute top-1/2 right-2.5 -translate-y-1/2 text-xs text-slate-400 transition-colors hover:text-blue-600">
                                                             <i className="fa-solid fa-paper-plane" />
                                                         </button>
                                                     </div>
                                                 </div>
 
-                                                {/* LISTA DE COMENTÁRIOS MOCKADOS */}
-                                                {post.comments.map((comment) => (
+                                                {/* COMENTÁRIOS REAIS */}
+                                                {post.comments?.map((comment) => (
                                                     <div key={comment.id} className="flex items-start gap-2.5 pt-1 text-xs">
                                                         <div
-                                                            className={`flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full text-[10px] font-bold ${comment.bg}`}
+                                                            className={`flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full text-[10px] font-bold ${
+                                                                comment.bg ?? 'bg-slate-100 text-slate-700'
+                                                            }`}
                                                         >
-                                                            {comment.avatar}
+                                                            {comment.avatar ?? comment.user?.charAt(0).toUpperCase()}
                                                         </div>
+
                                                         <div className="flex-1 rounded-xl border border-slate-100 bg-slate-50/80 p-2.5">
                                                             <div className="mb-0.5 flex items-center justify-between">
-                                                                <span className="text-[11px] font-bold text-slate-800">
-                                                                    {comment.user}
-                                                                </span>
+                                                                <span className="text-[11px] font-bold text-slate-800">{comment.user}</span>
+
                                                                 <span className="text-[9px] text-slate-400">{comment.time}</span>
                                                             </div>
-                                                            <p className="text-[11px] leading-relaxed text-slate-600">
-                                                                {comment.text}
-                                                            </p>
+
+                                                            <p className="text-[11px] leading-relaxed text-slate-600">{comment.text}</p>
                                                         </div>
                                                     </div>
                                                 ))}
@@ -406,11 +369,11 @@ export default function Feed({ auth, users = [] }) {
                         <aside className="hidden h-full w-[340px] flex-shrink-0 flex-col border-l border-slate-200/80 bg-white xl:flex">
                             {/* CAMPO DE BUSCA */}
                             <div className="border-b border-slate-100 bg-slate-50/50 p-4">
-                                <span className="mb-1.5 block text-[10px] font-bold tracking-wider text-slate-400 uppercase">
-                                    ENCONTRAR PESSOAS
-                                </span>
+                                <span className="mb-1.5 block text-[10px] font-bold tracking-wider text-slate-400 uppercase">ENCONTRAR PESSOAS</span>
+
                                 <div className="relative">
                                     <i className="fa-solid fa-magnifying-glass absolute top-1/2 left-3 -translate-y-1/2 text-xs text-slate-400" />
+
                                     <input
                                         type="text"
                                         placeholder="Buscar leitores na escola..."
@@ -423,9 +386,8 @@ export default function Feed({ auth, users = [] }) {
                                 {/* USUÁRIOS DA APLICAÇÃO */}
                                 <div>
                                     <div className="mb-3 flex items-center justify-between">
-                                        <h3 className="text-xs font-bold tracking-wider text-slate-800 uppercase">
-                                            Leitores em Destaque
-                                        </h3>
+                                        <h3 className="text-xs font-bold tracking-wider text-slate-800 uppercase">Leitores em Destaque</h3>
+
                                         <span className="rounded-full border border-emerald-200 bg-emerald-50 px-2 py-0.5 text-[10px] font-bold text-emerald-600">
                                             {users.length} ativos
                                         </span>
@@ -445,11 +407,13 @@ export default function Feed({ auth, users = [] }) {
                                                         .slice(0, 2)
                                                         .join('')
                                                         .toUpperCase()}
+
                                                     <span className="absolute right-0 bottom-0 h-2 w-2 rounded-full border border-white bg-emerald-500" />
                                                 </div>
 
                                                 <div className="min-w-0 flex-1">
                                                     <p className="truncate text-xs font-bold text-slate-800">{u.name}</p>
+
                                                     <p className="truncate text-[10px] text-slate-400">@{u.nickname}</p>
                                                 </div>
 
@@ -463,44 +427,9 @@ export default function Feed({ auth, users = [] }) {
 
                                 {/* SUGESTÕES DE AMIZADES */}
                                 <div>
-                                    <h3 className="mb-3 text-[10px] font-bold tracking-wider text-slate-400 uppercase">
-                                        Sugestões para Você
-                                    </h3>
+                                    <h3 className="mb-3 text-[10px] font-bold tracking-wider text-slate-400 uppercase">Sugestões para Você</h3>
 
-                                    <div className="flex flex-col gap-3">
-                                        {[
-                                            {
-                                                name: 'Rafaela Torres',
-                                                books: '28 livros lidos',
-                                                initials: 'RT',
-                                                color: 'bg-indigo-100 text-indigo-700',
-                                            },
-                                            {
-                                                name: 'Lucas Vance',
-                                                books: '14 livros lidos',
-                                                initials: 'LV',
-                                                color: 'bg-rose-100 text-rose-700',
-                                            },
-                                        ].map((person, idx) => (
-                                            <div key={idx} className="flex items-center justify-between">
-                                                <div className="flex items-center gap-2.5">
-                                                    <div
-                                                        className={`flex h-8 w-8 items-center justify-center rounded-full text-xs font-bold ${person.color}`}
-                                                    >
-                                                        {person.initials}
-                                                    </div>
-                                                    <div>
-                                                        <p className="text-xs font-bold text-slate-800">{person.name}</p>
-                                                        <p className="text-[10px] text-slate-400">{person.books}</p>
-                                                    </div>
-                                                </div>
-
-                                                <button className="flex items-center gap-1 rounded-lg bg-slate-100 px-2.5 py-1 text-[10px] font-semibold text-slate-700 transition-all hover:bg-blue-600 hover:text-white">
-                                                    <i className="fa-solid fa-user-plus" /> Seguir
-                                                </button>
-                                            </div>
-                                        ))}
-                                    </div>
+                                    <div className="flex flex-col gap-3">{/* Dados reais podem entrar aqui */}</div>
                                 </div>
 
                                 <hr className="border-slate-100" />
@@ -508,27 +437,11 @@ export default function Feed({ auth, users = [] }) {
                                 {/* TÓPICOS POPULARES */}
                                 <div>
                                     <h3 className="mb-3 flex items-center gap-1.5 text-[10px] font-bold tracking-wider text-slate-400 uppercase">
-                                        <i className="fa-solid fa-fire text-amber-500" /> Em Alta na Escola
+                                        <i className="fa-solid fa-fire text-amber-500" />
+                                        Em Alta na Escola
                                     </h3>
 
-                                    <div className="flex flex-col gap-1.5">
-                                        {[
-                                            { rank: 1, tag: '#DomCasmurro', posts: '34 publicações' },
-                                            { rank: 2, tag: '#SemanaLiterária', posts: '21 publicações' },
-                                            { rank: 3, tag: '#LeituradeVerão', posts: '17 publicações' },
-                                        ].map((item) => (
-                                            <div
-                                                key={item.rank}
-                                                className="flex items-center gap-3 rounded-xl p-2 transition-colors hover:bg-slate-50"
-                                            >
-                                                <span className="text-xs font-bold text-slate-400">#{item.rank}</span>
-                                                <div>
-                                                    <p className="text-xs font-bold text-slate-800">{item.tag}</p>
-                                                    <p className="text-[10px] text-slate-400">{item.posts}</p>
-                                                </div>
-                                            </div>
-                                        ))}
-                                    </div>
+                                    <div className="flex flex-col gap-1.5">{/* Dados reais podem entrar aqui */}</div>
                                 </div>
                             </div>
                         </aside>

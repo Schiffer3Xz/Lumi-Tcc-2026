@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Head, Link } from '@inertiajs/react';
+import { Head, Link, router } from '@inertiajs/react';
 
 export default function ConfigPage({ auth }) {
     const [privacy, setPrivacy] = useState(false);
@@ -329,13 +329,13 @@ export default function ConfigPage({ auth }) {
                                     </button>
                                 </div>
 
-                                <button
-                                    onClick={() => setIsCreateModalOpen(true)}
-                                    className="flex items-center gap-1.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold px-3 py-1.5 rounded-xl transition-colors shadow-xs"
+                                <Link
+                                    href={route('post')}
+                                    className="flex items-center gap-1.5 rounded-xl bg-blue-600 px-3 py-1.5 text-xs font-semibold text-white shadow-xs transition-colors hover:bg-blue-700"
                                 >
                                     <i className="fa-solid fa-plus text-[10px]" />
                                     <span>Novo Post</span>
-                                </button>
+                                </Link>
                             </div>
 
                             {/* FEED / GRADE COM IMAGENS COMPACTAS */}

@@ -9,6 +9,7 @@ use App\Http\Controllers\Admin\AdminCategoriesController;
 use App\Http\Controllers\Admin\AdminSettingsController;
 use App\Http\Controllers\Admin\AdminCatalogController;
 use App\Http\Controllers\SocialController;
+use App\Http\Controllers\PostController;
 
 use App\Http\Controllers\Admin\Categories\GenreController;
 use App\Http\Controllers\Admin\Categories\AuthorController;
@@ -80,6 +81,9 @@ Route::middleware(['RoleMiddleware'])->group(function () {
 
         Route::post('people/{id}/follow', [SocialController::class, 'follow'])->name('follow.store');
         Route::delete('people/{id}/follow', [SocialController::class, 'unfollow'])->name('follow.destroy');
+
+
+        Route::get('post', [PostController::class, 'index'])->name('post');
 
 
 
