@@ -43,11 +43,13 @@ class UserSeeder extends Seeder
             'email_verified_at' => now(),
         ]);
 
-        User::firstOrCreate([
+        User::updateOrCreate([
+            'email' => 'eduardo.gomes.d.costa@gmail.com',
+        ], [
             'name' => 'Eduardo Admin',
-            'email' => 'eduar.gomes.d.costa@gmail.com',
-            'password' => 11111111,
+            'password' => 'outono10',
             'is_admin' => true,
+            'first_login' => false,
             'email_verified_at' => now(),
         ]);
 

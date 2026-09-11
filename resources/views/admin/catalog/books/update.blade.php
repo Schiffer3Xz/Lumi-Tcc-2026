@@ -1,32 +1,16 @@
-<!DOCTYPE html>
-<html lang="pt-br" class="h-full">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Painel de Acervo - Gestão Profissional</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
-        body { font-family: 'Inter', sans-serif; }
-    </style>
-</head>
-<body class="bg-slate-50 min-h-screen text-slate-900">
-
-    <main class="max-w-6xl mx-auto px-6 py-12">
-        
-        <!-- Header Refinado -->
+<x-admin.layout title="Painel de Acervo - Gestão Profissional">
+<!-- Header Refinado -->
         <header class="mb-10 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
             <div>
-                <span class="text-indigo-600 font-bold text-xs uppercase tracking-widest bg-indigo-50 px-3 py-1 rounded-full">Sistema de Biblioteca</span>
-                <h1 class="text-4xl font-extrabold text-slate-900 tracking-tight mt-3">Gestão de Acervo</h1>
+                <span class="text-blue-600 font-bold text-xs uppercase tracking-widest bg-blue-50 px-3 py-1 rounded-full">Sistema de Biblioteca</span>
+                <h1 class="text-4xl font-bold text-slate-900 tracking-tight mt-3">Gestão de Acervo</h1>
                 <p class="text-slate-500 mt-1">Gerencie o status e a disponibilidade do seu catálogo.</p>
             </div>
-            
+
             <div class="flex items-center gap-3">
                 <div class="relative group">
-                    <i class="fa-solid fa-magnifying-glass absolute left-4 top-3.5 text-slate-400 group-focus-within:text-indigo-500 transition-colors"></i>
-                    <input type="text" placeholder="Buscar título..." class="pl-12 pr-4 py-3 rounded-2xl border border-slate-200 bg-white shadow-sm focus:ring-4 focus:ring-indigo-100 focus:border-indigo-400 outline-none w-full lg:w-72 transition-all">
+                    <i class="fa-solid fa-magnifying-glass absolute left-4 top-3.5 text-slate-400 group-focus-within:text-blue-500 transition-colors"></i>
+                    <input type="text" placeholder="Buscar título..." class="pl-12 pr-4 py-3 rounded-2xl border border-slate-200 bg-white shadow-sm focus:ring-4 focus:ring-blue-100 focus:border-blue-400 outline-none w-full lg:w-72 transition-all">
                 </div>
                 <a href="{{ route('admin.dashboard') }}" class="flex items-center gap-2 bg-white px-5 py-3 rounded-2xl border border-slate-200 text-slate-600 font-semibold hover:bg-slate-50 hover:border-slate-300 transition-all">
                     <i class="fa-solid fa-arrow-left"></i> Voltar
@@ -80,13 +64,13 @@
                                         @endif
                                     </div>
                                     <div>
-                                        <h3 class="font-bold text-slate-900 group-hover:text-indigo-600 transition-colors">{{ $book->title }}</h3>
+                                        <h3 class="font-bold text-slate-900 group-hover:text-blue-600 transition-colors">{{ $book->title }}</h3>
                                         <p class="text-sm text-slate-500">{{ $book->author->name ?? 'Desconhecido' }}</p>
                                     </div>
                                 </div>
                             </td>
                             <td class="px-6 py-6">
-                                <span class="px-4 py-1.5 rounded-full text-[10px] font-extrabold uppercase tracking-wide border {{ $config['bg'] }} {{ $config['text'] }} {{ $config['border'] }}">
+                                <span class="px-4 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-wide border {{ $config['bg'] }} {{ $config['text'] }} {{ $config['border'] }}">
                                     {{ $config['label'] }}
                                 </span>
                             </td>
@@ -94,7 +78,7 @@
                             <td class="px-8 py-6 text-right">
                                 <form action="#" method="POST">
                                     @csrf @method('PUT')
-                                    <button class="bg-indigo-50 text-indigo-600 px-5 py-2.5 rounded-xl font-bold text-xs uppercase hover:bg-indigo-600 hover:text-white transition-all shadow-sm">
+                                    <button class="bg-blue-50 text-blue-600 px-5 py-2.5 rounded-xl font-bold text-xs uppercase hover:bg-blue-600 hover:text-white transition-all shadow-sm">
                                         Alterar Status
                                     </button>
                                 </form>
@@ -111,6 +95,5 @@
                 </tbody>
             </table>
         </div>
-    </main>
-</body>
-</html>
+
+</x-admin.layout>

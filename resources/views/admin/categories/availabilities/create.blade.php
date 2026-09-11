@@ -1,20 +1,9 @@
-<!DOCTYPE html>
-<html lang="pt-br" class="h-full bg-slate-50">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gestão de Disponibilidades</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-</head>
-
-<body class="py-12 px-6">
-
-    <div class="max-w-4xl mx-auto">
+<x-admin.layout title="Gestão de Disponibilidades">
+<div class="max-w-4xl mx-auto">
 
         <div class="flex items-center justify-between mb-8">
             <div>
-                <h1 class="text-3xl font-extrabold text-slate-900 tracking-tight">Gestão de Disponibilidades</h1>
+                <h1 class="text-2xl font-bold text-slate-900 tracking-tight">Gestão de Disponibilidades</h1>
                 <p class="text-slate-500 mt-1">Cadastre e gerencie as disponibilidades do seu acervo.</p>
             </div>
             <a href="{{ route('admin.categories.index') }}" class="flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 rounded-xl text-sm font-semibold text-slate-600 hover:border-slate-300 hover:text-slate-900 transition-all shadow-sm">
@@ -26,8 +15,8 @@
             <form action="{{ route('admin.availability.store') }}" method="POST" class="flex flex-col sm:flex-row gap-4">
                 @csrf
                 <div class="flex-1">
-                    <label class="block text-sm font-bold text-slate-700 mb-2">Nome da Disponibilidade</label>
-                    <input
+                    <label for="admin-availability" class="block text-sm font-bold text-slate-700 mb-2">Nome da Disponibilidade</label>
+                    <input id="admin-availability"
                         type="text"
                         name="availability"
                         placeholder="Ex: Disponível"
@@ -36,7 +25,7 @@
                     >
                 </div>
                 <div class="flex items-end">
-                    <button type="submit" class="w-full sm:w-auto bg-slate-900 hover:bg-slate-800 text-white font-bold px-8 py-3 rounded-xl transition-all active:scale-95">
+                    <button type="submit" class="w-full sm:w-auto font-bold px-8 py-3 rounded-xl transition-all active:scale-95 bg-blue-600 text-white hover:bg-blue-700">
                         Adicionar
                     </button>
                 </div>
@@ -77,5 +66,4 @@
         </div>
     </div>
 
-</body>
-</html>
+</x-admin.layout>

@@ -14,11 +14,12 @@ const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
 
 createInertiaApp({
     title: (title) => `${title} - ${appName}`,
-    resolve: (name) =>
-        resolvePageComponent(
-            `./pages/${name}.jsx`,
-            import.meta.glob('./pages/**/*.{js,jsx,ts,tsx}')
-        ),
+    resolve: (name) => {
+        const pages = import.meta.glob('./pages/**/*.{js,jsx,ts,tsx}');
+        const path = ['jsx', 'tsx', 'js', 'ts'].map((extension) => `./pages/${name}.${extension}`).find((candidate) => candidate in pages);
+        if (!path) throw new Error(`Page not found: ${name}`);
+        return resolvePageComponent(path, pages);
+    },
     setup({ el, App, props }) {
         const root = createRoot(el);
 

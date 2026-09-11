@@ -1,0 +1,41 @@
+@import './app.css';
+
+.admin-app [hidden] {
+    display: none !important;
+}
+
+.admin-app summary::-webkit-details-marker {
+    display: none;
+}
+
+.admin-app :where(a, button, summary):focus-visible {
+    outline: 2px solid #2563eb;
+    outline-offset: 3px;
+}
+
+.admin-content :where(input:not([type='checkbox'], [type='radio'], [type='file']), select, textarea) {
+    border-radius: 0.75rem;
+    border-color: #e2e8f0;
+    background-color: #f8fafc;
+    color: #334155;
+}
+
+.admin-content :where(input, select, textarea):focus-visible {
+    border-color: #3b82f6;
+    outline: 2px solid #bfdbfe;
+    outline-offset: 1px;
+    background-color: white;
+}
+
+.admin-content table {
+    width: 100%;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .admin-app *,
+    .admin-app *::before,
+    .admin-app *::after {
+        transition-duration: 0.01ms !important;
+        animation-duration: 0.01ms !important;
+    }
+}

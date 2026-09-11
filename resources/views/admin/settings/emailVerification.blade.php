@@ -1,14 +1,5 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Verifique seu E-mail</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-</head>
-<body class="bg-gray-50 flex items-center justify-center min-h-screen p-4">
-
-    <div class="bg-white p-8 md:p-12 rounded-2xl shadow-xl w-full max-w-md text-center border border-gray-100">
+<x-admin.layout title="Verifique seu E-mail" :first-access="true" :step="2">
+<div class="bg-white/90 p-6 sm:p-10 rounded-3xl shadow-sm w-full max-w-2xl text-center border border-slate-100">
         <!-- Ícone -->
         <div class="mx-auto bg-blue-50 w-20 h-20 rounded-full flex items-center justify-center mb-6">
             <svg class="w-10 h-10 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -17,21 +8,28 @@
         </div>
 
         <!-- Título e Texto -->
-        <h1 class="text-2xl font-bold text-gray-800 mb-3">Verifique seu e-mail</h1>
-        <p class="text-gray-600 mb-8">
-            Enviamos um link de confirmação para o seu e-mail. Por favor, acesse sua caixa de entrada para continuar o acesso ao sistema.
+        <h1 class="text-2xl font-bold text-slate-800 mb-3">Verifique seu e-mail</h1>
+        <p class="text-slate-600 mb-8">
+            Confirme o endereço <strong>{{ auth()->user()->email }}</strong> pelo link de verificação para continuar o acesso ao sistema.
         </p>
+        @if (session('status') === 'verification-link-sent')
+            <p role="status" class="mb-6 rounded-xl bg-emerald-50 p-4 text-sm text-emerald-800">Link de verificação enviado. Confira sua caixa de entrada e a pasta de spam.</p>
+        @endif
 
         <!-- Botões -->
         <div class="space-y-3">
-            <a href="#" class="block w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-4 rounded-lg transition duration-200">
-                Abrir meu e-mail
+            <a href="{{ route('admin.dashboard') }}" class="block w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-4 rounded-lg transition duration-200">
+                Já confirmei meu e-mail. Continuar
             </a>
-            <button class="w-full text-gray-500 hover:text-gray-700 font-medium py-2 transition duration-200">
-                Não recebeu o e-mail? Reenviar
-            </button>
+            <form method="post" action="{{ route('verification.send') }}">
+                @csrf
+                <button type="submit" class="w-full text-slate-500 hover:text-slate-700 font-medium py-2 transition duration-200">Não recebeu o e-mail? Reenviar</button>
+            </form>
+            <form method="post" action="{{ route('logout') }}">
+                @csrf
+                <button type="submit" class="text-sm text-slate-500 underline">Sair</button>
+            </form>
         </div>
     </div>
 
-</body>
-</html>
+</x-admin.layout>

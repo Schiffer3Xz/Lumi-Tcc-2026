@@ -1,16 +1,7 @@
-<!DOCTYPE html>
-<html lang="pt-PT">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Editar Disponibilidade | Gestão</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-</head>
-<body class="bg-slate-50 text-slate-900 font-sans antialiased">
+<x-admin.layout title="Editar Disponibilidade | Gestão">
+<div class="min-h-screen flex items-center justify-center p-6">
 
-    <div class="min-h-screen flex items-center justify-center p-6">
-
-        <div class="w-full max-w-lg bg-white shadow-xl shadow-slate-200/50 border border-slate-100 rounded-3xl p-8">
+        <div class="w-full max-w-lg bg-white shadow-sm shadow-slate-200/50 border border-slate-100 rounded-3xl p-8">
 
             <div class="mb-8 text-center sm:text-left">
                 <h1 class="text-2xl font-bold text-slate-900 tracking-tight">Editar Disponibilidade</h1>
@@ -45,7 +36,7 @@
                         Cancelar
                     </a>
                     <button type="submit"
-                            class="w-full sm:flex-1 px-6 py-3 bg-amber-600 text-white font-semibold rounded-xl hover:bg-amber-700 shadow-lg shadow-amber-500/20 transition-all active:scale-95">
+                            class="w-full sm:flex-1 px-6 py-3 font-semibold rounded-xl shadow-lg shadow-amber-500/20 transition-all active:scale-95 bg-blue-600 text-white hover:bg-blue-700">
                         Salvar Alterações
                     </button>
                 </div>
@@ -54,5 +45,4 @@
         </div>
     </div>
 
-</body>
-</html>
+</x-admin.layout>

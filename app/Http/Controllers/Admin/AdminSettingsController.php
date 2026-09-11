@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Hash;
 use App\Models\User;
+use App\Services\VerificationEmailSender;
 
 use Illuminate\Http\Request;
 
@@ -22,7 +23,7 @@ use Illuminate\Http\Request;
     }
 
     public function emailVerification(){
-        return view('admin/settings/emailVerification');
+        return redirect()->route('verification.notice');
     }
 
     public function editEmail(){
@@ -45,7 +46,10 @@ use Illuminate\Http\Request;
 
 
     //Update do first Access
-    public function update(Request $request){
+    public function update(Request $request, VerificationEmailSender $verificationEmail){
+        if (! $request->filled('email')) {
+            $request->merge(['email' => $request->user()->email]);
+        }
         $request->validate([
             'name' => 'required|string|max:255',
             'nickname' => 'required|string|max:255|unique:users,nickname,' . auth()->id(),
@@ -71,9 +75,14 @@ use Illuminate\Http\Request;
 
         $user->save();
 
-        if ($firstLogin) {
-            $user->sendEmailVerificationNotification();
-            return redirect()->route('admin.email-verification');
+        if (($firstLogin || $emailAlterado) && ! $user->hasVerifiedEmail()) {
+            $sent = $verificationEmail->send($user);
+            $response = redirect()->route('verification.notice')
+                ->with('success', 'Dados salvos. Confirme seu e-mail para acessar o painel.');
+
+            return $sent
+                ? $response->with('status', 'verification-link-sent')
+                : $response->withErrors(['verification' => VerificationEmailSender::ERROR_MESSAGE]);
         }
 
         return redirect()->route('admin.dashboard');
@@ -99,7 +108,7 @@ use Illuminate\Http\Request;
         return redirect()->route('admin.dashboard');
     }
 
-    public function updateEmail(Request $request){
+    public function updateEmail(Request $request, VerificationEmailSender $verificationEmail){
          $request->validate([
             'email' => 'required|email|max:255|unique:users,email,' . auth()->id(),
             'current_password' => 'required|current_password',
@@ -111,8 +120,12 @@ use Illuminate\Http\Request;
         
         $user->save();
 
-        $user->sendEmailVerificationNotification();
-        return redirect()->route('verification.notice');
+        $sent = $verificationEmail->send($user);
+        $response = redirect()->route('verification.notice');
+
+        return $sent
+            ? $response->with('status', 'verification-link-sent')
+            : $response->withErrors(['verification' => VerificationEmailSender::ERROR_MESSAGE]);
     }
 
     public function updatePassword(Request $request){

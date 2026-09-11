@@ -12,9 +12,11 @@ export default [
     {
         ...react.configs.flat.recommended,
         ...react.configs.flat['jsx-runtime'], // Required for React 17+
+        files: ['**/*.{js,jsx,ts,tsx}'],
         languageOptions: {
             globals: {
                 ...globals.browser,
+                route: 'readonly',
             },
         },
         rules: {

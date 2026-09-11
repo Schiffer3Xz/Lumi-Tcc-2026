@@ -1,0 +1,11 @@
+export const READER_NAVIGATION = [
+    { id: 'home', label: 'Home', icon: 'fa-solid fa-house', routeName: 'dashboard' },
+    { id: 'biblioteca', label: 'Catálogo', icon: 'fa-solid fa-book-open', routeName: 'catalogo' },
+    { id: 'usuarios', label: 'Social', icon: 'fa-solid fa-users', routeName: 'list' },
+    { id: 'config', label: 'Config', icon: 'fa-solid fa-gear', routeName: 'profile' },
+];
+
+export const ACCOUNT_NAVIGATION = [
+    { id: 'settings', label: 'Configurações', icon: 'fa-solid fa-gear', routeName: 'profile.edit' },
+    { id: 'logout', label: 'Sair da Conta', icon: 'fa-solid fa-right-from-bracket', routeName: 'logout', method: 'post', as: 'button' },
+];

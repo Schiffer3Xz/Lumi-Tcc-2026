@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Inertia\Inertia;
 use App\Models\User;
 use App\Models\Follow;
+use App\Models\Post;
 
 class SocialController extends Controller
 {
@@ -15,6 +16,28 @@ class SocialController extends Controller
         $followingIds = $user->follows->pluck('id');
 
         return Inertia::render("social", [
+            "posts" => Post::with(['user', 'book.author'])
+                ->latest()
+                ->orderByDesc('id')
+                ->get()
+                ->map(fn (Post $post) => [
+                    'id' => $post->id,
+                    'content' => $post->content,
+                    'time' => $post->created_at?->locale('pt_BR')->diffForHumans(),
+                    'author' => [
+                        'name' => $post->user?->name,
+                        'username' => ltrim($post->user?->nickname ?? '', '@'),
+                    ],
+                    'book' => $post->book ? [
+                        'title' => $post->book->title,
+                        'author' => $post->book->author?->name,
+                        'badge' => 'Livro',
+                        'coverBg' => 'bg-slate-800',
+                    ] : null,
+                    'likesCount' => 0,
+                    'commentsCount' => 0,
+                    'comments' => [],
+                ]),
             "users" => User::where('id', '!=', auth()->id())->where('is_admin', false)->whereNotIn('id', $followingIds)->limit(5)->get()->map(function ($user) {
                 return [
                     "id" => $user->id,
