@@ -41,11 +41,11 @@ export default function PostCard({ post, user, isLiked = false, onLike }) {
 
             {/* FOTO DO POST (SE HOUVER) */}
             {post.image && (
-                <div className="max-h-[360px] overflow-hidden rounded-xl border border-slate-100 bg-slate-900/5">
+                <div className="flex max-h-[360px] min-h-[180px] items-center justify-center overflow-hidden rounded-xl border border-slate-100 bg-slate-900/5">
                     <img
                         src={post.image}
                         alt="Imagem da publicação"
-                        className="h-full w-full object-cover transition-transform duration-300 hover:scale-[1.01]"
+                        className="block max-h-[360px] w-full object-contain transition-transform duration-300 hover:scale-[1.01]"
                     />
                 </div>
             )}

@@ -1,5 +1,3 @@
-import '../css/admin.css';
-
 const sidebar = document.querySelector('#admin-sidebar');
 const trigger = document.querySelector('[data-admin-menu]');
 const overlay = document.querySelector('[data-admin-overlay]');

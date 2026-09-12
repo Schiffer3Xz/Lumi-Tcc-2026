@@ -8,7 +8,7 @@
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=instrument-sans:400,500,600" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    @vite('resources/js/admin.js')
+    @vite(['resources/css/admin.css', 'resources/js/admin.js'])
     {{ $head ?? '' }}
 </head>
 <body class="admin-app min-h-screen bg-[#F8FAFC] font-sans text-slate-700 antialiased selection:bg-yellow-200">

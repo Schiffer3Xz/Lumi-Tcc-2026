@@ -7,6 +7,7 @@ export default function BookFilters({
     genres,
     selectedGenre,
     onGenreChange,
+    onMoreGenres,
     placeholder = 'Pesquise por livros, autores, gêneros...',
     searchLabel = 'BUSCAR',
     onSearch,
@@ -24,7 +25,7 @@ export default function BookFilters({
                     {searchLabel}
                 </button>
             </div>
-            <GenreQuickSelect genres={genres} value={selectedGenre} onChange={onGenreChange} />
+            <GenreQuickSelect genres={genres} value={selectedGenre} onChange={onGenreChange} onMore={onMoreGenres} />
         </>
     );
 }

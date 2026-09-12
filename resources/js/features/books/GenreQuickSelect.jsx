@@ -1,6 +1,6 @@
 import { cn } from '@/lib/utils';
 
-export default function GenreQuickSelect({ genres, value, onChange, disabled = false, className }) {
+export default function GenreQuickSelect({ genres, value, onChange, onMore, disabled = false, className }) {
     return (
         <div className={cn('mb-6 flex flex-wrap gap-2', className)} role="group" aria-label="Gêneros literários">
             {genres.map((genre) => (
@@ -21,6 +21,16 @@ export default function GenreQuickSelect({ genres, value, onChange, disabled = f
                     {genre.label}
                 </button>
             ))}
+            {onMore && (
+                <button
+                    type="button"
+                    onClick={onMore}
+                    className="flex items-center gap-1 rounded-full border border-gray-200 bg-white px-4 py-2 text-xs font-semibold text-gray-600 transition-all hover:border-gray-300 hover:bg-gray-50 sm:text-sm"
+                >
+                    Ver mais
+                    <i className="fa-solid fa-chevron-right text-[10px]" aria-hidden="true" />
+                </button>
+            )}
         </div>
     );
 }

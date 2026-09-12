@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use App\Models\Book;
+use App\Models\Genre;
 
 use App\Http\Controllers\Admin\AdminDashboardController;
 use App\Http\Controllers\Admin\AdminCategoriesController;
@@ -51,9 +52,15 @@ Route::middleware(['RoleMiddleware'])->group(function () {
                 return [
                     'id' => $book->id,
                     'title' => $book->title,
+                    'page_count' => $book->page_count,
+                    'publication_year' => $book->publication_year,
+                    'publisher' => $book->publisher,
+                    'readers_count' => $book->readers_count,
                     'description' => $book->description,
                     'rating' => $book->rating ?? 0,
-                    'cover_url' => $book->cover_url ? asset('storage/' . $book->cover_url) : null,
+                    'cover_url' => $book->cover_url
+                        ? (str_starts_with($book->cover_url, 'http') ? $book->cover_url : asset('storage/' . $book->cover_url))
+                        : null,
                     'author' => $book->author,
                     'genre' => $book->genre,
                     'availability' => $book->availability,
@@ -62,6 +69,13 @@ Route::middleware(['RoleMiddleware'])->group(function () {
 
         return Inertia::render('catalogo', [
             'books' => $books,
+            'genres' => Genre::query()
+                ->orderBy('name')
+                ->get()
+                ->map(fn ($genre) => [
+                    'label' => $genre->name,
+                    'icon' => 'fa-solid fa-bookmark',
+                ]),
         ]);
     })->name('catalogo');
 
@@ -84,6 +98,8 @@ Route::middleware(['RoleMiddleware'])->group(function () {
 
 
         Route::get('post', [PostController::class, 'index'])->name('post');
+        Route::post('post', [PostController::class, 'store'])->name('posts.store');
+        Route::delete('post/{id}', [SocialController::class, 'destroyPost'])->name('posts.destroy');
 
 
 

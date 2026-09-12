@@ -1,6 +1,6 @@
 import CreatePostModal from '@/features/profile/CreatePostModal';
 import PreferencesPanel from '@/features/profile/PreferencesPanel';
-import { defaultPersonalProfile, profilePosts, readingRules } from '@/features/profile/profile-data';
+import { defaultPersonalProfile, readingRules } from '@/features/profile/profile-data';
 import ProfilePosts from '@/features/profile/ProfilePosts';
 import ProfileStatCard from '@/features/profile/ProfileStatCard';
 import ProfileSummary from '@/features/profile/ProfileSummary';
@@ -9,7 +9,7 @@ import ReaderLayout from '@/layouts/reader-layout';
 import { Link } from '@inertiajs/react';
 import { useState } from 'react';
 
-export default function ConfigPage({ auth }) {
+export default function ConfigPage({ auth, posts = [] }) {
     const [drawerOpen, setDrawerOpen] = useState(false);
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
 
@@ -60,7 +60,7 @@ export default function ConfigPage({ auth }) {
                             <ProfileStatCard icon="fa-star" count="12" label="Avaliações" />
                         </div>
 
-                        <ProfilePosts posts={profilePosts} user={user} createPostHref={route('post')} />
+                        <ProfilePosts posts={posts} user={user} createPostHref={route('post')} />
 
                         {/* BANNER DE REGRAS */}
                         <ReadingRules rules={readingRules} />

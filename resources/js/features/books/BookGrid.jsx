@@ -3,7 +3,7 @@ import BookCard from './BookCard';
 
 const GRID_COLUMNS = {
     featured: 'grid-cols-2 sm:grid-cols-3 lg:grid-cols-4',
-    catalog: 'grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6',
+    catalog: 'grid-cols-1 lg:grid-cols-3',
 };
 
 export default function BookGrid({ books, variant = 'catalog', className, emptyState, cardProps }) {

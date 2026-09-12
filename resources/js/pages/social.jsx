@@ -3,9 +3,32 @@ import PostFeed from '@/features/social/PostFeed';
 import ReaderListItem from '@/features/social/ReaderListItem';
 import ReaderLayout from '@/layouts/reader-layout';
 import { router } from '@inertiajs/react';
+import { useEffect, useState } from 'react';
 
-export default function Feed({ auth, users = [], posts = [] }) {
+export default function Feed({ auth, suggestedUsers = [], followedUsers = [], allUsers = [], posts = [] }) {
     const user = auth?.user ?? { name: 'Estudante', email: '' };
+    const [searchTerm, setSearchTerm] = useState('');
+    const [searchResults, setSearchResults] = useState([]);
+
+    useEffect(() => {
+        const normalizedSearch = searchTerm.trim().toLocaleLowerCase();
+
+        if (!normalizedSearch) {
+            setSearchResults([]);
+            return;
+        }
+
+        setSearchResults(
+            allUsers.filter((user) => {
+                const name = user.name?.toLocaleLowerCase() ?? '';
+                const nickname = user.nickname?.toLocaleLowerCase() ?? '';
+
+                return name.includes(normalizedSearch) || nickname.includes(normalizedSearch);
+            }),
+        );
+    }, [allUsers, searchTerm]);
+
+    const usersToDisplay = searchTerm.trim() ? searchResults : suggestedUsers;
 
     return (
         <>
@@ -47,6 +70,8 @@ export default function Feed({ auth, users = [], posts = [] }) {
                                 className="relative"
                                 iconClassName="fa-solid fa-magnifying-glass absolute top-1/2 left-3 -translate-y-1/2 text-xs text-slate-400"
                                 placeholder="Buscar leitores na escola..."
+                                value={searchTerm}
+                                onChange={(event) => setSearchTerm(event.target.value)}
                                 inputClassName="w-full rounded-xl border border-slate-200/90 bg-white py-2 pr-3 pl-9 text-xs text-slate-700 shadow-xs outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
                             />
                         </div>
@@ -55,15 +80,15 @@ export default function Feed({ auth, users = [], posts = [] }) {
                             {/* USUÁRIOS DA APLICAÇÃO */}
                             <div>
                                 <div className="mb-3 flex items-center justify-between">
-                                    <h3 className="text-xs font-bold tracking-wider text-slate-800 uppercase">Leitores em Destaque</h3>
+                                    <h3 className="text-xs font-bold tracking-wider text-slate-800 uppercase">Sugestões para você</h3>
 
                                     <span className="rounded-full border border-emerald-200 bg-emerald-50 px-2 py-0.5 text-[10px] font-bold text-emerald-600">
-                                        {users.length} ativos
+                                        {usersToDisplay.length} encontrados
                                     </span>
                                 </div>
 
                                 <div className="flex flex-col gap-1">
-                                    {users.slice(0, 5).map((u) => (
+                                    {usersToDisplay.slice(0, 5).map((u) => (
                                         <ReaderListItem key={u.id} user={u} variant="featured" onClick={() => router.get(`people/${u.id}`)} />
                                     ))}
                                 </div>
@@ -71,11 +96,15 @@ export default function Feed({ auth, users = [], posts = [] }) {
 
                             <hr className="border-slate-100" />
 
-                            {/* SUGESTÕES DE AMIZADES */}
+                            {/* AMIGOS ADICIONADOS */}
                             <div>
-                                <h3 className="mb-3 text-[10px] font-bold tracking-wider text-slate-400 uppercase">Sugestões para Você</h3>
+                                <h3 className="mb-3 text-[10px] font-bold tracking-wider text-slate-400 uppercase">Amigos adicionados</h3>
 
-                                <div className="flex flex-col gap-3" />
+                                <div className="flex flex-col gap-1">
+                                    {followedUsers.map((u) => (
+                                        <ReaderListItem key={u.id} user={u} variant="featured" onClick={() => router.get(`people/${u.id}`)} />
+                                    ))}
+                                </div>
                             </div>
 
                             <hr className="border-slate-100" />
