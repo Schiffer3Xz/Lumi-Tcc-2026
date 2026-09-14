@@ -24,6 +24,8 @@ export default function Profile({ mustVerifyEmail, status }: { mustVerifyEmail: 
 
     const { data, setData, patch, errors, processing, recentlySuccessful } = useForm({
         name: auth.user.name,
+        nickname: auth.user.nickname ?? '',
+        description: auth.user.description ?? '',
         email: auth.user.email,
     });
 
@@ -56,6 +58,35 @@ export default function Profile({ mustVerifyEmail, status }: { mustVerifyEmail: 
                             />
 
                             <InputError className="mt-2" message={errors.name} />
+                        </div>
+
+                        <div className="grid gap-2">
+                            <Label htmlFor="nickname">Nickname</Label>
+
+                            <Input
+                                id="nickname"
+                                className="mt-1 block w-full"
+                                value={data.nickname}
+                                onChange={(e) => setData('nickname', e.target.value)}
+                                autoComplete="nickname"
+                                placeholder="Como você quer ser encontrado"
+                            />
+
+                            <InputError className="mt-2" message={errors.nickname} />
+                        </div>
+
+                        <div className="grid gap-2">
+                            <Label htmlFor="description">Descrição</Label>
+
+                            <textarea
+                                id="description"
+                                className="mt-1 block min-h-24 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                                value={data.description}
+                                onChange={(e) => setData('description', e.target.value)}
+                                placeholder="Conte um pouco sobre você"
+                            />
+
+                            <InputError className="mt-2" message={errors.description} />
                         </div>
 
                         <div className="grid gap-2">

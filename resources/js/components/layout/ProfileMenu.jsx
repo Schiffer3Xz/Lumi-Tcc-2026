@@ -11,6 +11,7 @@ export default function ProfileMenu({ user, items, variant = 'social', showPhoto
     const isLibrary = variant === 'library';
     const isProfile = variant === 'profile';
     const isStatic = variant === 'composer';
+    const displayName = user.nickname?.replace(/^@/, '') || user.name;
 
     useEffect(() => {
         function handleOutside(event) {
@@ -64,7 +65,7 @@ export default function ProfileMenu({ user, items, variant = 'social', showPhoto
                         isStatic && 'max-w-[120px] truncate',
                     )}
                 >
-                    {user.name}
+                    {displayName}
                 </span>
                 <i
                     aria-hidden="true"
@@ -93,7 +94,7 @@ export default function ProfileMenu({ user, items, variant = 'social', showPhoto
                             {isLibrary ? 'Logado como' : 'Conta'}
                         </p>
                         <p className={isLibrary ? 'truncate text-sm font-semibold text-gray-800' : 'truncate text-xs font-bold text-slate-800'}>
-                            {user.name}
+                            {displayName}
                         </p>
                     </div>
                     {items.map((item) => (

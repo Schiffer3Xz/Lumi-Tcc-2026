@@ -69,6 +69,7 @@ export default function Catalogo({ books = [], auth, genres = [] }) {
                     selectedGenre={generoAtivo}
                     onGenreChange={setGeneroAtivo}
                     onMoreGenres={() => setIsGenresSidebarOpen(true)}
+                    showSearchButton={false}
                 />
 
                 {/* Cabeçalho do Catálogo */}

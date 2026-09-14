@@ -21,10 +21,12 @@ export default function UserProfilePage({ auth, targetUser, users = [], isFollow
         reading_books: [],
         shelf_books: [],
         rated_books: [],
+        shelf_books_count: 0,
+        rated_books_count: 0,
+        posts_count: 0,
     };
 
     const getBookList = (value) => (Array.isArray(value) ? value : []);
-    const getBookCount = (value) => (Array.isArray(value) ? value.length : Number(value) || 0);
 
     const readBooks = getBookList(profile.read_books);
     const readingBooks = getBookList(profile.reading_books);
@@ -66,11 +68,12 @@ export default function UserProfilePage({ auth, targetUser, users = [], isFollow
                     />
 
                     {/* ESTATÍSTICAS DO USUÁRIO */}
-                    <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
-                        <ProfileStatCard icon="fa-book-open" count={getBookCount(profile.read_books)} label="Livros Lidos" />
-                        <ProfileStatCard icon="fa-book-bookmark" count={getBookCount(profile.reading_books)} label="Lendo Agora" />
-                        <ProfileStatCard icon="fa-bookmark" count={getBookCount(profile.shelf_books)} label="Na Estante" />
-                        <ProfileStatCard icon="fa-star" count={getBookCount(profile.rated_books)} label="Avaliações" />
+                    <div className="grid grid-cols-2 gap-4 md:grid-cols-5">
+                        <ProfileStatCard icon="fa-book-open" count={0} label="Livros Lidos" />
+                        <ProfileStatCard icon="fa-book-bookmark" count={0} label="Lendo Agora" />
+                        <ProfileStatCard icon="fa-bookmark" count={profile.shelf_books_count ?? 0} label="Na Estante" />
+                        <ProfileStatCard icon="fa-star" count={profile.rated_books_count ?? 0} label="Avaliações" />
+                        <ProfileStatCard icon="fa-newspaper" count={profile.posts_count ?? 0} label="Posts" />
                     </div>
 
                     {/* HISTÓRICO DE LIVROS */}

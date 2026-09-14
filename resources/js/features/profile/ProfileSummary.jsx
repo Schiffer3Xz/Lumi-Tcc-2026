@@ -34,9 +34,8 @@ export default function ProfileSummary({ user, variant = 'personal', action }) {
                 {/* CONTADORES SOCIAIS */}
                 <div className="flex items-center gap-8 border-t border-slate-100 pt-3 text-xs">
                     {[
-                        { label: 'Seguidores', count: user.followers },
-                        { label: 'Seguindo', count: user.following },
-                        { label: 'Amigos', count: user.friends },
+                        { label: 'Seguindo', count: user.following_count ?? user.following ?? 0 },
+                        { label: 'Seguidores', count: user.followers_count ?? user.followers ?? 0 },
                     ].map(({ label, count }) => (
                         <div key={label} className="flex items-center gap-1.5">
                             <span className="text-sm font-bold text-slate-900">{count}</span>
@@ -68,6 +67,17 @@ export default function ProfileSummary({ user, variant = 'personal', action }) {
                         {user.nickname && <span className="text-xs font-medium text-slate-400">@{user.nickname.replace('@', '')}</span>}
                     </div>
                     <p className="mt-0.5 text-xs text-slate-500">{user.description || 'Nenhuma descrição informada.'}</p>
+                    <div className="mt-3 flex items-center gap-5 text-xs">
+                        {[
+                            { label: 'Seguindo', count: user.following_count ?? user.following ?? 0 },
+                            { label: 'Seguidores', count: user.followers_count ?? user.followers ?? 0 },
+                        ].map(({ label, count }) => (
+                            <div key={label} className="flex items-center gap-1.5">
+                                <span className="font-bold text-slate-900">{count}</span>
+                                <span className="text-slate-500">{label}</span>
+                            </div>
+                        ))}
+                    </div>
                 </div>
             </div>
             {action}

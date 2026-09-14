@@ -7,6 +7,7 @@ use Inertia\Inertia;
 use App\Models\User;
 use App\Models\Follow;
 use App\Models\Post;
+use Illuminate\Support\Facades\DB;
 
 class SocialController extends Controller
 {
@@ -63,6 +64,11 @@ class SocialController extends Controller
 
     public function profile()
     {
+        $profileUser = User::withCount(['followers', 'follows as following_count'])->findOrFail(auth()->id());
+        $profileUser->setAttribute('shelf_books_count', DB::table('book_favorites')->where('user_id', $profileUser->id)->count());
+        $profileUser->setAttribute('rated_books_count', DB::table('book_ratings')->where('user_id', $profileUser->id)->count());
+        $profileUser->setAttribute('posts_count', DB::table('posts')->where('fk_user_id', $profileUser->id)->count());
+
         $posts = Post::where('fk_user_id', auth()->id())
             ->with('book.author')
             ->latest()
@@ -86,11 +92,15 @@ class SocialController extends Controller
 
         return Inertia::render('personalProfile', [
             'posts' => $posts,
+            'profileUser' => $profileUser,
         ]);
     }
 
     public function people($id){
-        $targetUser = User::find($id);
+        $targetUser = User::withCount(['followers', 'follows as following_count'])->findOrFail($id);
+        $targetUser->setAttribute('shelf_books_count', DB::table('book_favorites')->where('user_id', $targetUser->id)->count());
+        $targetUser->setAttribute('rated_books_count', DB::table('book_ratings')->where('user_id', $targetUser->id)->count());
+        $targetUser->setAttribute('posts_count', DB::table('posts')->where('fk_user_id', $targetUser->id)->count());
 
         return Inertia::render("userProfilePage", [
             "users" => User::where('id', '!=', auth()->id())->where('is_admin', false)->get()->map(function ($user) {
@@ -100,10 +110,13 @@ class SocialController extends Controller
                     "nickname" => $user->nickname,
                     "description" => $user->description,
                     "profile_photo" => $user->profile_photo,
-                    "read_books" => $user->read_books,
-                    "reading_books" => $user->reading_books,
-                    "shelf_books" => $user->shelf_books,
-                    "rated_books" => $user->rated_books,
+                    "read_books" => [],
+                    "reading_books" => [],
+                    "shelf_books" => [],
+                    "rated_books" => [],
+                    "shelf_books_count" => DB::table('book_favorites')->where('user_id', $user->id)->count(),
+                    "rated_books_count" => DB::table('book_ratings')->where('user_id', $user->id)->count(),
+                    "posts_count" => DB::table('posts')->where('fk_user_id', $user->id)->count(),
                 ];
             }),
 

@@ -16,11 +16,15 @@ return new class extends Migration
             $table->id();
             $table->string('title', 150);
             $table->integer('page_count');
+            $table->unsignedSmallInteger('publication_year')->nullable();
             $table->foreignId('fk_author_id')->constrained('authors');
             $table->foreignId('fk_genre_id')->constrained('genres');
             $table->foreignId('fk_availability_id')->constrained('availabilities');
             $table->text('description')->nullable();
             $table->string('cover_url')->nullable();
+            $table->string('publisher')->nullable();
+            $table->decimal('rating', 2, 1)->default(0);
+            $table->unsignedInteger('readers_count')->default(0);
             $table->timestamps();
         });
     }

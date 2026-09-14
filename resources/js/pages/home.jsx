@@ -45,9 +45,9 @@ export default function Home({ books = [], auth }) {
         });
     }, [books, searchQuery, generoAtivo]);
 
-    // 4 livros melhores avaliados dentro dos livros filtrados
+    // 3 livros melhores avaliados dentro dos livros filtrados
     const topRatedBooks = useMemo(() => {
-        return [...filteredBooks].sort((a, b) => Number(b.rating || 0) - Number(a.rating || 0)).slice(0, 4);
+        return [...filteredBooks].sort((a, b) => Number(b.rating || 0) - Number(a.rating || 0)).slice(0, 3);
     }, [filteredBooks]);
 
     return (
@@ -73,6 +73,7 @@ export default function Home({ books = [], auth }) {
                         genres={BOOK_GENRES}
                         selectedGenre={generoAtivo}
                         onGenreChange={setGeneroAtivo}
+                        showSearchButton={false}
                     />
                     <ReadingProgressCard
                         eyebrow="PROGRESSO ATUAL"
@@ -81,7 +82,7 @@ export default function Home({ books = [], auth }) {
                         actionLabel="Adicionar Progresso"
                         progressLabel="0%"
                     />
-                    {/* ==================== 4 LIVROS MELHORES AVALIADOS ==================== */}
+                    {/* ==================== 3 LIVROS MELHORES AVALIADOS ==================== */}
                     <SectionHeader title="Melhores Avaliados">
                         <Link href={route('catalogo')} className="text-sm font-medium text-[#81A9D4] transition-colors hover:text-[#6B9AC4]">
                             Ver todos
@@ -89,8 +90,9 @@ export default function Home({ books = [], auth }) {
                     </SectionHeader>
                     <BookGrid
                         books={topRatedBooks}
-                        variant="featured"
-                        cardProps={{ showRating: true }}
+                        variant="catalog"
+                        className="lg:grid-cols-3"
+                        cardProps={{ className: 'min-h-72', imageClassName: 'h-72 sm:h-80' }}
                         emptyState={
                             <EmptyState
                                 title="Nenhum livro encontrado"

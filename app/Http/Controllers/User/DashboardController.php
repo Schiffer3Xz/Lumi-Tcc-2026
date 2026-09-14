@@ -16,12 +16,16 @@ class DashboardController extends Controller
                 'author',
                 'genre',
                 'availability'
-            ])->get()->map(function ($book) {
+            ])->withAvg('ratings', 'rating')->get()->map(function ($book) {
                 return [
                     'id' => $book->id,
                     'title' => $book->title,
                     'description' => $book->description,
-                    'rating' => $book->rating ?? 0,
+                    'page_count' => $book->page_count,
+                    'publication_year' => $book->publication_year,
+                    'publisher' => $book->publisher,
+                    'rating' => (float) ($book->ratings_avg_rating ?? 0),
+                    'readers_count' => $book->readers_count ?? 0,
                     'cover_url' => $book->cover_url
                         ? asset('storage/' . $book->cover_url)
                         : null,

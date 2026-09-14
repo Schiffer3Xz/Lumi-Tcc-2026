@@ -1,8 +1,17 @@
 import { cn } from '@/lib/utils';
+import { Link } from '@inertiajs/react';
 
-export default function BookCard({ book, variant = 'catalog', showRating = book.rating !== undefined && book.rating !== null, className, children }) {
+export default function BookCard({
+    book,
+    variant = 'catalog',
+    showRating = book.rating !== undefined && book.rating !== null,
+    className,
+    imageClassName,
+    children,
+}) {
     return (
-        <div
+        <Link
+            href={route('book.show', book.id)}
             className={cn(
                 variant === 'catalog'
                     ? 'group relative flex min-h-56 w-full overflow-hidden rounded-2xl border border-slate-200/80 bg-[#F8F9FA] shadow-sm transition-all duration-200 hover:border-slate-300 hover:shadow-md'
@@ -13,7 +22,7 @@ export default function BookCard({ book, variant = 'catalog', showRating = book.
         >
             {variant === 'catalog' ? (
                 <>
-                    <div className="aspect-[2/3] h-56 w-40 shrink-0 overflow-hidden bg-slate-100 sm:h-60 sm:w-44">
+                    <div className={cn('aspect-[2/3] h-56 w-40 shrink-0 overflow-hidden bg-slate-100 sm:h-60 sm:w-44', imageClassName)}>
                         {book.cover_url ? <img src={book.cover_url} alt={book.title} className="h-full w-full object-cover" /> : <div className="flex h-full w-full items-center justify-center text-slate-400"><i className="fa-solid fa-book text-2xl" aria-hidden="true" /></div>}
                     </div>
                     <div className="flex min-w-0 flex-1 flex-col p-3 sm:p-4">
@@ -47,6 +56,6 @@ export default function BookCard({ book, variant = 'catalog', showRating = book.
                 </div>
             )}
             {children}
-        </div>
+        </Link>
     );
 }

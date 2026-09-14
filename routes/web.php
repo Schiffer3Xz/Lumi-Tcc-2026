@@ -11,6 +11,7 @@ use App\Http\Controllers\Admin\AdminSettingsController;
 use App\Http\Controllers\Admin\AdminCatalogController;
 use App\Http\Controllers\SocialController;
 use App\Http\Controllers\PostController;
+use App\Http\Controllers\BookController as PublicBookController;
 
 use App\Http\Controllers\Admin\Categories\GenreController;
 use App\Http\Controllers\Admin\Categories\AuthorController;
@@ -36,6 +37,13 @@ Route::middleware('auth')->group(function () {
     Route::get('admin/verification', [AdminSettingsController::class, 'emailVerification'])
         ->name('admin.email-verification');
 
+    Route::post('admin/verification/resend', [AdminSettingsController::class, 'resendVerification'])
+        ->name('admin.email.resend');
+
+    Route::get('admin/verification/{id}/{hash}', [AdminSettingsController::class, 'verifyEmail'])
+        ->middleware('signed')
+        ->name('admin.email.verify');
+
     Route::post('admin/credentials', [AdminSettingsController::class, 'update'])
         ->name('admin.credentials.update');
 });
@@ -47,6 +55,7 @@ Route::middleware(['RoleMiddleware'])->group(function () {
 
     Route::get('catalogo', function () {
         $books = Book::with(['author', 'genre', 'availability'])
+            ->withAvg('ratings', 'rating')
             ->get()
             ->map(function ($book) {
                 return [
@@ -57,7 +66,7 @@ Route::middleware(['RoleMiddleware'])->group(function () {
                     'publisher' => $book->publisher,
                     'readers_count' => $book->readers_count,
                     'description' => $book->description,
-                    'rating' => $book->rating ?? 0,
+                    'rating' => (float) ($book->ratings_avg_rating ?? 0),
                     'cover_url' => $book->cover_url
                         ? (str_starts_with($book->cover_url, 'http') ? $book->cover_url : asset('storage/' . $book->cover_url))
                         : null,
@@ -78,6 +87,12 @@ Route::middleware(['RoleMiddleware'])->group(function () {
                 ]),
         ]);
     })->name('catalogo');
+
+    Route::middleware('auth')->get('books/{id}', [PublicBookController::class, 'show'])->name('book.show');
+    Route::middleware('auth')->get('estante', [PublicBookController::class, 'favorites'])->name('shelf');
+    Route::middleware('auth')->post('books/{id}/favorite', [PublicBookController::class, 'toggleFavorite'])->name('book.favorite');
+    Route::middleware('auth')->post('books/{id}/rating', [PublicBookController::class, 'rate'])->name('book.rating');
+    Route::middleware('auth')->delete('books/{bookId}/comments/{ratingId}', [PublicBookController::class, 'deleteComment'])->name('book.comment.destroy');
 
 
 
@@ -108,7 +123,7 @@ Route::middleware(['RoleMiddleware'])->group(function () {
         // ========================================================
 
 
-        Route::middleware(['FirstLoginMiddleware', 'verified'])->group(function () {
+        Route::middleware(['FirstLoginMiddleware'])->group(function () {
 
             Route::get('admin/dashboard', [AdminDashboardController::class, 'index'])
                 ->name('admin.dashboard');

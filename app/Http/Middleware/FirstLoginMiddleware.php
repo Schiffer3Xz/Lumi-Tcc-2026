@@ -16,9 +16,19 @@ class FirstLoginMiddleware
     public function handle(Request $request, Closure $next): Response
     {
 
-     if(auth()->user()->first_login && !$request->routeIs('admin.first-login') && !$request->routeIs('admin.credentials.update')){
-                return redirect()->route('admin.first-login');
-            }
+        $user = $request->user();
+
+        if ($user->first_login && ! $request->routeIs('admin.first-login') && ! $request->routeIs('admin.credentials.update')) {
+            return redirect()->route('admin.first-login');
+        }
+
+        if ($user->is_admin && is_null($user->email_verified_at)
+            && ! $request->routeIs('admin.email-verification')
+            && ! $request->routeIs('admin.email.verify')
+            && ! $request->routeIs('admin.email.resend')
+            && ! $request->routeIs('logout')) {
+            return redirect()->route('admin.email-verification');
+        }
 
         return $next($request);
     }

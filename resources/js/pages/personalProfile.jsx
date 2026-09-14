@@ -9,7 +9,7 @@ import ReaderLayout from '@/layouts/reader-layout';
 import { Link } from '@inertiajs/react';
 import { useState } from 'react';
 
-export default function ConfigPage({ auth, posts = [] }) {
+export default function ConfigPage({ auth, posts = [], profileUser }) {
     const [drawerOpen, setDrawerOpen] = useState(false);
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
 
@@ -40,7 +40,7 @@ export default function ConfigPage({ auth, posts = [] }) {
                     <main className="flex-1 space-y-6 overflow-y-auto p-4 md:p-8">
                         {/* CARTÃO DE PERFIL */}
                         <ProfileSummary
-                            user={user}
+                            user={{ ...user, ...profileUser }}
                             action={
                                 <Link
                                     href={route('profile.edit')}
@@ -53,11 +53,12 @@ export default function ConfigPage({ auth, posts = [] }) {
                         />
 
                         {/* MÉTRICAS DA CONTA */}
-                        <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
-                            <ProfileStatCard icon="fa-book-open" count="2" label="Livros Lidos" />
-                            <ProfileStatCard icon="fa-book-bookmark" count="7" label="Em Leitura" />
-                            <ProfileStatCard icon="fa-bookmark" count="9" label="Na Estante" />
-                            <ProfileStatCard icon="fa-star" count="12" label="Avaliações" />
+                        <div className="grid grid-cols-2 gap-4 md:grid-cols-5">
+                            <ProfileStatCard icon="fa-book-open" count={0} label="Livros Lidos" />
+                            <ProfileStatCard icon="fa-book-bookmark" count={0} label="Em Leitura" />
+                            <ProfileStatCard icon="fa-bookmark" count={profileUser?.shelf_books_count ?? 0} label="Na Estante" />
+                            <ProfileStatCard icon="fa-star" count={profileUser?.rated_books_count ?? 0} label="Avaliações" />
+                            <ProfileStatCard icon="fa-newspaper" count={profileUser?.posts_count ?? 0} label="Posts" />
                         </div>
 
                         <ProfilePosts posts={posts} user={user} createPostHref={route('post')} />
