@@ -92,15 +92,6 @@ use Illuminate\Http\Request;
 
         $user->save();
 
-        $sent = $this->sendVerificationEmail($user);
-
-        if (! $sent) {
-            return back()->withErrors(['verification' => 'Não foi possível enviar o e-mail de verificação.']);
-        }
-
-        return redirect()
-            ->route('admin.email-verification')
-            ->with('success', 'Dados salvos. Enviamos um link de verificação para seu e-mail.');
     }
 
 
