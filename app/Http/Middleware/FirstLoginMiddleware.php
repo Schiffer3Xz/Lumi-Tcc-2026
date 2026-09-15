@@ -27,7 +27,7 @@ class FirstLoginMiddleware
             && ! $request->routeIs('admin.email.verify')
             && ! $request->routeIs('admin.email.resend')
             && ! $request->routeIs('logout')) {
-            return redirect()->route('admin.email-verification');
+            return redirect()->route('verification.notice');
         }
 
         return $next($request);

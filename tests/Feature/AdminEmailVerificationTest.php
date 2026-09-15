@@ -15,6 +15,25 @@ class AdminEmailVerificationTest extends TestCase
 {
     use RefreshDatabase;
 
+    public function test_reader_cannot_access_admin_first_access_routes(): void
+    {
+        $reader = User::factory()->create();
+        $this->actingAs($reader)->get(route('admin.first-login'))->assertRedirect(route('dashboard'));
+        $this->post(route('admin.credentials.update'), $this->credentials())->assertRedirect(route('dashboard'));
+        $this->assertTrue(Hash::check('password', $reader->fresh()->password));
+    }
+
+    public function test_legacy_verification_link_cannot_verify_another_admin(): void
+    {
+        $admin = User::factory()->unverified()->create(['is_admin' => true]);
+        $other = User::factory()->unverified()->create(['is_admin' => true]);
+        $link = URL::temporarySignedRoute('admin.email.verify', now()->addMinutes(60), [
+            'id' => $other->id, 'hash' => sha1($other->email),
+        ]);
+        $this->actingAs($admin)->get($link)->assertForbidden();
+        $this->assertFalse($other->fresh()->hasVerifiedEmail());
+    }
+
     private function credentials(): array
     {
         return [

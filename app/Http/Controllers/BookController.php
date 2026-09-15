@@ -28,14 +28,27 @@ class BookController extends Controller
                 'readers_count' => $book->readers_count,
                 'rating' => (float) ($book->ratings_avg_rating ?? 0),
                 'cover_url' => $book->cover_url
-                    ? (str_starts_with($book->cover_url, 'http') ? $book->cover_url : asset('storage/' . $book->cover_url))
+                    ? (str_starts_with($book->cover_url, 'http') ? $book->cover_url : asset('storage/'.$book->cover_url))
                     : null,
                 'author' => $book->author,
                 'genre' => $book->genre,
                 'availability' => $book->availability,
             ]);
 
-        return Inertia::render('estante', ['books' => $books]);
+        $availableBooks = Book::with('author')
+            ->whereNotIn('id', $books->pluck('id'))
+            ->orderBy('title')
+            ->get()
+            ->map(fn (Book $book) => [
+                'id' => $book->id,
+                'title' => $book->title,
+                'author' => $book->author?->name,
+                'cover_url' => $book->cover_url
+                    ? (str_starts_with($book->cover_url, 'http') ? $book->cover_url : asset('storage/'.$book->cover_url))
+                    : null,
+            ]);
+
+        return Inertia::render('estante', ['books' => $books, 'availableBooks' => $availableBooks]);
     }
 
     public function show(Request $request, int $id)
@@ -55,6 +68,8 @@ class BookController extends Controller
             ->where('book_id', $book->id)
             ->first(['rating', 'comment']);
         $comments = BookRating::with('user:id,name')
+            ->where(fn ($query) => $query->where('user_id', $request->user()->id)
+                ->orWhereHas('user', fn ($user) => $user->where('public_reviews', true)))
             ->where('book_id', $book->id)
             ->whereNotNull('comment')
             ->where('comment', '!=', '')
@@ -68,7 +83,7 @@ class BookController extends Controller
                 'can_delete' => $rating->user_id === $request->user()->id,
             ]);
 
-        return Inertia::render('bookDetails', [
+        $details = [
             'book' => [
                 'id' => $book->id,
                 'title' => $book->title,
@@ -85,7 +100,7 @@ class BookController extends Controller
                 'user_rating' => $userRating?->rating,
                 'user_comment' => $userRating?->comment,
                 'cover_url' => $book->cover_url
-                    ? (str_starts_with($book->cover_url, 'http') ? $book->cover_url : asset('storage/' . $book->cover_url))
+                    ? (str_starts_with($book->cover_url, 'http') ? $book->cover_url : asset('storage/'.$book->cover_url))
                     : null,
                 'author' => $book->author,
                 'genre' => $book->genre,
@@ -95,18 +110,38 @@ class BookController extends Controller
                 'id' => $similarBook->id,
                 'title' => $similarBook->title,
                 'cover_url' => $similarBook->cover_url
-                    ? (str_starts_with($similarBook->cover_url, 'http') ? $similarBook->cover_url : asset('storage/' . $similarBook->cover_url))
+                    ? (str_starts_with($similarBook->cover_url, 'http') ? $similarBook->cover_url : asset('storage/'.$similarBook->cover_url))
                     : null,
                 'rating' => (float) ($similarBook->ratings_avg_rating ?? 0),
                 'author' => $similarBook->author,
             ]),
             'comments' => $comments,
-        ]);
+        ];
+
+        if ($request->expectsJson() && ! $request->header('X-Inertia')) {
+            return response()->json($details);
+        }
+
+        return Inertia::render('bookDetails', $details);
     }
 
     public function toggleFavorite(Request $request, int $id)
     {
         $book = Book::findOrFail($id);
+        $key = ['user_id' => $request->user()->id, 'book_id' => $book->id];
+
+        if ($request->isMethod('put')) {
+            DB::table('book_favorites')->insertOrIgnore($key + ['created_at' => now(), 'updated_at' => now()]);
+
+            return back();
+        }
+
+        if ($request->isMethod('delete')) {
+            DB::table('book_favorites')->where($key)->delete();
+
+            return back();
+        }
+
         $favorite = DB::table('book_favorites')
             ->where('user_id', $request->user()->id)
             ->where('book_id', $book->id)
@@ -114,6 +149,7 @@ class BookController extends Controller
 
         if ($favorite) {
             DB::table('book_favorites')->where('id', $favorite->id)->delete();
+
             return back();
         }
 

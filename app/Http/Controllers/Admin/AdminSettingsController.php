@@ -1,37 +1,44 @@
 <?php
 
 namespace App\Http\Controllers\Admin;
+
 use App\Http\Controllers\Controller;
+use App\Models\User;
+use App\Services\VerificationEmailSender;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\URL;
-use App\Models\User;
-use Illuminate\Http\RedirectResponse;
 use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 
-use Illuminate\Http\Request;
-
-    class AdminSettingsController extends Controller
+class AdminSettingsController extends Controller
 {
-    public function index(){
+    public function index()
+    {
         return view('admin/settings/index');
     }
 
-    public function create(){
+    public function create()
+    {
         return view('admin/settings/updateCredentials');
     }
 
-    public function firstLogin(){
+    public function firstLogin()
+    {
         return view('admin/settings/firstLoginSetup');
     }
 
-    public function emailVerification(){
-        return view('admin.settings.emailVerification');
+    public function emailVerification()
+    {
+        return redirect()->route('verification.notice');
     }
 
     public function verifyEmail(Request $request, int $id): RedirectResponse
     {
         $user = User::findOrFail($id);
+
+        abort_unless($request->user()->id === $user->id, 403);
 
         abort_unless(hash_equals(sha1($user->email), (string) $request->route('hash')), 403);
 
@@ -51,32 +58,37 @@ use Illuminate\Http\Request;
             : back()->withErrors(['verification' => 'Não foi possível enviar o e-mail de verificação.']);
     }
 
-    public function editEmail(){
+    public function editEmail()
+    {
         return view('admin/settings/editEmail');
     }
 
-    public function editPassword(){
+    public function editPassword()
+    {
         return view('admin/settings/editPassword');
     }
 
-    public function adminView(){
+    public function adminView()
+    {
         return view('admin/settings/createAdmin');
     }
 
-    public function adminCount(){
+    public function adminCount()
+    {
         $admins = User::where('is_admin', true)->get();
         $totalAdmins = User::where('is_admin', true)->count();
+
         return view('admin/settings/countAdmin', compact('totalAdmins', 'admins'));
     }
 
+    // Update do first Access
 
-    //Update do first Access
-
-    public function update(Request $request){
+    public function update(Request $request)
+    {
         $request->validate([
             'name' => 'required|string|max:255',
-            'nickname' => 'required|string|max:255|unique:users,nickname,' . auth()->id(),
-            'email' => 'required|email|max:255|unique:users,email,' . auth()->id(),
+            'nickname' => 'required|string|max:255|unique:users,nickname,'.auth()->id(),
+            'email' => 'nullable|email|max:255|unique:users,email,'.auth()->id(),
             'current_password' => 'required|current_password',
             'password' => 'required|string|min:8|confirmed',
         ]);
@@ -85,26 +97,31 @@ use Illuminate\Http\Request;
 
         $user->name = $request->name;
         $user->nickname = $request->nickname;
-        $user->email = $request->email;
+        $user->email = $request->filled('email') ? $request->email : $user->email;
         $user->password = Hash::make($request->password);
         $user->first_login = false;
         $user->email_verified_at = null;
 
         $user->save();
 
+        $sent = app(VerificationEmailSender::class)->send($user);
+        $response = redirect()->route('verification.notice');
+
+        return $sent
+            ? $response->with('status', 'verification-link-sent')
+            : $response->withErrors(['verification' => VerificationEmailSender::ERROR_MESSAGE]);
     }
 
-
-
-    //Update do Perfil ja logado
-    public function updateProfile(Request $request){
+    // Update do Perfil ja logado
+    public function updateProfile(Request $request)
+    {
         $request->validate([
             'name' => 'required|string|max:255',
-            'nickname' => 'required|string|max:255|unique:users,nickname,' . auth()->id(),
+            'nickname' => 'required|string|max:255|unique:users,nickname,'.auth()->id(),
             'description' => 'required|string|max:255',
         ]);
 
-         $user = auth()->user();
+        $user = auth()->user();
 
         $user->name = $request->name;
         $user->nickname = $request->nickname;
@@ -115,16 +132,17 @@ use Illuminate\Http\Request;
         return redirect()->route('admin.dashboard');
     }
 
-    public function updateEmail(Request $request){
-         $request->validate([
-            'email' => 'required|email|max:255|unique:users,email,' . auth()->id(),
+    public function updateEmail(Request $request)
+    {
+        $request->validate([
+            'email' => 'required|email|max:255|unique:users,email,'.auth()->id(),
             'current_password' => 'required|current_password',
         ]);
 
         $user = auth()->user();
         $user->email = $request->email;
         $user->email_verified_at = null;
-        
+
         $user->save();
 
         $sent = $this->sendVerificationEmail($user);
@@ -159,25 +177,27 @@ use Illuminate\Http\Request;
         return true;
     }
 
-    public function updatePassword(Request $request){
-         $request->validate([
+    public function updatePassword(Request $request)
+    {
+        $request->validate([
             'current_password' => 'required|current_password',
             'password' => 'required|string|min:8|confirmed',
         ]);
 
         $user = auth()->user();
         $user->password = Hash::make($request->password);
-        
+
         $user->save();
 
         return redirect()->route('admin.dashboard');
     }
 
-    public function createAdmin(Request $request){
+    public function createAdmin(Request $request)
+    {
         $request->validate([
             'name' => 'required|string|max:255',
             'nickname' => 'required|string|max:255|unique:users,nickname,',
-            'email' => 'required|email|max:255|unique:users,email,' . auth()->id(),
+            'email' => 'required|email|max:255|unique:users,email,'.auth()->id(),
             'password' => 'required|string|min:8|',
         ]);
 
@@ -189,8 +209,7 @@ use Illuminate\Http\Request;
             'is_admin' => true,
             'first_login' => true,
         ]);
-        
+
         return redirect()->route('admin.dashboard')->with('success', 'Administrador cadastrado com sucesso!');
     }
-    
 }

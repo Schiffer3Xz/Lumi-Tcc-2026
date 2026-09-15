@@ -1,4 +1,4 @@
-export default function PreferenceToggle({ title, description, enabled, onChange }) {
+export default function PreferenceToggle({ title, description, enabled, onChange, disabled = false }) {
     return (
         <div className="flex items-start justify-between gap-2 rounded-xl border border-slate-200/60 bg-slate-50 p-3">
             <div>
@@ -11,6 +11,7 @@ export default function PreferenceToggle({ title, description, enabled, onChange
                 aria-checked={enabled}
                 aria-label={title}
                 onClick={onChange}
+                disabled={disabled}
                 className={`mt-0.5 flex h-5 w-9 shrink-0 items-center rounded-full p-0.5 transition-colors ${
                     enabled ? 'justify-end bg-amber-400' : 'justify-start bg-slate-300'
                 }`}

@@ -1,9 +1,10 @@
 import EmptyState from '@/components/shared/EmptyState';
 import SectionHeader from '@/components/shared/SectionHeader';
 import BookGrid from '@/features/books/BookGrid';
+import ShelfBookPicker from '@/features/books/ShelfBookPicker';
 import ReaderLayout from '@/layouts/reader-layout';
 
-export default function Estante({ books = [], auth }) {
+export default function Estante({ books = [], availableBooks = [], auth }) {
     const user = auth?.user ?? { name: 'Usuário', email: '' };
 
     return (
@@ -24,24 +25,29 @@ export default function Estante({ books = [], auth }) {
                             <p className="text-sm text-slate-300">Olá, {user.name}!</p>
                             <h1 className="mt-1 text-2xl font-bold">Seus livros favoritos</h1>
                             <p className="mt-2 text-sm text-slate-300">
-                                {books.length === 1 ? 'Você tem 1 livro guardado na estante.' : `Você tem ${books.length} livros guardados na estante.`}
+                                {books.length === 1
+                                    ? 'Você tem 1 livro guardado na estante.'
+                                    : `Você tem ${books.length} livros guardados na estante.`}
                             </p>
                         </div>
                     </div>
                 </div>
 
-                <SectionHeader title="Minha estante">
-                    <span className="text-xs font-semibold text-gray-400">
-                        {books.length} {books.length === 1 ? 'livro favorito' : 'livros favoritos'}
-                    </span>
-                </SectionHeader>
+                <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
+                    <SectionHeader title="Minha estante" className="mb-0 flex-wrap justify-start gap-3">
+                        <span className="text-xs font-semibold text-gray-400">
+                            {books.length} {books.length === 1 ? 'livro favorito' : 'livros favoritos'}
+                        </span>
+                    </SectionHeader>
+                    <ShelfBookPicker books={availableBooks} />
+                </div>
 
                 <BookGrid
                     books={books}
                     emptyState={
                         <EmptyState
                             title="Sua estante está vazia"
-                            description="Favorite livros no catálogo para salvá-los aqui."
+                            description="Use Adicionar à estante para escolher livros ou favorite-os no catálogo."
                             icon="fa-solid fa-book-bookmark"
                             className="mb-8 p-12"
                         />

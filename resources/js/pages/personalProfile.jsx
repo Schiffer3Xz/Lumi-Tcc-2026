@@ -34,7 +34,6 @@ export default function ConfigPage({ auth, posts = [], profileUser }) {
                     ),
                 }}
             >
-                {drawerOpen && <div className="fixed inset-0 z-40 bg-black/50" onClick={() => setDrawerOpen(false)} />}
                 <div className="flex flex-1 overflow-hidden">
                     {/* CONTEÚDO PRINCIPAL */}
                     <main className="flex-1 space-y-6 overflow-y-auto p-4 md:p-8">

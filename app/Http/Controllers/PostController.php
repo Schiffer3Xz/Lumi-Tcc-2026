@@ -2,13 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Post;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
-use App\Models\Post;
 
 class PostController extends Controller
 {
-
     public function index()
     {
         return Inertia::render('newPost');
@@ -21,7 +20,7 @@ class PostController extends Controller
             'image' => ['nullable', 'image', 'max:5120'],
         ]);
 
-        if (blank($validated['content'] ?? null) && !$request->hasFile('image')) {
+        if (blank($validated['content'] ?? null) && ! $request->hasFile('image')) {
             return back()->withErrors(['content' => 'Escreva algo ou adicione uma imagem.']);
         }
 
@@ -37,5 +36,16 @@ class PostController extends Controller
         $post->save();
 
         return redirect()->route('list')->with('success', 'Publicação criada com sucesso.');
+    }
+
+    public function update(Request $request, Post $post)
+    {
+        abort_unless($post->fk_user_id === $request->user()->id, 403);
+        $validated = $request->validate([
+            'content' => [$post->media_url ? 'nullable' : 'required', 'string', 'max:5000'],
+        ]);
+        $post->update(['content' => $validated['content'] ?? '']);
+
+        return back();
     }
 }

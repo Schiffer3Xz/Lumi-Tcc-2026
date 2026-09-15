@@ -1,4 +1,5 @@
 import clsx from 'clsx';
+import NotificationPopover from './NotificationPopover';
 import ProfileMenu from './ProfileMenu';
 
 export default function Topbar({
@@ -68,34 +69,14 @@ export default function Topbar({
             </div>
             <div className={clsx('flex items-center', isLibrary ? 'gap-3 sm:gap-4' : actions ? 'gap-3' : isComposer ? 'gap-2 sm:gap-4' : 'gap-4')}>
                 {actions}
-                <button
-                    type="button"
-                    aria-label="Notificações"
+                <NotificationPopover
                     className={
                         isLibrary
                             ? 'relative rounded-lg p-2 text-gray-600 transition-colors hover:bg-gray-100'
                             : clsx('relative rounded-full text-slate-600 transition-colors hover:bg-slate-100', isComposer ? 'p-2 sm:p-2.5' : 'p-2.5')
                     }
-                >
-                    <i
-                        aria-hidden="true"
-                        className={clsx(isLibrary ? 'fa-solid fa-bell' : 'fa-regular fa-bell', isComposer ? 'text-base sm:text-lg' : 'text-lg')}
-                    />
-                    <span
-                        className={
-                            isLibrary
-                                ? 'absolute top-1.5 right-1.5 h-2 w-2 rounded-full border-2 border-white bg-red-500'
-                                : clsx(
-                                      'absolute h-2 w-2 rounded-full ring-2 ring-white',
-                                      isProfile
-                                          ? 'top-1.5 right-1.5 bg-red-500'
-                                          : isComposer
-                                            ? 'top-1.5 right-1.5 bg-rose-500 sm:top-2 sm:right-2'
-                                            : 'top-2 right-2 bg-rose-500',
-                                  )
-                        }
-                    />
-                </button>
+                    iconClassName={clsx(isLibrary ? 'fa-solid fa-bell' : 'fa-regular fa-bell', isComposer ? 'text-base sm:text-lg' : 'text-lg')}
+                />
                 <ProfileMenu user={user} items={accountItems} variant={variant} showPhoto={showPhoto} />
             </div>
         </header>

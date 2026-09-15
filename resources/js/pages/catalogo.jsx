@@ -82,6 +82,8 @@ export default function Catalogo({ books = [], auth, genres = [] }) {
                 {/* GRID DE TODOS OS LIVROS */}
                 <BookGrid
                     books={filteredBooks}
+                    className="lg:grid-cols-2 2xl:grid-cols-3"
+                    cardProps={{ showActions: Boolean(auth?.user) }}
                     emptyState={
                         <EmptyState
                             title="Nenhum livro encontrado"

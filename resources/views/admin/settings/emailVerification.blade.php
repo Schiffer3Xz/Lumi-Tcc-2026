@@ -21,7 +21,7 @@
             <a href="{{ route('admin.dashboard') }}" class="block w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-4 rounded-lg transition duration-200">
                 Já confirmei meu e-mail. Continuar
             </a>
-            <form method="post" action="{{ route('admin.email.resend') }}">
+            <form method="post" action="{{ route('verification.send') }}">
                 @csrf
                 <button type="submit" class="w-full text-slate-500 hover:text-slate-700 font-medium py-2 transition duration-200">Não recebeu o e-mail? Reenviar</button>
             </form>

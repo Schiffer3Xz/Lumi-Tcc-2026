@@ -5,14 +5,17 @@ import { BOOK_GENRES } from '@/constants/genres';
 import BookFilters from '@/features/books/BookFilters';
 import BookGrid from '@/features/books/BookGrid';
 import ReadingProgressCard from '@/features/books/ReadingProgressCard';
+import PrivacySettings from '@/features/profile/PrivacySettings';
+import ReadingRules from '@/features/profile/ReadingRules';
+import { readingRules } from '@/features/profile/profile-data';
 import ReaderLayout from '@/layouts/reader-layout';
 import { Link, router } from '@inertiajs/react';
 import { useEffect, useMemo, useState } from 'react';
 
 const QUICK_ACCESS = [
-    { label: 'Consultar Histórico', icon: 'fa-solid fa-clock-rotate-left' },
-    { label: 'Regras da Sala de Leitura', icon: 'fa-solid fa-gavel' },
-    { label: 'Configurações de Privacidade', icon: 'fa-solid fa-shield-halved' },
+    { label: 'Consultar Histórico', icon: 'fa-solid fa-clock-rotate-left', routeName: 'reading.history' },
+    { label: 'Regras da Sala de Leitura', icon: 'fa-solid fa-gavel', panel: 'rules' },
+    { label: 'Configurações de Privacidade', icon: 'fa-solid fa-shield-halved', panel: 'privacy' },
 ];
 
 const getTextValue = (value) => {
@@ -90,19 +93,24 @@ export default function Home({ books = [], auth, genres = [], readingProgress = 
         const selectedIds = new Set(readingProgress.map((progress) => progress.book.id));
 
         return books.filter((book) => {
-            const matchesQuery = !query || getTextValue(book.title).toLowerCase().includes(query) || getTextValue(book.author).toLowerCase().includes(query);
+            const matchesQuery =
+                !query || getTextValue(book.title).toLowerCase().includes(query) || getTextValue(book.author).toLowerCase().includes(query);
             return matchesQuery && !selectedIds.has(book.id);
         });
     }, [books, progressSearch, readingProgress]);
 
     const addBookToProgress = (bookId) => {
-        router.post(route('reading-progress.store'), { book_id: bookId }, {
-            preserveScroll: true,
-            onSuccess: () => {
-                setIsBookPickerOpen(false);
-                setIsProgressSidebarOpen(true);
+        router.post(
+            route('reading-progress.store'),
+            { book_id: bookId },
+            {
+                preserveScroll: true,
+                onSuccess: () => {
+                    setIsBookPickerOpen(false);
+                    setIsProgressSidebarOpen(true);
+                },
             },
-        });
+        );
     };
 
     const updateCurrentPage = (progress, currentPage) => {
@@ -151,7 +159,11 @@ export default function Home({ books = [], auth, genres = [], readingProgress = 
                     <ReadingProgressCard
                         eyebrow="PROGRESSO ATUAL"
                         title="Seu Progresso de Leitura"
-                        description={readingProgress.length ? `${readingProgress.length} ${readingProgress.length === 1 ? 'livro em leitura' : 'livros em leitura'}` : 'Sem leitura ativa'}
+                        description={
+                            readingProgress.length
+                                ? `${readingProgress.length} ${readingProgress.length === 1 ? 'livro em leitura' : 'livros em leitura'}`
+                                : 'Sem leitura ativa'
+                        }
                         actionLabel="Adicionar progresso"
                         onAction={() => setIsProgressSidebarOpen(true)}
                         onClick={() => setIsProgressSidebarOpen(true)}
@@ -179,24 +191,53 @@ export default function Home({ books = [], auth, genres = [], readingProgress = 
                     />
                 </div>
                 {/* ==================== SIDEBAR DIREITA ==================== */}
-                <div className="hidden lg:block">
+                <div>
                     <div className="sticky top-6">
-                        <QuickAccessPanel title="Acesso Rápido" items={QUICK_ACCESS} />
+                        <QuickAccessPanel
+                            title="Acesso Rápido"
+                            items={QUICK_ACCESS.map((item) => ({
+                                ...item,
+                                ...(item.routeName
+                                    ? { href: route(item.routeName) }
+                                    : {
+                                          dialog:
+                                              item.panel === 'rules'
+                                                  ? {
+                                                        description: 'Consulte as orientações da sala de leitura.',
+                                                        content: <ReadingRules rules={readingRules} />,
+                                                    }
+                                                  : {
+                                                        description: 'Controle a privacidade das avaliações e os avisos da conta.',
+                                                        content: <PrivacySettings />,
+                                                    },
+                                      }),
+                            }))}
+                        />
                     </div>
                 </div>
             </div>
 
             {isProgressSidebarOpen && (
                 <div className="fixed inset-0 z-50 flex justify-end" role="dialog" aria-modal="true" aria-label="Progresso de leitura">
-                    <button type="button" aria-label="Fechar progresso de leitura" onClick={closeProgressSidebar} className="absolute inset-0 cursor-default bg-slate-900/25 animate-in fade-in duration-200" />
-                    <aside className="relative flex h-full w-full max-w-md animate-in slide-in-from-right duration-300 flex-col bg-white p-5 shadow-2xl">
+                    <button
+                        type="button"
+                        aria-label="Fechar progresso de leitura"
+                        onClick={closeProgressSidebar}
+                        className="animate-in fade-in absolute inset-0 cursor-default bg-slate-900/25 duration-200"
+                    />
+                    <aside className="animate-in slide-in-from-right relative flex h-full w-full max-w-md flex-col bg-white p-5 shadow-2xl duration-300">
                         <div className="mb-5 flex items-center justify-between border-b border-slate-100 pb-4">
                             <div>
                                 <p className="text-[10px] font-bold tracking-widest text-blue-600 uppercase">MINHAS LEITURAS</p>
                                 <h2 className="text-lg font-bold text-slate-800">Progresso de leitura</h2>
                                 <p className="mt-1 text-xs text-slate-500">{readingProgress.length}/3 livros em andamento</p>
                             </div>
-                            <button type="button" onClick={closeProgressSidebar} aria-label="Fechar progresso de leitura" className="flex h-9 w-9 items-center justify-center rounded-full text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-700">
+                            <button
+                                type="button"
+                                onClick={closeProgressSidebar}
+                                aria-label="Fechar progresso de leitura"
+                                className="flex h-9 w-9 items-center justify-center rounded-full text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-700"
+                            >
                                 <i className="fa-solid fa-xmark" aria-hidden="true" />
                             </button>
                         </div>
@@ -211,15 +252,49 @@ export default function Home({ books = [], auth, genres = [], readingProgress = 
                                     <article key={progress.id} className="rounded-xl border border-slate-200 p-3">
                                         <div className="flex gap-3">
                                             <div className="h-20 w-14 shrink-0 overflow-hidden rounded-lg bg-slate-100">
-                                                {progress.book.cover_url ? <img src={progress.book.cover_url} alt="" className="h-full w-full object-cover" /> : <div className="flex h-full items-center justify-center text-slate-400"><i className="fa-solid fa-book" aria-hidden="true" /></div>}
+                                                {progress.book.cover_url ? (
+                                                    <img src={progress.book.cover_url} alt="" className="h-full w-full object-cover" />
+                                                ) : (
+                                                    <div className="flex h-full items-center justify-center text-slate-400">
+                                                        <i className="fa-solid fa-book" aria-hidden="true" />
+                                                    </div>
+                                                )}
                                             </div>
                                             <div className="min-w-0 flex-1">
                                                 <div className="flex gap-2">
-                                                    <div className="min-w-0 flex-1"><h3 className="truncate text-sm font-bold text-slate-800">{progress.book.title}</h3><p className="truncate text-xs text-slate-500">{progress.book.author || 'Autor não informado'}</p></div>
-                                                    <button type="button" aria-label={`Remover ${progress.book.title} do progresso`} onClick={() => router.delete(route('reading-progress.destroy', progress.id), { preserveScroll: true })} className="h-7 w-7 shrink-0 rounded-md text-slate-400 hover:bg-red-50 hover:text-red-600"><i className="fa-solid fa-trash-can text-xs" aria-hidden="true" /></button>
+                                                    <div className="min-w-0 flex-1">
+                                                        <h3 className="truncate text-sm font-bold text-slate-800">{progress.book.title}</h3>
+                                                        <p className="truncate text-xs text-slate-500">
+                                                            {progress.book.author || 'Autor não informado'}
+                                                        </p>
+                                                    </div>
+                                                    <button
+                                                        type="button"
+                                                        aria-label={`Remover ${progress.book.title} do progresso`}
+                                                        onClick={() =>
+                                                            router.delete(route('reading-progress.destroy', progress.id), { preserveScroll: true })
+                                                        }
+                                                        className="h-7 w-7 shrink-0 rounded-md text-slate-400 hover:bg-red-50 hover:text-red-600"
+                                                    >
+                                                        <i className="fa-solid fa-trash-can text-xs" aria-hidden="true" />
+                                                    </button>
                                                 </div>
-                                                <div className="mt-3 flex items-center justify-between text-xs font-semibold text-slate-600"><span>Página {currentPage} de {pageCount || '-'}</span><span>{percentage}%</span></div>
-                                                <input type="range" min="0" max={pageCount || 0} value={Math.min(currentPage, pageCount || 0)} onChange={(event) => updateCurrentPage(progress, event.target.value)} disabled={!pageCount} aria-label={`Página atual de ${progress.book.title}`} className="mt-1 h-2 w-full cursor-pointer accent-[#6B9AC4] disabled:cursor-not-allowed" />
+                                                <div className="mt-3 flex items-center justify-between text-xs font-semibold text-slate-600">
+                                                    <span>
+                                                        Página {currentPage} de {pageCount || '-'}
+                                                    </span>
+                                                    <span>{percentage}%</span>
+                                                </div>
+                                                <input
+                                                    type="range"
+                                                    min="0"
+                                                    max={pageCount || 0}
+                                                    value={Math.min(currentPage, pageCount || 0)}
+                                                    onChange={(event) => updateCurrentPage(progress, event.target.value)}
+                                                    disabled={!pageCount}
+                                                    aria-label={`Página atual de ${progress.book.title}`}
+                                                    className="mt-1 h-2 w-full cursor-pointer accent-[#6B9AC4] disabled:cursor-not-allowed"
+                                                />
                                             </div>
                                         </div>
                                     </article>
@@ -227,7 +302,12 @@ export default function Home({ books = [], auth, genres = [], readingProgress = 
                             })}
                         </div>
 
-                        <button type="button" disabled={readingProgress.length >= 3} onClick={() => setIsBookPickerOpen(true)} className="mt-5 flex w-full items-center justify-center gap-2 rounded-xl bg-[#1A2332] px-4 py-3 text-sm font-bold text-white transition-colors hover:bg-[#27364d] disabled:cursor-not-allowed disabled:bg-slate-300">
+                        <button
+                            type="button"
+                            disabled={readingProgress.length >= 3}
+                            onClick={() => setIsBookPickerOpen(true)}
+                            className="mt-5 flex w-full items-center justify-center gap-2 rounded-xl bg-[#1A2332] px-4 py-3 text-sm font-bold text-white transition-colors hover:bg-[#27364d] disabled:cursor-not-allowed disabled:bg-slate-300"
+                        >
                             <i className="fa-solid fa-plus text-xs" aria-hidden="true" />
                             {readingProgress.length >= 3 ? 'Limite de 3 livros atingido' : 'Adicionar livro'}
                         </button>
@@ -237,18 +317,62 @@ export default function Home({ books = [], auth, genres = [], readingProgress = 
 
             {isBookPickerOpen && (
                 <div className="fixed inset-0 z-[60] flex justify-end" role="dialog" aria-modal="true" aria-label="Adicionar livro ao progresso">
-                    <button type="button" aria-label="Fechar seleção de livros" onClick={() => setIsBookPickerOpen(false)} className="absolute inset-0 cursor-default bg-slate-900/40 animate-in fade-in duration-200" />
-                    <aside className="relative flex h-full w-full max-w-md animate-in slide-in-from-right duration-300 flex-col bg-white p-5 shadow-2xl">
+                    <button
+                        type="button"
+                        aria-label="Fechar seleção de livros"
+                        onClick={() => setIsBookPickerOpen(false)}
+                        className="animate-in fade-in absolute inset-0 cursor-default bg-slate-900/40 duration-200"
+                    />
+                    <aside className="animate-in slide-in-from-right relative flex h-full w-full max-w-md flex-col bg-white p-5 shadow-2xl duration-300">
                         <div className="mb-5 flex items-center justify-between border-b border-slate-100 pb-4">
-                            <div><p className="text-[10px] font-bold tracking-widest text-blue-600 uppercase">PROGRESSO DE LEITURA</p><h2 className="text-lg font-bold text-slate-800">Adicionar livro</h2></div>
-                            <button type="button" onClick={() => setIsBookPickerOpen(false)} aria-label="Fechar seleção de livros" className="flex h-9 w-9 items-center justify-center rounded-full text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-700"><i className="fa-solid fa-xmark" aria-hidden="true" /></button>
+                            <div>
+                                <p className="text-[10px] font-bold tracking-widest text-blue-600 uppercase">PROGRESSO DE LEITURA</p>
+                                <h2 className="text-lg font-bold text-slate-800">Adicionar livro</h2>
+                            </div>
+                            <button
+                                type="button"
+                                onClick={() => setIsBookPickerOpen(false)}
+                                aria-label="Fechar seleção de livros"
+                                className="flex h-9 w-9 items-center justify-center rounded-full text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-700"
+                            >
+                                <i className="fa-solid fa-xmark" aria-hidden="true" />
+                            </button>
                         </div>
-                        <label className="relative mb-4 block"><span className="sr-only">Pesquisar livros</span><i className="fa-solid fa-magnifying-glass absolute top-1/2 left-3 -translate-y-1/2 text-xs text-slate-400" aria-hidden="true" /><input value={progressSearch} onChange={(event) => setProgressSearch(event.target.value)} placeholder="Pesquisar por título ou autor..." className="w-full rounded-xl border border-slate-200 py-3 pr-4 pl-9 text-sm outline-none transition focus:border-[#81A9D4] focus:ring-2 focus:ring-[#81A9D4]/20" /></label>
+                        <label className="relative mb-4 block">
+                            <span className="sr-only">Pesquisar livros</span>
+                            <i
+                                className="fa-solid fa-magnifying-glass absolute top-1/2 left-3 -translate-y-1/2 text-xs text-slate-400"
+                                aria-hidden="true"
+                            />
+                            <input
+                                value={progressSearch}
+                                onChange={(event) => setProgressSearch(event.target.value)}
+                                placeholder="Pesquisar por título ou autor..."
+                                className="w-full rounded-xl border border-slate-200 py-3 pr-4 pl-9 text-sm transition outline-none focus:border-[#81A9D4] focus:ring-2 focus:ring-[#81A9D4]/20"
+                            />
+                        </label>
                         <div className="flex flex-1 flex-col gap-2 overflow-y-auto">
                             {availableProgressBooks.map((book) => (
-                                <button key={book.id} type="button" onClick={() => addBookToProgress(book.id)} className="flex items-center gap-3 rounded-xl border border-slate-200 p-3 text-left transition-colors hover:border-[#81A9D4] hover:bg-blue-50/40">
-                                    <div className="h-16 w-11 shrink-0 overflow-hidden rounded-md bg-slate-100">{book.cover_url ? <img src={book.cover_url} alt="" className="h-full w-full object-cover" /> : <div className="flex h-full items-center justify-center text-slate-400"><i className="fa-solid fa-book text-xs" aria-hidden="true" /></div>}</div>
-                                    <div className="min-w-0 flex-1"><h3 className="truncate text-sm font-bold text-slate-800">{book.title}</h3><p className="truncate text-xs text-slate-500">{getTextValue(book.author) || 'Autor não informado'}</p><p className="mt-1 text-[11px] text-slate-400">{book.page_count || '-'} páginas</p></div>
+                                <button
+                                    key={book.id}
+                                    type="button"
+                                    onClick={() => addBookToProgress(book.id)}
+                                    className="flex items-center gap-3 rounded-xl border border-slate-200 p-3 text-left transition-colors hover:border-[#81A9D4] hover:bg-blue-50/40"
+                                >
+                                    <div className="h-16 w-11 shrink-0 overflow-hidden rounded-md bg-slate-100">
+                                        {book.cover_url ? (
+                                            <img src={book.cover_url} alt="" className="h-full w-full object-cover" />
+                                        ) : (
+                                            <div className="flex h-full items-center justify-center text-slate-400">
+                                                <i className="fa-solid fa-book text-xs" aria-hidden="true" />
+                                            </div>
+                                        )}
+                                    </div>
+                                    <div className="min-w-0 flex-1">
+                                        <h3 className="truncate text-sm font-bold text-slate-800">{book.title}</h3>
+                                        <p className="truncate text-xs text-slate-500">{getTextValue(book.author) || 'Autor não informado'}</p>
+                                        <p className="mt-1 text-[11px] text-slate-400">{book.page_count || '-'} páginas</p>
+                                    </div>
                                     <i className="fa-solid fa-plus text-xs text-[#6B9AC4]" aria-hidden="true" />
                                 </button>
                             ))}

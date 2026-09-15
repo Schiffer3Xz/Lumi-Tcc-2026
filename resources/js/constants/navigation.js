@@ -7,6 +7,7 @@ export const READER_NAVIGATION = [
 ];
 
 export const ACCOUNT_NAVIGATION = [
+    { id: 'privacy', label: 'Privacidade', icon: 'fa-solid fa-shield-halved', routeName: 'privacy' },
     { id: 'settings', label: 'Configurações', icon: 'fa-solid fa-gear', routeName: 'profile.edit' },
     { id: 'logout', label: 'Sair da Conta', icon: 'fa-solid fa-right-from-bracket', routeName: 'logout', method: 'post', as: 'button' },
 ];

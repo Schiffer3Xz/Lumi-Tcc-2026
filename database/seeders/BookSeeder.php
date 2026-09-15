@@ -2,9 +2,10 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
-use Illuminate\Database\Seeder;
 use App\Models\Book;
+use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Storage;
 
 class BookSeeder extends Seeder
 {
@@ -13,6 +14,14 @@ class BookSeeder extends Seeder
      */
     public function run(): void
     {
+        // Keep the sample covers available after a fresh checkout without replacing uploaded files.
+        foreach (File::files(database_path('seeders/assets/covers')) as $cover) {
+            $path = 'covers/'.$cover->getFilename();
+            if (! Storage::disk('public')->exists($path)) {
+                Storage::disk('public')->put($path, File::get($cover->getPathname()));
+            }
+        }
+
         Book::updateOrCreate(['title' => '1984'], [
             'page_count' => 328,
             'publication_year' => 1949,
