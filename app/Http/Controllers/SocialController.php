@@ -65,6 +65,7 @@ class SocialController extends Controller
     public function profile()
     {
         $profileUser = User::withCount(['followers', 'follows as following_count'])->findOrFail(auth()->id());
+        $profileUser->setAttribute('reading_books_count', DB::table('reading_progresses')->where('user_id', $profileUser->id)->count());
         $profileUser->setAttribute('shelf_books_count', DB::table('book_favorites')->where('user_id', $profileUser->id)->count());
         $profileUser->setAttribute('rated_books_count', DB::table('book_ratings')->where('user_id', $profileUser->id)->count());
         $profileUser->setAttribute('posts_count', DB::table('posts')->where('fk_user_id', $profileUser->id)->count());
@@ -98,6 +99,7 @@ class SocialController extends Controller
 
     public function people($id){
         $targetUser = User::withCount(['followers', 'follows as following_count'])->findOrFail($id);
+        $targetUser->setAttribute('reading_books_count', DB::table('reading_progresses')->where('user_id', $targetUser->id)->count());
         $targetUser->setAttribute('shelf_books_count', DB::table('book_favorites')->where('user_id', $targetUser->id)->count());
         $targetUser->setAttribute('rated_books_count', DB::table('book_ratings')->where('user_id', $targetUser->id)->count());
         $targetUser->setAttribute('posts_count', DB::table('posts')->where('fk_user_id', $targetUser->id)->count());
@@ -112,6 +114,7 @@ class SocialController extends Controller
                     "profile_photo" => $user->profile_photo,
                     "read_books" => [],
                     "reading_books" => [],
+                    "reading_books_count" => DB::table('reading_progresses')->where('user_id', $user->id)->count(),
                     "shelf_books" => [],
                     "rated_books" => [],
                     "shelf_books_count" => DB::table('book_favorites')->where('user_id', $user->id)->count(),

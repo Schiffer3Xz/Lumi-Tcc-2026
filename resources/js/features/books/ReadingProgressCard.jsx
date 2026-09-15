@@ -1,9 +1,10 @@
 import { cn } from '@/lib/utils';
 
-export default function ReadingProgressCard({ title, description, eyebrow, progressLabel, actionLabel, onAction, className }) {
+export default function ReadingProgressCard({ title, description, eyebrow, progressLabel, actionLabel, onAction, onClick, className }) {
     return (
         <div
-            className={cn('relative mb-8 overflow-hidden rounded-2xl bg-gradient-to-br from-[#81A9D4] to-[#6B9AC4] p-6 shadow-lg sm:p-8', className)}
+            className={cn('relative mb-8 overflow-hidden rounded-2xl bg-gradient-to-br from-[#81A9D4] to-[#6B9AC4] p-6 shadow-lg sm:p-8', onClick && 'cursor-pointer', className)}
+            onClick={onClick}
         >
             <div className="absolute -top-8 -right-8 h-32 w-32 rounded-full bg-white/10" />
             <div className="absolute -right-4 -bottom-12 h-24 w-24 rounded-full bg-white/5" />

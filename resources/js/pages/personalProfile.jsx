@@ -55,7 +55,7 @@ export default function ConfigPage({ auth, posts = [], profileUser }) {
                         {/* MÉTRICAS DA CONTA */}
                         <div className="grid grid-cols-2 gap-4 md:grid-cols-5">
                             <ProfileStatCard icon="fa-book-open" count={0} label="Livros Lidos" />
-                            <ProfileStatCard icon="fa-book-bookmark" count={0} label="Em Leitura" />
+                            <ProfileStatCard icon="fa-book-bookmark" count={profileUser?.reading_books_count ?? 0} label="Em Leitura" />
                             <ProfileStatCard icon="fa-bookmark" count={profileUser?.shelf_books_count ?? 0} label="Na Estante" />
                             <ProfileStatCard icon="fa-star" count={profileUser?.rated_books_count ?? 0} label="Avaliações" />
                             <ProfileStatCard icon="fa-newspaper" count={profileUser?.posts_count ?? 0} label="Posts" />
