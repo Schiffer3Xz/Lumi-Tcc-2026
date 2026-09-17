@@ -48,11 +48,11 @@ Route::middleware(['auth', 'RoleMiddleware'])->group(function () {
 });
 
 Route::middleware(['RoleMiddleware'])->group(function () {
-    Route::get('dashboard', [DashboardController::class, 'index'])->middleware('auth')->name('dashboard');
-    Route::post('reading-progress', [DashboardController::class, 'addReadingProgress'])->name('reading-progress.store');
-    Route::patch('reading-progress/sync', [DashboardController::class, 'syncReadingProgress'])->name('reading-progress.sync');
-    Route::patch('reading-progress/{progressId}', [DashboardController::class, 'updateReadingProgress'])->name('reading-progress.update');
-    Route::delete('reading-progress/{progressId}', [DashboardController::class, 'removeReadingProgress'])->name('reading-progress.destroy');
+    Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    Route::post('reading-progress', [DashboardController::class, 'addReadingProgress'])->middleware('auth')->name('reading-progress.store');
+    Route::patch('reading-progress/sync', [DashboardController::class, 'syncReadingProgress'])->middleware('auth')->name('reading-progress.sync');
+    Route::patch('reading-progress/{progressId}', [DashboardController::class, 'updateReadingProgress'])->middleware('auth')->name('reading-progress.update');
+    Route::delete('reading-progress/{progressId}', [DashboardController::class, 'removeReadingProgress'])->middleware('auth')->name('reading-progress.destroy');
 
     Route::get('catalogo', function () {
         $favoriteIds = auth()->check()

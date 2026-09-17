@@ -142,7 +142,14 @@ function NotificationList({ close }) {
 }
 
 export default function NotificationPopover({ className, iconClassName }) {
-    const { unreadNotifications = 0 } = usePage().props;
+    const { auth, unreadNotifications = 0 } = usePage().props;
+    if (!auth?.user) {
+        return (
+            <Link href={route('login')} aria-label="Entrar para ver notificações" className={className}>
+                <i aria-hidden="true" className={iconClassName} />
+            </Link>
+        );
+    }
     return (
         <Popover>
             <PopoverButton aria-label={unreadNotifications ? `Notificações: ${unreadNotifications} não lidas` : 'Notificações'} className={className}>

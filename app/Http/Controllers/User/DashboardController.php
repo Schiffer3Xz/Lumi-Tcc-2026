@@ -3,32 +3,32 @@
 namespace App\Http\Controllers\User;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
 use App\Models\Book;
 use App\Models\Genre;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 
 class DashboardController extends Controller
 {
-
-    public function index(){
-        $userId = request()->user()->id;
-        $progressRecords = DB::table('reading_progresses')
+    public function index()
+    {
+        $userId = request()->user()?->id;
+        $progressRecords = $userId ? DB::table('reading_progresses')
             ->where('user_id', $userId)
             ->orderBy('created_at')
-            ->get();
+            ->get() : collect();
         $progressBooks = Book::with('author')
             ->whereIn('id', $progressRecords->pluck('book_id'))
             ->get()
             ->keyBy('id');
 
-         return Inertia::render('home', [
+        return Inertia::render('home', [
             'books' => Book::with([
                 'author',
                 'genre',
-                'availability'
+                'availability',
             ])->withAvg('ratings', 'rating')->get()->map(function ($book) {
                 return [
                     'id' => $book->id,
@@ -40,7 +40,7 @@ class DashboardController extends Controller
                     'rating' => (float) ($book->ratings_avg_rating ?? 0),
                     'readers_count' => $book->readers_count ?? 0,
                     'cover_url' => $book->cover_url
-                        ? asset('storage/' . $book->cover_url)
+                        ? asset('storage/'.$book->cover_url)
                         : null,
                     'author' => $book->author,
                     'genre' => $book->genre,
@@ -70,7 +70,7 @@ class DashboardController extends Controller
                             'title' => $book->title,
                             'page_count' => $book->page_count,
                             'cover_url' => $book->cover_url
-                                ? (str_starts_with($book->cover_url, 'http') ? $book->cover_url : asset('storage/' . $book->cover_url))
+                                ? (str_starts_with($book->cover_url, 'http') ? $book->cover_url : asset('storage/'.$book->cover_url))
                                 : null,
                             'author' => $book->author?->name,
                         ],
@@ -110,7 +110,7 @@ class DashboardController extends Controller
         $progress = DB::table('reading_progresses')->where('id', $progressId)->where('user_id', $request->user()->id)->first();
         abort_unless($progress, 404);
         $book = Book::findOrFail($progress->book_id);
-        $validated = $request->validate(['current_page' => ['required', 'integer', 'min:0', 'max:' . max(0, $book->page_count ?? 0)]]);
+        $validated = $request->validate(['current_page' => ['required', 'integer', 'min:0', 'max:'.max(0, $book->page_count ?? 0)]]);
 
         DB::table('reading_progresses')->where('id', $progress->id)->update([
             'current_page' => $validated['current_page'],
@@ -166,9 +166,10 @@ class DashboardController extends Controller
         return back();
     }
 
-    
-    public function list(){
+    public function list()
+    {
         $books = Book::with(['author', 'genre', 'availability'])->latest()->get();
+
         return view('user/dashboard', compact('books'));
     }
 }

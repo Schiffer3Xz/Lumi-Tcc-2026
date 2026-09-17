@@ -1,9 +1,11 @@
+import { usePage } from '@inertiajs/react';
 import { createContext, useContext } from 'react';
 
 export const BookDetailsContext = createContext(null);
 
 export default function BookDetailsLink({ bookId, children, onClick, ...props }) {
     const openBook = useContext(BookDetailsContext);
+    const { auth } = usePage().props;
     return (
         <a
             {...props}
@@ -12,6 +14,7 @@ export default function BookDetailsLink({ bookId, children, onClick, ...props })
                 onClick?.(event);
                 if (
                     !openBook ||
+                    !auth?.user ||
                     event.defaultPrevented ||
                     event.button !== 0 ||
                     event.ctrlKey ||
