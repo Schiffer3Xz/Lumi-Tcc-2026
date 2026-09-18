@@ -18,7 +18,9 @@ return new class extends Migration
             $table->string('nickname')->nullable();
             $table->string('description')->nullable();
             $table->string('profile_photo')->nullable();
-            //$table->boolean('first_login')->default(true); add por outra migration
+            $table->boolean('first_login')->default(true);
+            $table->boolean('public_reviews')->default(true);
+            $table->boolean('social_notifications')->default(true);
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');

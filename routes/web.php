@@ -93,21 +93,12 @@ Route::middleware(['RoleMiddleware'])->group(function () {
         ]);
     })->name('catalogo');
 
-    Route::middleware('auth')->get('books/{id}', [PublicBookController::class, 'show'])->name('book.show');
-    Route::middleware('auth')->get('estante', [PublicBookController::class, 'favorites'])->name('shelf');
-    Route::middleware('auth')->match(['post', 'put', 'delete'], 'books/{id}/favorite', [PublicBookController::class, 'toggleFavorite'])->name('book.favorite');
-    Route::middleware('auth')->post('books/{id}/rating', [PublicBookController::class, 'rate'])->name('book.rating');
-    Route::middleware('auth')->delete('books/{bookId}/comments/{ratingId}', [PublicBookController::class, 'deleteComment'])->name('book.comment.destroy');
-
     Route::middleware('auth')->group(function () {
 
         // ============================================================
         // USER
         // ============================================================
         Route::get('/social', [SocialController::class, 'index'])->name('list');
-        Route::get('messages/{id}', [DirectMessageController::class, 'index'])->name('messages.index');
-        Route::post('messages/{id}', [DirectMessageController::class, 'store'])->middleware('throttle:60,1')->name('messages.store');
-        Route::post('messages/{id}/read', [DirectMessageController::class, 'read'])->name('messages.read');
         Route::get('historico', [ReaderAccountController::class, 'history'])->name('reading.history');
         Route::get('regras', fn () => Inertia::render('readingRules'))->name('reading.rules');
         Route::get('privacidade', [ReaderAccountController::class, 'privacy'])->name('privacy');
@@ -131,6 +122,14 @@ Route::middleware(['RoleMiddleware'])->group(function () {
         Route::post('post/{post}/comments', [PostInteractionController::class, 'comment'])->name('posts.comments.store');
         Route::delete('post/{post}/comments/{comment}', [PostInteractionController::class, 'deleteComment'])->name('posts.comments.destroy');
         Route::delete('post/{id}', [SocialController::class, 'destroyPost'])->name('posts.destroy');
+
+        Route::get('books/{id}', [PublicBookController::class, 'show'])->name('book.show');
+        Route::get('estante', [PublicBookController::class, 'favorites'])->name('shelf');
+        Route::match(['post', 'put', 'delete'], 'books/{id}/favorite', [PublicBookController::class, 'toggleFavorite'])->name('book.favorite');
+        Route::post('books/{id}/rating', [PublicBookController::class, 'rate'])->name('book.rating');
+        Route::delete('books/{bookId}/comments/{ratingId}', [PublicBookController::class, 'deleteComment'])->name('book.comment.destroy');
+
+        Route::post('/chat/send', [DirectMessageController::class, 'start'])->name('chat');
 
         // ========================================================
         // ADMINISTRATOR

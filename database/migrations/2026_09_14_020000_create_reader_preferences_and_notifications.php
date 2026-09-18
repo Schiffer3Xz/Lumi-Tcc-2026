@@ -8,10 +8,6 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::table('users', function (Blueprint $table) {
-            $table->boolean('public_reviews')->default(true);
-            $table->boolean('social_notifications')->default(true);
-        });
         Schema::create('reader_notifications', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained()->cascadeOnDelete();
@@ -27,6 +23,5 @@ return new class extends Migration
     public function down(): void
     {
         Schema::dropIfExists('reader_notifications');
-        Schema::table('users', fn (Blueprint $table) => $table->dropColumn(['public_reviews', 'social_notifications']));
     }
 };

@@ -2,59 +2,68 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\User;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
+use App\Models\Conversation;
+use App\Models\ConversationUser;
+use App\Models\Message;
+use App\Models\User;
 
 class DirectMessageController extends Controller
-{
-    private function recipient(Request $request, int $id): User
+{   
+    public function start(Request $request)
     {
-        abort_if($id === $request->user()->id, 422);
-
-        return User::where('is_admin', false)->findOrFail($id);
-    }
-
-    public function index(Request $request, int $id)
-    {
-        $recipient = $this->recipient($request, $id);
-        $request->validate(['before' => ['nullable', 'integer', 'min:1']]);
-        $viewer = $request->user()->id;
-        $messages = DB::table('direct_messages')
-            ->where(fn ($query) => $query
-                ->where(fn ($pair) => $pair->where('sender_id', $viewer)->where('recipient_id', $recipient->id))
-                ->orWhere(fn ($pair) => $pair->where('sender_id', $recipient->id)->where('recipient_id', $viewer)))
-            ->when($request->filled('before'), fn ($query) => $query->where('id', '<', $request->integer('before')))
-            ->orderByDesc('id')->limit(51)->get(['id', 'sender_id', 'content', 'created_at', 'read_at']);
-
-        return response()->json([
-            'messages' => $messages->take(50)->reverse()->values(),
-            'hasOlder' => $messages->count() > 50,
+        $validated = $request->validate([
+            'user_id' => ['required', 'integer', 'exists:users,id'],
+            'content' => ['required', 'string', 'max:5000'],
+            'group_name' => ['nullable', 'string', 'max:255'],
         ]);
-    }
 
-    public function store(Request $request, int $id)
-    {
-        $recipient = $this->recipient($request, $id);
-        $validated = $request->validate(['content' => ['required', 'string', 'max:2000']]);
-        DB::table('direct_messages')->insert([
-            'sender_id' => $request->user()->id,
-            'recipient_id' => $recipient->id,
-            'content' => $validated['content'],
-            'created_at' => now(), 'updated_at' => now(),
-        ]);
+        $myId = auth()->id();
+        $userId = $validated['user_id'];
+
+        abort_if($myId === $userId, 422);
+        
+        User::whereKey($userId)->where('is_admin', false)->firstOrFail();
+
+        $myConversations = ConversationUser::where('fk_user_id', $myId)->pluck('fk_conversation_id');
+
+        $conversationId = ConversationUser::whereIn('fk_conversation_id', $myConversations)
+            ->where('fk_user_id', $userId)
+            ->value('fk_conversation_id');
+
+
+
+        if(empty($conversationId)){
+            $conversation = Conversation::create([
+                'name' => $validated['group_name'] ?? null,
+            ]);
+
+             $conversationId = $conversation->id;
+
+            ConversationUser::create([
+                'fk_user_id' => $myId,
+                'fk_conversation_id' => $conversationId,
+            ]);
+
+            ConversationUser::create([
+                'fk_user_id' => $userId,
+                'fk_conversation_id' => $conversationId,
+            ]);
+        }
+
+        $this->sendMessage($validated['content'], $conversationId);
 
         return response()->json(['sent' => true], 201);
     }
 
-    public function read(Request $request, int $id)
-    {
-        $recipient = $this->recipient($request, $id);
-        $validated = $request->validate(['through' => ['required', 'integer', 'min:1']]);
-        DB::table('direct_messages')->where('sender_id', $recipient->id)
-            ->where('recipient_id', $request->user()->id)->where('id', '<=', $validated['through'])
-            ->whereNull('read_at')->update(['read_at' => now(), 'updated_at' => now()]);
 
-        return response()->noContent();
+    //Agora eu preciso fazer a logica pra criar a msg com o conteudo
+    public function sendMessage(string $content, $conversationId)
+    {
+        Message::create([
+            'fk_user_id' => auth()->id(),
+            'fk_conversation_id' => $conversationId,
+            'content' => $content,
+        ]);
     }
 }

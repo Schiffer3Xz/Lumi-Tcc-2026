@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Http\Resources\PostResource;
 use App\Models\Follow;
+use App\Models\ConversationUser;
+use App\Models\Message;
 use App\Models\Post;
 use App\Models\User;
 use App\Services\ReaderNotificationService;
@@ -22,24 +24,39 @@ class SocialController extends Controller
         }
         $user = User::find(auth()->id());
         $followingIds = $user->follows->pluck('id');
-        $unreadMessages = DB::table('direct_messages')->where('recipient_id', $user->id)->whereNull('read_at')
-            ->selectRaw('sender_id, COUNT(*) as total')->groupBy('sender_id')->pluck('total', 'sender_id');
-        $conversations = DB::table('direct_messages')
-            ->where(fn ($query) => $query->where('sender_id', $user->id)->orWhere('recipient_id', $user->id))
-            ->selectRaw('CASE WHEN sender_id = ? THEN recipient_id ELSE sender_id END as partner_id, MAX(id) as latest_id', [$user->id])
-            ->groupBy('partner_id')->orderByDesc('latest_id')->pluck('partner_id');
+        $conversationIds = ConversationUser::where('fk_user_id', $user->id)->pluck('fk_conversation_id');
+        $recipients = ConversationUser::whereIn('fk_conversation_id', $conversationIds)->where('fk_user_id', '!=', $user->id)->get()->groupBy('fk_conversation_id');
+        $messagesByConversation = Message::whereIn('fk_conversation_id', $conversationIds)
+            ->orderBy('created_at')
+            ->get()
+            ->groupBy('fk_conversation_id');
+        $directMessages = [];
+
+        foreach ($recipients as $conversationId => $participants) {
+            $messages = $messagesByConversation->get($conversationId, collect())
+                ->map(fn (Message $message) => [
+                    'id' => $message->id,
+                    'user_id' => $message->fk_user_id,
+                    'content' => $message->content,
+                    'created_at' => $message->created_at?->toIso8601String(),
+                ])
+                ->values()
+                ->all();
+
+            foreach ($participants as $participant) {
+                $directMessages[(string) $participant->fk_user_id] = $messages;
+            }
+        }
         $userSummary = fn ($user) => [
             'id' => $user->id,
             'name' => $user->name,
             'nickname' => $user->nickname,
             'isFollowing' => $followingIds->contains($user->id),
-            'unreadMessages' => (int) ($unreadMessages[$user->id] ?? 0),
         ];
 
         return Inertia::render('social', [
             'filters' => ['saved' => $request->boolean('saved'), 'post' => $request->input('post')],
-            'conversationUsers' => User::whereIn('id', $conversations)->where('is_admin', false)->get()
-                ->sortBy(fn ($person) => $conversations->search($person->id))->values()->map($userSummary),
+            'directMessages' => $directMessages,
             'trendingPosts' => Post::with('user:id,name')
                 ->withCount([
                     'likes' => fn ($query) => $query->where('post_likes.created_at', '>=', now()->subDays(7)),

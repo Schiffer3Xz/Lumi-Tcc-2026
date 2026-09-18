@@ -4,8 +4,8 @@ import CommunitySidebar from '@/features/social/CommunitySidebar';
 import PostFeed from '@/features/social/PostFeed';
 
 import ReaderLayout from '@/layouts/reader-layout';
-import { Link, usePoll } from '@inertiajs/react';
-import { useState } from 'react';
+import { Link } from '@inertiajs/react';
+import { useEffect, useRef, useState } from 'react';
 
 export default function Feed({
     auth,
@@ -16,21 +16,33 @@ export default function Feed({
     trendingPosts = [],
     posts = [],
     filters = {},
+    directMessages = {},
 }) {
     const user = auth?.user ?? { name: 'Estudante', email: '' };
     const [chatUser, setChatUser] = useState(null);
     const [peopleOpen, setPeopleOpen] = useState(false);
-    usePoll(15000, { only: ['conversationUsers'] });
+    const openChatTimerRef = useRef(null);
+
+    useEffect(() => () => window.clearTimeout(openChatTimerRef.current), []);
+
+    const openChat = (reader) => {
+        if (!peopleOpen) {
+            setChatUser(reader);
+            return;
+        }
+
+        setPeopleOpen(false);
+        window.clearTimeout(openChatTimerRef.current);
+        openChatTimerRef.current = window.setTimeout(() => setChatUser(reader), 200);
+    };
+
     const sidebarProps = {
         suggestedUsers,
         followedUsers,
         allUsers,
         conversationUsers,
         trendingPosts,
-        onChat: (reader) => {
-            setPeopleOpen(false);
-            setChatUser(reader);
-        },
+        onChat: openChat,
     };
 
     return (
@@ -100,7 +112,14 @@ export default function Feed({
                         <CommunitySidebar {...sidebarProps} />
                     </aside>
                 </div>
-                <ChatDialog recipient={chatUser} viewerId={user.id} onClose={() => setChatUser(null)} />
+                {chatUser && (
+                    <ChatDialog
+                        recipient={chatUser}
+                        viewerId={user.id}
+                        messages={directMessages?.[chatUser.id] ?? []}
+                        onClose={() => setChatUser(null)}
+                    />
+                )}
             </ReaderLayout>
         </>
     );

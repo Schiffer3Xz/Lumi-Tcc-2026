@@ -81,7 +81,7 @@ export default function Login({ status, canResetPassword }) {
             >
                 <Link
                     type="button"
-                    href={route('dashboard')}
+                    href={route('catalogo')}
                     className="flex h-10 w-full items-center justify-center gap-2 rounded-xl border border-slate-200 text-xs font-medium text-slate-700 transition-all hover:bg-slate-50"
                 >
                     <Eye className="h-3.5 w-3.5 text-slate-400" />

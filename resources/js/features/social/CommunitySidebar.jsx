@@ -5,6 +5,7 @@ import ReaderListItem from './ReaderListItem';
 
 export default function CommunitySidebar({ suggestedUsers, followedUsers, allUsers, conversationUsers, trendingPosts, onChat }) {
     const [search, setSearch] = useState('');
+    const conversations = Array.isArray(conversationUsers) ? conversationUsers : [];
     const query = search.trim().replace(/^@/, '').toLocaleLowerCase('pt-BR');
     const users = query
         ? allUsers.filter((user) => `${user.name} ${user.nickname ?? ''}`.toLocaleLowerCase('pt-BR').includes(query))
@@ -47,8 +48,8 @@ export default function CommunitySidebar({ suggestedUsers, followedUsers, allUse
                 </section>
                 <section className="border-t border-slate-100 pt-5">
                     <h3 className="mb-3 text-[10px] font-bold text-slate-400 uppercase">Conversas</h3>
-                    {conversationUsers.map(renderUser)}
-                    {!conversationUsers.length && <p className="text-xs text-slate-500">Clique no balão ao lado de um leitor para conversar.</p>}
+                    {conversations.map(renderUser)}
+                    {!conversations.length && <p className="text-xs text-slate-500">Clique no balão ao lado de um leitor para conversar.</p>}
                 </section>
                 <section className="border-t border-slate-100 pt-5">
                     <h3 className="mb-2 flex items-center gap-1.5 text-[10px] font-bold text-slate-400 uppercase">
