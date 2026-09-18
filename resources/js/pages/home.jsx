@@ -31,7 +31,8 @@ export default function Home({ books = [], auth, genres = [], readingProgress = 
     const [isBookPickerOpen, setIsBookPickerOpen] = useState(false);
     const [progressSearch, setProgressSearch] = useState('');
     const [draftPages, setDraftPages] = useState({});
-    const user = auth?.user ?? { name: 'Usuário', email: '' };
+    const user = auth?.user ?? { name: 'Visitante', email: '' };
+    const openProgress = () => (auth?.user ? setIsProgressSidebarOpen(true) : router.get(route('login')));
 
     const allGenres = useMemo(() => {
         const genresByLabel = new Map(BOOK_GENRES.map((genre) => [genre.label.toLowerCase(), genre]));
@@ -164,9 +165,9 @@ export default function Home({ books = [], auth, genres = [], readingProgress = 
                                 ? `${readingProgress.length} ${readingProgress.length === 1 ? 'livro em leitura' : 'livros em leitura'}`
                                 : 'Sem leitura ativa'
                         }
-                        actionLabel="Adicionar progresso"
-                        onAction={() => setIsProgressSidebarOpen(true)}
-                        onClick={() => setIsProgressSidebarOpen(true)}
+                        actionLabel={auth?.user ? 'Adicionar progresso' : 'Entrar para acompanhar leitura'}
+                        onAction={openProgress}
+                        onClick={openProgress}
                         progressLabel={`${progressPercentage}%`}
                     />
                     {/* ==================== 3 LIVROS MELHORES AVALIADOS ==================== */}
@@ -197,20 +198,22 @@ export default function Home({ books = [], auth, genres = [], readingProgress = 
                             title="Acesso Rápido"
                             items={QUICK_ACCESS.map((item) => ({
                                 ...item,
-                                ...(item.routeName
-                                    ? { href: route(item.routeName) }
-                                    : {
-                                          dialog:
-                                              item.panel === 'rules'
-                                                  ? {
-                                                        description: 'Consulte as orientações da sala de leitura.',
-                                                        content: <ReadingRules rules={readingRules} />,
-                                                    }
-                                                  : {
-                                                        description: 'Controle a privacidade das avaliações e os avisos da conta.',
-                                                        content: <PrivacySettings />,
-                                                    },
-                                      }),
+                                ...(item.panel === 'privacy' && !auth?.user
+                                    ? { href: route('login') }
+                                    : item.routeName
+                                      ? { href: route(item.routeName) }
+                                      : {
+                                            dialog:
+                                                item.panel === 'rules'
+                                                    ? {
+                                                          description: 'Consulte as orientações da sala de leitura.',
+                                                          content: <ReadingRules rules={readingRules} />,
+                                                      }
+                                                    : {
+                                                          description: 'Controle a privacidade das avaliações e os avisos da conta.',
+                                                          content: <PrivacySettings />,
+                                                      },
+                                        }),
                             }))}
                         />
                     </div>

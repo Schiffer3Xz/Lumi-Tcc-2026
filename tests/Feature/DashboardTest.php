@@ -3,10 +3,10 @@
 namespace Tests\Feature;
 
 use App\Models\Author;
+use App\Models\Availability;
 use App\Models\Book;
 use App\Models\Genre;
 use App\Models\User;
-use App\Models\Availability;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Inertia\Testing\AssertableInertia as Assert;
 use Tests\TestCase;
@@ -15,9 +15,21 @@ class DashboardTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_guests_are_redirected_to_the_login_page()
+    public function test_guests_can_visit_dashboard_without_personal_data()
     {
-        $this->get('/dashboard')->assertRedirect('/login');
+        $this->withoutVite()->get('/dashboard')->assertOk()
+            ->assertInertia(fn (Assert $page) => $page->component('home')
+                ->where('auth.user', null)->has('readingProgress', 0)->where('unreadNotifications', 0));
+        $this->get('/catalogo')->assertOk();
+    }
+
+    public function test_guests_must_login_before_changing_reading_progress(): void
+    {
+        $this->post('/reading-progress', ['book_id' => 1])->assertRedirect('/login');
+        $this->patch('/reading-progress/sync', ['progresses' => []])->assertRedirect('/login');
+        $this->patch('/reading-progress/1', ['current_page' => 10])->assertRedirect('/login');
+        $this->delete('/reading-progress/1')->assertRedirect('/login');
+        $this->assertDatabaseCount('reading_progresses', 0);
     }
 
     public function test_authenticated_users_can_visit_the_dashboard()
