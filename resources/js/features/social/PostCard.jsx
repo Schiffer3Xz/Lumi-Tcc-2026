@@ -3,8 +3,18 @@ import { Link, router, useForm } from '@inertiajs/react';
 import { useRef, useState } from 'react';
 import PostBookCard from './PostBookCard';
 import PostComments from './PostComments';
+import {
+    Dialog,
+    DialogContent,
+    DialogHeader,
+    DialogTitle,
+} from '@/components/ui/dialog';
+import { Textarea } from '@/components/ui/textarea';
+import { Button } from '@/components/ui/button';
 
 export default function PostCard({ post, user }) {
+    const [showReportModal, setShowReportModal] = useState(false);
+    const [reportText, setReportText] = useState('');
     const inputRef = useRef(null);
     const requestPending = useRef(false);
     const [busy, setBusy] = useState(false);
@@ -69,6 +79,7 @@ export default function PostCard({ post, user }) {
         });
     };
 
+
     return (
         <article
             id={`post-${post.id}`}
@@ -126,6 +137,66 @@ export default function PostCard({ post, user }) {
                                 </DropdownMenuItem>
                             </>
                         )}
+
+                            <DropdownMenuItem
+                                onSelect={() => {
+                                    setReportText('');
+                                    setShowReportModal(true);
+                                }}
+                            >
+                                Denunciar Comentário
+                            </DropdownMenuItem>
+
+                       <Dialog
+                            open={showReportModal}
+                            onOpenChange={setShowReportModal}
+                        >
+                            <DialogContent>
+                                <DialogHeader>
+                                    <DialogTitle>Denunciar comentário</DialogTitle>
+
+                                    <DialogDescription>
+                                        Explique o motivo da denúncia. Sua informação será analisada.
+                                    </DialogDescription>
+                                </DialogHeader>
+
+                                <div className="py-4">
+                                    <Textarea
+                                        placeholder="Descreva o motivo da denúncia..."
+                                        value={reportText}
+                                        onChange={(e) => setReportText(e.target.value)}
+                                        rows={5}
+                                    />
+                                </div>
+
+                                <DialogFooter>
+                                    <Button
+                                        variant="outline"
+                                        onClick={() => setShowReportModal(false)}
+                                    >
+                                        Cancelar
+                                    </Button>
+
+                                    <Button
+                                        variant="destructive"
+                                        disabled={!reportText.trim()}
+                                        onClick={() => {
+                                            console.log(reportText);
+
+                                            // Aqui você envia para o Laravel
+
+                                            setShowReportModal(false);
+                                            setReportText('');
+                                        }}
+                                    >
+                                        Enviar denúncia
+                                    </Button>
+                                </DialogFooter>
+                            </DialogContent>
+                        </Dialog>
+
+
+
                     </DropdownMenuContent>
                 </DropdownMenu>
             </div>
