@@ -1,47 +1,51 @@
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 
 import { Link, router, useForm } from '@inertiajs/react';
-
 import { useRef, useState } from 'react';
 
 import PostBookCard from './PostBookCard';
-
 import PostComments from './PostComments';
 
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+} from '@/components/ui/dialog';
 
 import { Button } from '@/components/ui/button';
 
 export default function PostCard({ post, user }) {
     const inputRef = useRef(null);
-
     const requestPending = useRef(false);
 
     const [busy, setBusy] = useState(false);
-
     const [message, setMessage] = useState('');
-
     const [shareFallback, setShareFallback] = useState(false);
-
     const [editing, setEditing] = useState(false);
 
     const [showReportModal, setShowReportModal] = useState(false);
-
     const [reportText, setReportText] = useState('');
 
-    const editForm = useForm({ content: post.content });
+    const editForm = useForm({
+        content: post.content,
+    });
 
     const isLiked = post.isLiked;
-
     const isSaved = post.isSaved;
 
     const mutate = (method, url) => {
         if (requestPending.current || editForm.processing) return;
 
         requestPending.current = true;
-
         setBusy(true);
-
         setMessage('');
 
         router.visit(url, {
@@ -49,7 +53,11 @@ export default function PostCard({ post, user }) {
             preserveScroll: true,
             preserveState: true,
 
-            onError: () => setMessage('Não foi possível concluir a ação. Tente novamente.'),
+            onError: () => {
+                setMessage(
+                    'Não foi possível concluir a ação. Tente novamente.'
+                );
+            },
 
             onFinish: () => {
                 requestPending.current = false;
@@ -65,11 +73,9 @@ export default function PostCard({ post, user }) {
             await navigator.clipboard.writeText(post.url);
 
             setShareFallback(false);
-
             setMessage('Link copiado!');
         } catch {
             setShareFallback(true);
-
             setMessage('Copie o link abaixo para compartilhar.');
         }
     };
@@ -77,7 +83,9 @@ export default function PostCard({ post, user }) {
     const share = async () => {
         setMessage('');
 
-        if (!navigator.share) return copyLink();
+        if (!navigator.share) {
+            return copyLink();
+        }
 
         try {
             await navigator.share({
@@ -85,7 +93,9 @@ export default function PostCard({ post, user }) {
                 url: post.url,
             });
         } catch (error) {
-            if (error.name !== 'AbortError') await copyLink();
+            if (error.name !== 'AbortError') {
+                await copyLink();
+            }
         }
     };
 
@@ -103,13 +113,14 @@ export default function PostCard({ post, user }) {
         editForm.patch(route('posts.update', post.id), {
             preserveScroll: true,
 
-            onSuccess: () => setEditing(false),
+            onSuccess: () => {
+                setEditing(false);
+            },
         });
     };
 
     const openReportModal = () => {
         setReportText('');
-
         setShowReportModal(true);
     };
 
@@ -117,18 +128,16 @@ export default function PostCard({ post, user }) {
         if (!reportText.trim()) return;
 
         console.log('Post:', post.id);
-
         console.log('Motivo:', reportText);
 
-        // Aqui você poderá enviar para o Laravel.
-        // Exemplo futuramente:
+        // Aqui você poderá enviar a denúncia para o Laravel.
+        // Exemplo:
         //
         // router.post(route('posts.report', post.id), {
         //     reason: reportText,
         // });
 
         setShowReportModal(false);
-
         setReportText('');
     };
 
@@ -144,22 +153,33 @@ export default function PostCard({ post, user }) {
                             post.author?.bg ?? 'bg-slate-800'
                         }`}
                     >
-                        {post.author?.avatar ?? post.author?.name?.charAt(0).toUpperCase()}
+                        {post.author?.avatar ??
+                            post.author?.name?.charAt(0).toUpperCase()}
                     </div>
 
                     <div>
                         <div className="flex items-center gap-1.5">
                             <Link
-                                href={post.canManage ? route('profile') : route('people', post.author.id)}
+                                href={
+                                    post.canManage
+                                        ? route('profile')
+                                        : route('people', post.author.id)
+                                }
                                 className="text-xs font-bold text-slate-800 hover:text-blue-600"
                             >
                                 {post.author?.name}
                             </Link>
 
-                            {post.author?.username && <span className="text-[11px] text-slate-400">@{post.author.username}</span>}
+                            {post.author?.username && (
+                                <span className="text-[11px] text-slate-400">
+                                    @{post.author.username}
+                                </span>
+                            )}
                         </div>
 
-                        <p className="text-[10px] text-slate-400">{post.time}</p>
+                        <p className="text-[10px] text-slate-400">
+                            {post.time}
+                        </p>
                     </div>
                 </div>
 
@@ -176,33 +196,50 @@ export default function PostCard({ post, user }) {
                     </DropdownMenuTrigger>
 
                     <DropdownMenuContent align="end">
-                        <DropdownMenuItem onSelect={copyLink}>Copiar link</DropdownMenuItem>
+                        <DropdownMenuItem onSelect={copyLink}>
+                            Copiar link
+                        </DropdownMenuItem>
 
-                        <DropdownMenuItem onSelect={() => mutate(isSaved ? 'delete' : 'put', route('posts.save', post.id))}>
-                            {isSaved ? 'Remover dos salvos' : 'Salvar publicação'}
+                        <DropdownMenuItem
+                            onSelect={() =>
+                                mutate(
+                                    isSaved ? 'delete' : 'put',
+                                    route('posts.save', post.id)
+                                )
+                            }
+                        >
+                            {isSaved
+                                ? 'Remover dos salvos'
+                                : 'Salvar publicação'}
                         </DropdownMenuItem>
 
                         {post.canManage && (
                             <>
                                 <DropdownMenuItem
                                     onSelect={() => {
-                                        editForm.setData('content', post.content);
-
+                                        editForm.setData(
+                                            'content',
+                                            post.content
+                                        );
                                         editForm.clearErrors();
-
                                         setEditing(true);
                                     }}
                                 >
                                     Editar publicação
                                 </DropdownMenuItem>
 
-                                <DropdownMenuItem onSelect={deletePost} className="text-red-600">
+                                <DropdownMenuItem
+                                    onSelect={deletePost}
+                                    className="text-red-600"
+                                >
                                     Excluir publicação
                                 </DropdownMenuItem>
                             </>
                         )}
 
-                        <DropdownMenuItem onSelect={openReportModal}>Denunciar publicação</DropdownMenuItem>
+                        <DropdownMenuItem onSelect={openReportModal}>
+                            Denunciar publicação
+                        </DropdownMenuItem>
                     </DropdownMenuContent>
                 </DropdownMenu>
             </div>
@@ -213,14 +250,22 @@ export default function PostCard({ post, user }) {
                         autoFocus
                         aria-label="Editar texto da publicação"
                         value={editForm.data.content}
-                        onChange={(event) => editForm.setData('content', event.target.value)}
+                        onChange={(event) =>
+                            editForm.setData(
+                                'content',
+                                event.target.value
+                            )
+                        }
                         maxLength={5000}
                         disabled={editForm.processing}
                         className="min-h-24 w-full rounded-xl border border-slate-200 p-3 text-xs text-slate-700"
                     />
 
                     {editForm.errors.content && (
-                        <p role="alert" className="text-xs text-red-600">
+                        <p
+                            role="alert"
+                            className="text-xs text-red-600"
+                        >
                             {editForm.errors.content}
                         </p>
                     )}
@@ -228,19 +273,32 @@ export default function PostCard({ post, user }) {
                     <div className="flex gap-3 text-xs">
                         <button
                             type="submit"
-                            disabled={busy || editForm.processing || (!post.image && !editForm.data.content.trim())}
+                            disabled={
+                                busy ||
+                                editForm.processing ||
+                                (!post.image &&
+                                    !editForm.data.content.trim())
+                            }
                             className="rounded-lg bg-blue-600 px-3 py-2 text-white disabled:opacity-40"
                         >
-                            {editForm.processing ? 'Salvando...' : 'Salvar alterações'}
+                            {editForm.processing
+                                ? 'Salvando...'
+                                : 'Salvar alterações'}
                         </button>
 
-                        <button type="button" disabled={editForm.processing} onClick={() => setEditing(false)}>
+                        <button
+                            type="button"
+                            disabled={editForm.processing}
+                            onClick={() => setEditing(false)}
+                        >
                             Cancelar
                         </button>
                     </div>
                 </form>
             ) : (
-                <p className="text-xs leading-relaxed break-words whitespace-pre-wrap text-slate-600">{post.content}</p>
+                <p className="break-words whitespace-pre-wrap text-xs leading-relaxed text-slate-600">
+                    {post.content}
+                </p>
             )}
 
             {post.book && <PostBookCard book={post.book} />}
@@ -259,14 +317,29 @@ export default function PostCard({ post, user }) {
                 <button
                     type="button"
                     disabled={busy || editForm.processing}
-                    onClick={() => mutate(isLiked ? 'delete' : 'put', route('posts.like', post.id))}
-                    aria-label={isLiked ? 'Descurtir publicação' : 'Curtir publicação'}
+                    onClick={() =>
+                        mutate(
+                            isLiked ? 'delete' : 'put',
+                            route('posts.like', post.id)
+                        )
+                    }
+                    aria-label={
+                        isLiked
+                            ? 'Descurtir publicação'
+                            : 'Curtir publicação'
+                    }
                     aria-pressed={isLiked}
                     className={`flex items-center gap-1.5 transition-colors disabled:opacity-40 ${
-                        isLiked ? 'font-bold text-rose-500' : 'hover:text-rose-500'
+                        isLiked
+                            ? 'font-bold text-rose-500'
+                            : 'hover:text-rose-500'
                     }`}
                 >
-                    <i className={`${isLiked ? 'fa-solid' : 'fa-regular'} fa-heart text-sm`} />
+                    <i
+                        className={`${
+                            isLiked ? 'fa-solid' : 'fa-regular'
+                        } fa-heart text-sm`}
+                    />
 
                     <span>{post.likesCount ?? 0}</span>
                 </button>
@@ -290,18 +363,37 @@ export default function PostCard({ post, user }) {
                 >
                     <i className="fa-solid fa-share-nodes text-sm" />
 
-                    <span className="hidden sm:inline">Compartilhar</span>
+                    <span className="hidden sm:inline">
+                        Compartilhar
+                    </span>
                 </button>
 
                 <button
                     type="button"
                     disabled={busy || editForm.processing}
-                    onClick={() => mutate(isSaved ? 'delete' : 'put', route('posts.save', post.id))}
-                    aria-label={isSaved ? 'Remover publicação dos salvos' : 'Salvar publicação'}
+                    onClick={() =>
+                        mutate(
+                            isSaved ? 'delete' : 'put',
+                            route('posts.save', post.id)
+                        )
+                    }
+                    aria-label={
+                        isSaved
+                            ? 'Remover publicação dos salvos'
+                            : 'Salvar publicação'
+                    }
                     aria-pressed={isSaved}
-                    className={`ml-auto transition-colors disabled:opacity-40 ${isSaved ? 'text-blue-600' : 'text-slate-400 hover:text-slate-600'}`}
+                    className={`ml-auto transition-colors disabled:opacity-40 ${
+                        isSaved
+                            ? 'text-blue-600'
+                            : 'text-slate-400 hover:text-slate-600'
+                    }`}
                 >
-                    <i className={`${isSaved ? 'fa-solid' : 'fa-regular'} fa-bookmark text-sm`} />
+                    <i
+                        className={`${
+                            isSaved ? 'fa-solid' : 'fa-regular'
+                        } fa-bookmark text-sm`}
+                    />
                 </button>
             </div>
 
@@ -329,35 +421,60 @@ export default function PostCard({ post, user }) {
                 busy={busy || editForm.processing}
                 onDelete={(commentId) => {
                     if (window.confirm('Excluir este comentário?')) {
-                        mutate('delete', route('posts.comments.destroy', [post.id, commentId]));
+                        mutate(
+                            'delete',
+                            route('posts.comments.destroy', [
+                                post.id,
+                                commentId,
+                            ])
+                        );
                     }
                 }}
             />
 
-            <Dialog open={showReportModal} onOpenChange={setShowReportModal}>
+            <Dialog
+                open={showReportModal}
+                onOpenChange={setShowReportModal}
+            >
                 <DialogContent>
                     <DialogHeader>
-                        <DialogTitle>Denunciar publicação</DialogTitle>
+                        <DialogTitle>
+                            Denunciar publicação
+                        </DialogTitle>
 
-                        <DialogDescription>Explique o motivo da denúncia. Sua informação será analisada.</DialogDescription>
+                        <DialogDescription>
+                            Explique o motivo da denúncia. Sua informação
+                            será analisada.
+                        </DialogDescription>
                     </DialogHeader>
 
                     <div className="py-4">
                         <textarea
                             placeholder="Descreva o motivo da denúncia..."
                             value={reportText}
-                            onChange={(event) => setReportText(event.target.value)}
+                            onChange={(event) =>
+                                setReportText(event.target.value)
+                            }
                             rows={5}
                             className="w-full rounded-xl border border-slate-200 p-3 text-sm text-slate-700 outline-none focus:border-blue-500"
                         />
                     </div>
 
                     <DialogFooter>
-                        <Button variant="outline" onClick={() => setShowReportModal(false)}>
+                        <Button
+                            variant="outline"
+                            onClick={() =>
+                                setShowReportModal(false)
+                            }
+                        >
                             Cancelar
                         </Button>
 
-                        <Button variant="destructive" disabled={!reportText.trim()} onClick={submitReport}>
+                        <Button
+                            variant="destructive"
+                            disabled={!reportText.trim()}
+                            onClick={submitReport}
+                        >
                             Enviar denúncia
                         </Button>
                     </DialogFooter>
