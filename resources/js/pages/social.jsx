@@ -114,9 +114,11 @@ export default function Feed({
                 </div>
                 {chatUser && (
                     <ChatDialog
+                        key={chatUser.id}
                         recipient={chatUser}
                         viewerId={user.id}
-                        messages={directMessages?.[chatUser.id] ?? []}
+                        messages={directMessages?.[chatUser.id]?.messages ?? []}
+                        conversationId={directMessages?.[chatUser.id]?.conversation_id}
                         onClose={() => setChatUser(null)}
                     />
                 )}

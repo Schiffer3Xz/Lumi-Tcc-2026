@@ -119,6 +119,7 @@ Route::middleware(['RoleMiddleware'])->group(function () {
         Route::patch('post/{post}', [PostController::class, 'update'])->name('posts.update');
         Route::match(['put', 'delete'], 'post/{post}/like', [PostInteractionController::class, 'like'])->name('posts.like');
         Route::match(['put', 'delete'], 'post/{post}/save', [PostInteractionController::class, 'save'])->name('posts.save');
+        Route::post('post/{post}/save', [PostInteractionController::class, 'save'])->name('posts.report');
         Route::post('post/{post}/comments', [PostInteractionController::class, 'comment'])->name('posts.comments.store');
         Route::delete('post/{post}/comments/{comment}', [PostInteractionController::class, 'deleteComment'])->name('posts.comments.destroy');
         Route::delete('post/{id}', [SocialController::class, 'destroyPost'])->name('posts.destroy');

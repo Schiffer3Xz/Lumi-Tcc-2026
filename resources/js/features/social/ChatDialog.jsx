@@ -4,6 +4,7 @@ export default function ChatDialog({
     recipient,
     viewerId,
     messages = [],
+    conversationId,
     onClose,
 }) {
     const initials = recipient?.name
@@ -14,20 +15,61 @@ export default function ChatDialog({
         .join('')
         .toUpperCase();
 
-    const [pendingMessages, setPendingMessages] = useState([]);
+    const [chatMessages, setChatMessages] = useState(messages);
     const [content, setContent] = useState('');
     const [processing, setProcessing] = useState(false);
     const [error, setError] = useState('');
 
     const messagesEndRef = useRef(null);
 
-    const conversation = [...messages, ...pendingMessages];
+    const sortMessages = (messageList) =>
+        [...messageList].sort(
+            (first, second) =>
+                new Date(first.created_at).getTime() -
+                new Date(second.created_at).getTime()
+        );
+
+    const conversation = sortMessages(chatMessages);
 
     useEffect(() => {
-        setPendingMessages([]);
         setContent('');
         setError('');
     }, [recipient]);
+
+    useEffect(() => {
+        setChatMessages((current) => {
+            const merged = [...current];
+
+            messages.forEach((message) => {
+                const existingIndex = merged.findIndex(
+                    (currentMessage) =>
+                        String(currentMessage.id) === String(message.id)
+                );
+
+                if (existingIndex >= 0) {
+                    merged[existingIndex] = message;
+                    return;
+                }
+
+                const optimisticIndex = merged.findIndex(
+                    (currentMessage) =>
+                        String(currentMessage.id).startsWith('pending-') &&
+                        Number(currentMessage.user_id) ===
+                            Number(message.user_id) &&
+                        currentMessage.content === message.content
+                );
+
+                if (optimisticIndex >= 0) {
+                    merged[optimisticIndex] = message;
+                    return;
+                }
+
+                merged.push(message);
+            });
+
+            return sortMessages(merged);
+        });
+    }, [messages]);
 
     useEffect(() => {
         messagesEndRef.current?.scrollIntoView({
@@ -49,6 +91,80 @@ export default function ChatDialog({
         };
     }, [onClose]);
 
+    useEffect(() => {
+        if (!conversationId || !window.Echo) {
+            return;
+        }
+
+        console.log(
+            '🟡 Entrando no canal:',
+            `conversation.${conversationId}`
+        );
+
+        const channel = window.Echo.private(
+            `conversation.${conversationId}`
+        );
+
+        channel.subscribed(() => {
+            console.log(
+                '🟢 INSCRITO NO CANAL:',
+                `conversation.${conversationId}`
+            );
+        });
+
+        channel.error((error) => {
+            console.log('🔴 ERRO NO CANAL:', error);
+        });
+
+        channel.listen('MessageSent', (event) => {
+            const receivedMessage = {
+                id: event.message.id,
+                user_id: event.message.fk_user_id,
+                content: event.message.content,
+                created_at: event.message.created_at,
+            };
+
+            setChatMessages((current) => {
+                if (
+                    current.some(
+                        (message) =>
+                            String(message.id) ===
+                            String(receivedMessage.id)
+                    )
+                ) {
+                    return current;
+                }
+
+                const optimisticIndex = current.findIndex(
+                    (message) =>
+                        String(message.id).startsWith('pending-') &&
+                        Number(message.user_id) ===
+                            Number(receivedMessage.user_id) &&
+                        message.content === receivedMessage.content
+                );
+
+                if (optimisticIndex >= 0) {
+                    const updated = [...current];
+                    updated[optimisticIndex] = receivedMessage;
+                    return sortMessages(updated);
+                }
+
+                return sortMessages([...current, receivedMessage]);
+            });
+        });
+
+        return () => {
+            window.Echo.leave(
+                `conversation.${conversationId}`
+            );
+
+            console.log(
+                '⚪ Saiu do canal:',
+                `conversation.${conversationId}`
+            );
+        };
+    }, [conversationId]);
+
     const enviar = (event) => {
         event.preventDefault();
 
@@ -60,7 +176,7 @@ export default function ChatDialog({
 
         const temporaryId = `pending-${Date.now()}`;
 
-        setPendingMessages((current) => [
+        setChatMessages((current) => [
             ...current,
             {
                 id: temporaryId,
@@ -97,26 +213,28 @@ export default function ChatDialog({
                     );
                 }
 
-                setPendingMessages((current) =>
+                setChatMessages((current) =>
                     current.map((message) =>
                         message.id === temporaryId
                             ? {
-                                ...message,
-                                pending: false,
-                            }
+                                  ...message,
+                                  pending: false,
+                              }
                             : message
                     )
                 );
             })
             .catch(() => {
-                setPendingMessages((current) =>
+                setChatMessages((current) =>
                     current.filter(
                         (message) => message.id !== temporaryId
                     )
                 );
 
                 setContent(messageContent);
-                setError('Não foi possível enviar a mensagem.');
+                setError(
+                    'Não foi possível enviar a mensagem.'
+                );
             })
             .finally(() => {
                 setProcessing(false);
@@ -274,7 +392,9 @@ export default function ChatDialog({
 
                         <button
                             type="submit"
-                            disabled={!content.trim() || processing}
+                            disabled={
+                                !content.trim() || processing
+                            }
                             aria-label="Enviar mensagem"
                             className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-slate-200 text-sm text-slate-500 transition-all hover:bg-blue-600 hover:text-white hover:shadow-md hover:shadow-blue-200 focus:outline-none focus:ring-4 focus:ring-blue-100 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:bg-slate-200 disabled:hover:text-slate-500"
                         >

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\MessageSent;
 use Illuminate\Http\Request;
 use App\Models\Conversation;
 use App\Models\ConversationUser;
@@ -22,7 +23,7 @@ class DirectMessageController extends Controller
         $userId = $validated['user_id'];
 
         abort_if($myId === $userId, 422);
-        
+
         User::whereKey($userId)->where('is_admin', false)->firstOrFail();
 
         $myConversations = ConversationUser::where('fk_user_id', $myId)->pluck('fk_conversation_id');
@@ -53,17 +54,22 @@ class DirectMessageController extends Controller
 
         $this->sendMessage($validated['content'], $conversationId);
 
-        return response()->json(['sent' => true], 201);
+        return response()->json([
+            'sent' => true,
+            'conversation_id' => $conversationId,
+        ], 201);
     }
 
 
     //Agora eu preciso fazer a logica pra criar a msg com o conteudo
     public function sendMessage(string $content, $conversationId)
     {
-        Message::create([
+        $message = Message::create([
             'fk_user_id' => auth()->id(),
             'fk_conversation_id' => $conversationId,
             'content' => $content,
         ]);
+
+        event(new MessageSent($message));
     }
 }

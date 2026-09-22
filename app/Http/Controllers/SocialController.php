@@ -44,7 +44,10 @@ class SocialController extends Controller
                 ->all();
 
             foreach ($participants as $participant) {
-                $directMessages[(string) $participant->fk_user_id] = $messages;
+                $directMessages[(string) $participant->fk_user_id] = [
+                    'conversation_id' => $conversationId,
+                    'messages' => $messages,
+                ];
             }
         }
         $userSummary = fn ($user) => [
