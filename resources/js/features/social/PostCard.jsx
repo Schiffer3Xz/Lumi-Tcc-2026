@@ -30,9 +30,10 @@ export default function PostCard({ post, user }) {
     const [message, setMessage] = useState('');
     const [shareFallback, setShareFallback] = useState(false);
     const [editing, setEditing] = useState(false);
+    const [showComments, setShowComments] = useState(false);
 
     const [showReportModal, setShowReportModal] = useState(false);
-    const [reportText, setReportText] = useState('');
+    const reportForm = useForm({ content: '' });
 
     const editForm = useForm({
         content: post.content,
@@ -120,25 +121,22 @@ export default function PostCard({ post, user }) {
     };
 
     const openReportModal = () => {
-        setReportText('');
+        reportForm.reset();
+        reportForm.clearErrors();
         setShowReportModal(true);
     };
 
     const submitReport = () => {
-        if (!reportText.trim()) return;
+        if (!reportForm.data.content.trim() || reportForm.processing) return;
 
-        console.log('Post:', post.id);
-        console.log('Motivo:', reportText);
-
-        // Aqui você poderá enviar a denúncia para o Laravel.
-        // Exemplo:
-        //
-        // router.post(route('posts.report', post.id), {
-        //     reason: reportText,
-        // });
-
-        setShowReportModal(false);
-        setReportText('');
+        reportForm.post(route('posts.report', post.id), {
+            preserveScroll: true,
+            onSuccess: () => {
+                setShowReportModal(false);
+                reportForm.reset();
+                setMessage('Denúncia enviada com sucesso.');
+            },
+        });
     };
 
     return (
@@ -346,13 +344,17 @@ export default function PostCard({ post, user }) {
 
                 <button
                     type="button"
-                    onClick={() => inputRef.current?.focus()}
-                    aria-label="Comentar publicação"
+                    onClick={() => setShowComments((visible) => !visible)}
+                    aria-expanded={showComments}
+                    aria-controls={`post-comments-${post.id}`}
+                    aria-label={showComments ? 'Ocultar comentários' : 'Mostrar comentários'}
                     className="flex items-center gap-1.5 transition-colors hover:text-blue-600"
                 >
                     <i className="fa-regular fa-comment text-sm" />
 
-                    <span>{post.commentsCount ?? 0}</span>
+                    <span>
+                        {showComments ? 'Ocultar comentários' : 'Comentários'} ({post.commentsCount ?? 0})
+                    </span>
                 </button>
 
                 <button
@@ -413,24 +415,26 @@ export default function PostCard({ post, user }) {
                 />
             )}
 
-            <PostComments
-                postId={post.id}
-                comments={post.comments}
-                user={user}
-                inputRef={inputRef}
-                busy={busy || editForm.processing}
-                onDelete={(commentId) => {
-                    if (window.confirm('Excluir este comentário?')) {
-                        mutate(
-                            'delete',
-                            route('posts.comments.destroy', [
-                                post.id,
-                                commentId,
-                            ])
-                        );
-                    }
-                }}
-            />
+            <div id={`post-comments-${post.id}`} hidden={!showComments}>
+                <PostComments
+                    postId={post.id}
+                    comments={post.comments}
+                    user={user}
+                    inputRef={inputRef}
+                    busy={busy || editForm.processing}
+                    onDelete={(commentId) => {
+                        if (window.confirm('Excluir este comentário?')) {
+                            mutate(
+                                'delete',
+                                route('posts.comments.destroy', [
+                                    post.id,
+                                    commentId,
+                                ])
+                            );
+                        }
+                    }}
+                />
+            </div>
 
             <Dialog
                 open={showReportModal}
@@ -451,13 +455,20 @@ export default function PostCard({ post, user }) {
                     <div className="py-4">
                         <textarea
                             placeholder="Descreva o motivo da denúncia..."
-                            value={reportText}
+                            value={reportForm.data.content}
                             onChange={(event) =>
-                                setReportText(event.target.value)
+                                reportForm.setData('content', event.target.value)
                             }
                             rows={5}
+                            maxLength={100}
+                            disabled={reportForm.processing}
                             className="w-full rounded-xl border border-slate-200 p-3 text-sm text-slate-700 outline-none focus:border-blue-500"
                         />
+                        {reportForm.errors.content && (
+                            <p role="alert" className="mt-2 text-sm text-red-600">
+                                {reportForm.errors.content}
+                            </p>
+                        )}
                     </div>
 
                     <DialogFooter>
@@ -472,7 +483,7 @@ export default function PostCard({ post, user }) {
 
                         <Button
                             variant="destructive"
-                            disabled={!reportText.trim()}
+                            disabled={!reportForm.data.content.trim() || reportForm.processing}
                             onClick={submitReport}
                         >
                             Enviar denúncia

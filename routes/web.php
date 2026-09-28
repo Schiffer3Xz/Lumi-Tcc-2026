@@ -13,6 +13,7 @@ use App\Http\Controllers\DirectMessageController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\PostInteractionController;
 use App\Http\Controllers\ReaderAccountController;
+use App\Http\Controllers\ReportController;
 use App\Http\Controllers\SocialController;
 use App\Http\Controllers\User\DashboardController;
 use App\Models\Book;
@@ -119,7 +120,7 @@ Route::middleware(['RoleMiddleware'])->group(function () {
         Route::patch('post/{post}', [PostController::class, 'update'])->name('posts.update');
         Route::match(['put', 'delete'], 'post/{post}/like', [PostInteractionController::class, 'like'])->name('posts.like');
         Route::match(['put', 'delete'], 'post/{post}/save', [PostInteractionController::class, 'save'])->name('posts.save');
-        Route::post('post/{post}/save', [PostInteractionController::class, 'save'])->name('posts.report');
+        Route::post('post/{post}/report', [ReportController::class, 'store'])->name('posts.report');
         Route::post('post/{post}/comments', [PostInteractionController::class, 'comment'])->name('posts.comments.store');
         Route::delete('post/{post}/comments/{comment}', [PostInteractionController::class, 'deleteComment'])->name('posts.comments.destroy');
         Route::delete('post/{id}', [SocialController::class, 'destroyPost'])->name('posts.destroy');
@@ -131,6 +132,10 @@ Route::middleware(['RoleMiddleware'])->group(function () {
         Route::delete('books/{bookId}/comments/{ratingId}', [PublicBookController::class, 'deleteComment'])->name('book.comment.destroy');
 
         Route::post('/chat/send', [DirectMessageController::class, 'start'])->name('chat');
+        Route::post('/chat/groups', [DirectMessageController::class, 'createGroup'])->name('chat.groups.store');
+        Route::post('/chat/groups/{conversation}/messages', [DirectMessageController::class, 'sendToGroup'])->name('chat.groups.messages.store');
+        Route::delete('/chat/groups/{conversation}', [DirectMessageController::class, 'destroyGroup'])->name('chat.groups.destroy');
+        Route::delete('/chat/groups/{conversation}/participants/{user}', [DirectMessageController::class, 'removeParticipant'])->name('chat.groups.participants.destroy');
 
         // ========================================================
         // ADMINISTRATOR

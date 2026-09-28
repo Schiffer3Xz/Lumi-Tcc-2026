@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Resources\PostResource;
 use App\Models\Follow;
+use App\Models\Conversation;
 use App\Models\ConversationUser;
 use App\Models\Message;
 use App\Models\Post;
@@ -18,30 +19,47 @@ class SocialController extends Controller
 {
     public function index(Request $request)
     {
-        $request->validate(['post' => ['nullable', 'integer'], 'saved' => ['nullable', 'boolean']]);
+        $request->validate(['post' => ['nullable', 'integer'], 'saved' => ['nullable', 'boolean'], 'group' => ['nullable', 'integer']]);
         if ($request->filled('post')) {
             Post::findOrFail($request->integer('post'));
         }
         $user = User::find(auth()->id());
         $followingIds = $user->follows->pluck('id');
         $conversationIds = ConversationUser::where('fk_user_id', $user->id)->pluck('fk_conversation_id');
+        $conversations = Conversation::with('participants:id,name')->whereIn('id', $conversationIds)->get()->keyBy('id');
         $recipients = ConversationUser::whereIn('fk_conversation_id', $conversationIds)->where('fk_user_id', '!=', $user->id)->get()->groupBy('fk_conversation_id');
-        $messagesByConversation = Message::whereIn('fk_conversation_id', $conversationIds)
+        $messagesByConversation = Message::with('user:id,name')->whereIn('fk_conversation_id', $conversationIds)
             ->orderBy('created_at')
             ->get()
             ->groupBy('fk_conversation_id');
         $directMessages = [];
+        $groupConversations = [];
 
-        foreach ($recipients as $conversationId => $participants) {
+        foreach ($conversations as $conversationId => $conversation) {
+            $participants = $recipients->get($conversationId, collect());
             $messages = $messagesByConversation->get($conversationId, collect())
                 ->map(fn (Message $message) => [
                     'id' => $message->id,
                     'user_id' => $message->fk_user_id,
+                    'user_name' => $message->user?->name,
                     'content' => $message->content,
                     'created_at' => $message->created_at?->toIso8601String(),
                 ])
                 ->values()
                 ->all();
+
+            if ($conversation->is_group) {
+                $groupConversations[] = [
+                    'id' => $conversation->id,
+                    'name' => $conversation->name,
+                    'is_group' => true,
+                    'created_by' => $conversation->created_by,
+                    'can_manage' => (int) $conversation->created_by === $user->id,
+                    'participants' => $conversation->participants->map(fn ($member) => ['id' => $member->id, 'name' => $member->name])->values(),
+                    'messages' => $messages,
+                ];
+                continue;
+            }
 
             foreach ($participants as $participant) {
                 $directMessages[(string) $participant->fk_user_id] = [
@@ -58,8 +76,10 @@ class SocialController extends Controller
         ];
 
         return Inertia::render('social', [
-            'filters' => ['saved' => $request->boolean('saved'), 'post' => $request->input('post')],
+            'filters' => ['saved' => $request->boolean('saved'), 'post' => $request->input('post'), 'group' => $request->integer('group')],
             'directMessages' => $directMessages,
+            'groupConversations' => $groupConversations,
+            'conversationUsers' => User::whereIn('id', array_keys($directMessages))->where('is_admin', false)->get()->map($userSummary),
             'trendingPosts' => Post::with('user:id,name')
                 ->withCount([
                     'likes' => fn ($query) => $query->where('post_likes.created_at', '>=', now()->subDays(7)),
