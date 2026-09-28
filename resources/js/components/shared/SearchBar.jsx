@@ -15,7 +15,7 @@ export default function SearchBar({
     const inputId = id ?? generatedId;
 
     return (
-        <div className={clsx(variant === 'library' && 'relative flex-1', className)}>
+        <div className={clsx(variant === 'library' && 'relative min-w-0 flex-1', className)}>
             <label className="sr-only" htmlFor={inputId}>
                 {label}
             </label>
@@ -28,7 +28,8 @@ export default function SearchBar({
             />
             <input
                 id={inputId}
-                type="text"
+                type="search"
+                enterKeyHint="search"
                 className={clsx(
                     variant === 'library' &&
                         'w-full rounded-xl border border-gray-200 bg-white py-3 pr-4 pl-12 text-sm text-gray-700 shadow-sm transition-all placeholder:text-gray-400 focus:border-yellow-400 focus:ring-2 focus:ring-yellow-400/50 focus:outline-none',

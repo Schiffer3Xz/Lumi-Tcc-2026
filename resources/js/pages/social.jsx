@@ -50,10 +50,10 @@ export default function Feed({
             <ReaderLayout title="Sala de Leitura - Feed da Comunidade" user={user} activeItem="usuarios" variant="social">
                 <div className="flex flex-1 overflow-hidden">
                     {/* FEED PRINCIPAL */}
-                    <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8">
+                    <main id="reader-main-content" tabIndex={-1} className="min-w-0 flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8">
                         <div className="mx-auto flex max-w-[720px] flex-col gap-6">
                             {/* CABEÇALHO DO FEED */}
-                            <div className="flex items-center justify-between rounded-2xl border border-slate-200/70 bg-white p-5 shadow-xs">
+                            <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-slate-200/70 bg-white p-5 shadow-xs">
                                 <div>
                                     <span className="mb-0.5 block text-[10px] font-bold tracking-widest text-blue-600 uppercase">
                                         COMUNIDADE LITERÁRIA
@@ -88,7 +88,7 @@ export default function Feed({
                                 </DialogContent>
                             </Dialog>
                             {/* LISTA DE POSTS */}
-                            <nav aria-label="Filtrar publicações" className="flex gap-4 text-xs font-semibold">
+                            <nav aria-label="Filtrar publicações" className="flex flex-wrap gap-4 text-xs font-semibold">
                                 <Link
                                     href={route('list')}
                                     aria-current={!filters.saved && !filters.post ? 'page' : undefined}

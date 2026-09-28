@@ -11,7 +11,7 @@
 @if ($links)
     <nav aria-label="Navegação da seção" class="mb-6 flex flex-wrap gap-2">
         @foreach ($links as $routeName => $label)
-            <a href="{{ route($routeName) }}" @if (request()->routeIs($routeName)) aria-current="page" @endif class="rounded-full border px-4 py-2 text-xs font-medium transition-colors {{ request()->routeIs($routeName) ? 'border-[#1A2332] bg-[#1A2332] text-yellow-300' : 'border-slate-200 bg-white text-slate-600 hover:border-slate-300 hover:bg-slate-50' }}">{{ $label }}</a>
+            <a href="{{ route($routeName) }}" @if (request()->routeIs($routeName)) aria-current="page" @endif class="rounded-full border px-4 py-2 text-xs font-medium transition-colors {{ request()->routeIs($routeName) ? 'border-lumi-navy bg-lumi-navy text-yellow-300' : 'border-slate-200 bg-white text-slate-600 hover:border-slate-300 hover:bg-slate-50' }}">{{ $label }}</a>
         @endforeach
     </nav>
 @endif

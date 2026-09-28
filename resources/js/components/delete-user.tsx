@@ -1,7 +1,6 @@
 import { useForm } from '@inertiajs/react';
-import { FormEventHandler, useRef } from 'react';
+import { FormEventHandler, useRef, useState } from 'react';
 
-// Components...
 import InputError from '@/components/input-error';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -13,6 +12,7 @@ import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, Di
 
 export default function DeleteUser() {
     const passwordInput = useRef<HTMLInputElement>(null);
+    const [open, setOpen] = useState(false);
     const { data, setData, delete: destroy, processing, reset, errors, clearErrors } = useForm({ password: '' });
 
     const deleteUser: FormEventHandler = (e) => {
@@ -27,58 +27,65 @@ export default function DeleteUser() {
     };
 
     const closeModal = () => {
+        setOpen(false);
         clearErrors();
         reset();
     };
 
     return (
         <div className="space-y-6">
-            <HeadingSmall title="Delete account" description="Delete your account and all of its resources" />
+            <HeadingSmall title="Excluir conta" description="Exclua sua conta e os dados associados a ela." />
             <div className="space-y-4 rounded-lg border border-red-100 bg-red-50 p-4 dark:border-red-200/10 dark:bg-red-700/10">
                 <div className="relative space-y-0.5 text-red-600 dark:text-red-100">
-                    <p className="font-medium">Warning</p>
-                    <p className="text-sm">Please proceed with caution, this cannot be undone.</p>
+                    <p className="font-medium">Atenção</p>
+                    <p className="text-sm">Esta ação é permanente e não pode ser desfeita.</p>
                 </div>
 
-                <Dialog>
+                <Dialog
+                    open={open}
+                    onOpenChange={(isOpen) => {
+                        if (isOpen) setOpen(true);
+                        else closeModal();
+                    }}
+                >
                     <DialogTrigger asChild>
-                        <Button variant="destructive">Delete account</Button>
+                        <Button variant="destructive">Excluir conta</Button>
                     </DialogTrigger>
                     <DialogContent>
-                        <DialogTitle>Are you sure you want to delete your account?</DialogTitle>
+                        <DialogTitle className="pr-6">Deseja excluir sua conta?</DialogTitle>
                         <DialogDescription>
-                            Once your account is deleted, all of its resources and data will also be permanently deleted. Please enter your password
-                            to confirm you would like to permanently delete your account.
+                            Sua conta e os dados associados serão excluídos permanentemente. Informe sua senha para confirmar.
                         </DialogDescription>
                         <form className="space-y-6" onSubmit={deleteUser}>
                             <div className="grid gap-2">
-                                <Label htmlFor="password" className="sr-only">
-                                    Password
-                                </Label>
+                                <Label htmlFor="delete-account-password">Senha atual</Label>
 
                                 <Input
-                                    id="password"
+                                    id="delete-account-password"
                                     type="password"
                                     name="password"
+                                    required
+                                    aria-invalid={Boolean(errors.password)}
+                                    aria-describedby={errors.password ? 'delete-account-password-error' : undefined}
                                     ref={passwordInput}
                                     value={data.password}
                                     onChange={(e) => setData('password', e.target.value)}
-                                    placeholder="Password"
+                                    placeholder="Sua senha atual"
                                     autoComplete="current-password"
                                 />
 
-                                <InputError message={errors.password} />
+                                <InputError id="delete-account-password-error" message={errors.password} />
                             </div>
 
                             <DialogFooter>
                                 <DialogClose asChild>
-                                    <Button variant="secondary" onClick={closeModal}>
-                                        Cancel
+                                    <Button type="button" variant="secondary" onClick={closeModal}>
+                                        Cancelar
                                     </Button>
                                 </DialogClose>
 
-                                <Button variant="destructive" disabled={processing} asChild>
-                                    <button type="submit">Delete account</button>
+                                <Button type="submit" variant="destructive" disabled={processing} aria-busy={processing}>
+                                    Excluir conta
                                 </Button>
                             </DialogFooter>
                         </form>

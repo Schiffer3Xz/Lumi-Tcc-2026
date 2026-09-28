@@ -42,6 +42,30 @@ class AuthenticationTest extends TestCase
         $this->assertGuest();
     }
 
+    public function test_admin_login_redirects_to_the_inertia_dashboard(): void
+    {
+        $admin = User::factory()->create(['is_admin' => true, 'first_login' => false]);
+
+        $this->withHeader('X-Inertia', 'true')->post('/login', [
+            'email' => $admin->email,
+            'password' => 'password',
+        ])->assertRedirect(route('admin.dashboard'))->assertHeaderMissing('X-Inertia-Location');
+
+        $this->assertAuthenticatedAs($admin);
+    }
+
+    public function test_admin_login_without_inertia_redirects_to_the_dashboard(): void
+    {
+        $admin = User::factory()->create(['is_admin' => true, 'first_login' => false]);
+
+        $this->post('/login', [
+            'email' => $admin->email,
+            'password' => 'password',
+        ])->assertRedirect(route('admin.dashboard'));
+
+        $this->assertAuthenticatedAs($admin);
+    }
+
     public function test_users_can_logout()
     {
         $user = User::factory()->create();

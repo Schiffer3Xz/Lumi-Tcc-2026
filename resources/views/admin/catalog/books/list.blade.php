@@ -11,7 +11,7 @@
 
             <!-- Ações do Topo -->
             <div class="flex flex-wrap items-center gap-3">
-                <a href="{{ route('admin.books.create') }}" class="group inline-flex items-center gap-2.5 bg-blue-600 hover:bg-blue-500 text-white font-medium px-5 py-3 rounded-2xl shadow-lg shadow-blue-600/25 hover:shadow-blue-600/40 hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200 text-sm">
+                <a href="{{ route('admin.books.index') }}" class="group inline-flex items-center gap-2.5 bg-blue-600 hover:bg-blue-500 text-white font-medium px-5 py-3 rounded-2xl shadow-lg shadow-blue-600/25 hover:shadow-blue-600/40 hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200 text-sm">
                     <span class="w-5 h-5 rounded-full bg-white/20 flex items-center justify-center text-xs group-hover:rotate-90 transition-transform duration-300">
                         <i class="fa-solid fa-plus text-[10px]"></i>
                     </span>
@@ -25,7 +25,7 @@
         </header>
 
         <!-- Grid do Catálogo -->
-        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
+        <div class="grid grid-cols-1 min-[380px]:grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 sm:gap-6">
 
             @forelse($books as $book)
                 <a href="{{ route('admin.books.edit', $book->id) }}"
@@ -48,7 +48,7 @@
                             @endif
 
                             <!-- Overlay de Edição Rápida ao passar o mouse -->
-                            <div class="absolute inset-0 bg-slate-900/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center backdrop-blur-[2px]">
+                            <div class="absolute inset-0 bg-slate-900/40 opacity-0 group-hover:opacity-100 group-focus-visible:opacity-100 transition-opacity duration-300 flex items-center justify-center backdrop-blur-[2px]">
                                 <span class="bg-white/90 text-slate-900 font-semibold text-xs px-3.5 py-2 rounded-xl shadow-lg transform translate-y-2 group-hover:translate-y-0 transition-all duration-300 flex items-center gap-1.5">
                                     <i class="fa-solid fa-pen text-[10px] text-blue-600"></i> Editar
                                 </span>
@@ -67,7 +67,7 @@
                     </div>
 
                     <!-- Status de Disponibilidade -->
-                    <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between">
+                    <div class="mt-4 pt-3 border-t border-slate-100 flex flex-wrap gap-2 items-center justify-between">
                         @php
                             $statusName = $book->availability->availability ?? 'Desconhecido';
                             $classes = match ($statusName) {
@@ -103,7 +103,7 @@
                     </div>
                     <h3 class="text-lg font-bold text-slate-800">Nenhum livro cadastrado</h3>
                     <p class="text-sm text-slate-500 max-w-md mx-auto mt-1 mb-6">Seu acervo está vazio no momento. Comece adicionando o primeiro título para gerenciá-lo por aqui.</p>
-                    <a href="{{ route('admin.books.create') }}" class="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-500 text-white font-medium px-5 py-2.5 rounded-xl shadow-md transition-all text-sm">
+                    <a href="{{ route('admin.books.index') }}" class="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-500 text-white font-medium px-5 py-2.5 rounded-xl shadow-md transition-all text-sm">
                         <i class="fa-solid fa-plus text-xs"></i> Cadastrar Livro Agora
                     </a>
                 </div>

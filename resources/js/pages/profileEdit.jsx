@@ -2,8 +2,12 @@ import ReaderLayout from '@/layouts/reader-layout';
 import { Link, useForm, usePage } from '@inertiajs/react';
 import { useState } from 'react';
 
-function FieldError({ message }) {
-    return message ? <p className="mt-1 text-xs text-rose-600">{message}</p> : null;
+function FieldError({ message, id }) {
+    return message ? (
+        <p id={id} role="alert" className="mt-1 text-xs text-rose-600">
+            {message}
+        </p>
+    ) : null;
 }
 
 export default function ProfileEdit() {
@@ -33,16 +37,18 @@ export default function ProfileEdit() {
             activeItem="config"
             variant="profile"
             topbar={{
-                actions: <span className="text-xs font-semibold text-slate-500">Configurações da conta</span>,
+                actions: <span className="hidden text-xs font-semibold text-slate-500 sm:inline">Configurações da conta</span>,
             }}
         >
-            <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8">
+            <main id="reader-main-content" tabIndex={-1} className="min-w-0 flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8">
                 <div className="mx-auto max-w-5xl space-y-6">
                     <header className="flex flex-col justify-between gap-4 border-b border-slate-200/80 pb-6 sm:flex-row sm:items-end">
                         <div>
                             <span className="text-[10px] font-bold tracking-[0.2em] text-blue-600 uppercase">Minha conta</span>
                             <h1 className="mt-2 text-2xl font-bold tracking-tight text-slate-900">Editar perfil</h1>
-                            <p className="mt-1 max-w-xl text-sm text-slate-500">Mantenha suas informações atualizadas para que outros leitores reconheçam você.</p>
+                            <p className="mt-1 max-w-xl text-sm text-slate-500">
+                                Mantenha suas informações atualizadas para que outros leitores reconheçam você.
+                            </p>
                         </div>
                         <Link
                             href={route('profile')}
@@ -60,7 +66,9 @@ export default function ProfileEdit() {
                                     {user.name ? user.name.charAt(0).toUpperCase() : 'U'}
                                 </div>
                                 <h2 className="mt-4 text-base font-bold text-slate-900">{user.name || 'Leitor'}</h2>
-                                <p className="mt-1 text-xs text-slate-500">{user.nickname ? `@${user.nickname.replace('@', '')}` : 'Adicione um nickname'}</p>
+                                <p className="mt-1 text-xs text-slate-500">
+                                    {user.nickname ? `@${user.nickname.replace('@', '')}` : 'Adicione um nickname'}
+                                </p>
                             </div>
 
                             <div className="mt-6 border-t border-slate-100 pt-4 text-xs text-slate-500">
@@ -68,7 +76,9 @@ export default function ProfileEdit() {
                                     <i className="fa-solid fa-circle-check text-emerald-500" />
                                     <span>Perfil da comunidade</span>
                                 </div>
-                                <p className="mt-3 leading-relaxed">Suas informações aparecem no seu perfil público e nas interações da comunidade.</p>
+                                <p className="mt-3 leading-relaxed">
+                                    Suas informações aparecem no seu perfil público e nas interações da comunidade.
+                                </p>
                             </div>
                         </aside>
 
@@ -88,34 +98,46 @@ export default function ProfileEdit() {
                                     <label className="text-xs font-semibold text-slate-700">
                                         Nome completo
                                         <input
+                                            name="name"
+                                            disabled={processing}
+                                            aria-invalid={Boolean(errors.name)}
+                                            aria-describedby={errors.name ? 'name-error' : undefined}
                                             value={data.name}
                                             onChange={(event) => setData('name', event.target.value)}
-                                            className="mt-2 block h-11 w-full rounded-xl border border-slate-200 bg-slate-50 px-3 text-sm font-normal text-slate-800 outline-none transition focus:border-blue-500 focus:bg-white focus:ring-2 focus:ring-blue-100"
+                                            className="mt-2 block h-11 w-full rounded-xl border border-slate-200 bg-slate-50 px-3 text-sm font-normal text-slate-800 transition outline-none focus:border-blue-500 focus:bg-white focus:ring-2 focus:ring-blue-100"
                                             required
                                         />
-                                        <FieldError message={errors.name} />
+                                        <FieldError id="name-error" message={errors.name} />
                                     </label>
 
                                     <label className="text-xs font-semibold text-slate-700">
                                         Nickname
                                         <input
+                                            name="nickname"
+                                            disabled={processing}
+                                            aria-invalid={Boolean(errors.nickname)}
+                                            aria-describedby={errors.nickname ? 'nickname-error' : undefined}
                                             value={data.nickname}
                                             onChange={(event) => setData('nickname', event.target.value)}
-                                            className="mt-2 block h-11 w-full rounded-xl border border-slate-200 bg-slate-50 px-3 text-sm font-normal text-slate-800 outline-none transition focus:border-blue-500 focus:bg-white focus:ring-2 focus:ring-blue-100"
+                                            className="mt-2 block h-11 w-full rounded-xl border border-slate-200 bg-slate-50 px-3 text-sm font-normal text-slate-800 transition outline-none focus:border-blue-500 focus:bg-white focus:ring-2 focus:ring-blue-100"
                                             placeholder="Como você quer ser chamado"
                                         />
-                                        <FieldError message={errors.nickname} />
+                                        <FieldError id="nickname-error" message={errors.nickname} />
                                     </label>
 
                                     <label className="text-xs font-semibold text-slate-700 sm:col-span-2">
                                         Descrição
                                         <textarea
+                                            name="description"
+                                            disabled={processing}
+                                            aria-invalid={Boolean(errors.description)}
+                                            aria-describedby={errors.description ? 'description-error' : undefined}
                                             value={data.description}
                                             onChange={(event) => setData('description', event.target.value)}
-                                            className="mt-2 block min-h-28 w-full resize-y rounded-xl border border-slate-200 bg-slate-50 px-3 py-3 text-sm font-normal leading-relaxed text-slate-800 outline-none transition focus:border-blue-500 focus:bg-white focus:ring-2 focus:ring-blue-100"
+                                            className="mt-2 block min-h-28 w-full resize-y rounded-xl border border-slate-200 bg-slate-50 px-3 py-3 text-sm leading-relaxed font-normal text-slate-800 transition outline-none focus:border-blue-500 focus:bg-white focus:ring-2 focus:ring-blue-100"
                                             placeholder="Conte um pouco sobre você e seus hábitos de leitura"
                                         />
-                                        <FieldError message={errors.description} />
+                                        <FieldError id="description-error" message={errors.description} />
                                     </label>
                                 </div>
                             </section>
@@ -135,17 +157,24 @@ export default function ProfileEdit() {
                                     E-mail
                                     <input
                                         type="email"
+                                        name="email"
+                                        disabled={processing}
+                                        aria-invalid={Boolean(errors.email)}
+                                        aria-describedby={errors.email ? 'email-error' : undefined}
                                         value={data.email}
                                         onChange={(event) => setData('email', event.target.value)}
-                                        className="mt-2 block h-11 w-full rounded-xl border border-slate-200 bg-slate-50 px-3 text-sm font-normal text-slate-800 outline-none transition focus:border-blue-500 focus:bg-white focus:ring-2 focus:ring-blue-100"
+                                        className="mt-2 block h-11 w-full rounded-xl border border-slate-200 bg-slate-50 px-3 text-sm font-normal text-slate-800 transition outline-none focus:border-blue-500 focus:bg-white focus:ring-2 focus:ring-blue-100"
                                         required
                                     />
-                                    <FieldError message={errors.email} />
+                                    <FieldError id="email-error" message={errors.email} />
                                 </label>
                             </section>
 
                             <div className="flex flex-col-reverse items-stretch justify-between gap-3 sm:flex-row sm:items-center">
-                                <Link href={route('profile')} className="text-center text-xs font-semibold text-slate-500 hover:text-slate-800 sm:text-left">
+                                <Link
+                                    href={route('profile')}
+                                    className="text-center text-xs font-semibold text-slate-500 hover:text-slate-800 sm:text-left"
+                                >
                                     Cancelar alterações
                                 </Link>
                                 <div className="flex items-center justify-end gap-3">

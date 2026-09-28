@@ -3,6 +3,9 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { cn } from '@/lib/utils';
 
+/**
+ * @param {import('react').ComponentProps<typeof Input> & { id: string, label: string, icon?: import('lucide-react').LucideIcon, error?: string, labelAction?: import('react').ReactNode, endAdornment?: import('react').ReactNode, inputClassName?: string }} props
+ */
 export default function AuthField({ id, label, icon: Icon, error, labelAction, endAdornment, className, inputClassName, ...inputProps }) {
     const fieldLabel = (
         <Label htmlFor={id} className="text-xs font-semibold text-slate-700">
@@ -13,7 +16,7 @@ export default function AuthField({ id, label, icon: Icon, error, labelAction, e
     return (
         <div className={cn('grid gap-1.5', className)}>
             {labelAction !== undefined ? (
-                <div className="flex items-center justify-between">
+                <div className="flex flex-wrap items-center justify-between gap-2">
                     {fieldLabel}
                     {labelAction}
                 </div>
@@ -29,6 +32,7 @@ export default function AuthField({ id, label, icon: Icon, error, labelAction, e
                 <Input
                     {...inputProps}
                     id={id}
+                    name={inputProps.name ?? id}
                     aria-invalid={error ? true : undefined}
                     aria-describedby={error ? `${id}-error` : inputProps['aria-describedby']}
                     className={cn(

@@ -1,63 +1,47 @@
-// Components
-import { Head, useForm } from '@inertiajs/react';
-import { LoaderCircle } from 'lucide-react';
+import TextLink from '@/components/text-link';
+import AuthField from '@/features/auth/auth-field';
+import AuthSubmitButton from '@/features/auth/auth-submit-button';
+import AuthLayout from '@/layouts/auth-layout';
+import { useForm } from '@inertiajs/react';
+import { Mail } from 'lucide-react';
 import { FormEventHandler } from 'react';
 
-import InputError from '@/components/input-error';
-import TextLink from '@/components/text-link';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import AuthLayout from '@/layouts/auth-layout';
-
 export default function ForgotPassword({ status }: { status?: string }) {
-    const { data, setData, post, processing, errors } = useForm({
-        email: '',
-    });
+    const { data, setData, post, processing, errors } = useForm({ email: '' });
 
-    const submit: FormEventHandler = (e) => {
-        e.preventDefault();
-
+    const submit: FormEventHandler = (event) => {
+        event.preventDefault();
         post(route('password.email'));
     };
 
     return (
-        <AuthLayout title="Forgot password" description="Enter your email to receive a password reset link">
-            <Head title="Forgot password" />
-
-            {status && <div className="mb-4 text-center text-sm font-medium text-green-600">{status}</div>}
-
-            <div className="space-y-6">
-                <form onSubmit={submit}>
-                    <div className="grid gap-2">
-                        <Label htmlFor="email">Email address</Label>
-                        <Input
-                            id="email"
-                            type="email"
-                            name="email"
-                            autoComplete="off"
-                            value={data.email}
-                            autoFocus
-                            onChange={(e) => setData('email', e.target.value)}
-                            placeholder="email@example.com"
-                        />
-
-                        <InputError message={errors.email} />
-                    </div>
-
-                    <div className="my-6 flex items-center justify-start">
-                        <Button className="w-full" disabled={processing}>
-                            {processing && <LoaderCircle className="h-4 w-4 animate-spin" />}
-                            Email password reset link
-                        </Button>
-                    </div>
-                </form>
-
-                <div className="text-muted-foreground space-x-1 text-center text-sm">
-                    <span>Or, return to</span>
-                    <TextLink href={route('login')}>log in</TextLink>
-                </div>
-            </div>
+        <AuthLayout title="Recuperar senha" description="Informe seu e-mail para receber um link de redefinição de senha.">
+            {status && (
+                <p role="status" className="mb-5 rounded-xl bg-emerald-50 p-3 text-sm text-emerald-700">
+                    {status}
+                </p>
+            )}
+            <form onSubmit={submit} className="space-y-5">
+                <AuthField
+                    id="email"
+                    label="E-mail"
+                    icon={Mail}
+                    type="email"
+                    required
+                    autoComplete="email"
+                    autoFocus
+                    value={data.email}
+                    onChange={(event) => setData('email', event.target.value)}
+                    placeholder="seu.email@escola.edu.br"
+                    error={errors.email}
+                />
+                <AuthSubmitButton processing={processing} icon={Mail}>
+                    Enviar link de recuperação
+                </AuthSubmitButton>
+            </form>
+            <p className="mt-6 text-center text-sm text-slate-500">
+                <TextLink href={route('login')}>Voltar para entrar</TextLink>
+            </p>
         </AuthLayout>
     );
 }

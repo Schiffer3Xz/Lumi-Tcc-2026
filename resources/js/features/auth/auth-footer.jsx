@@ -1,11 +1,11 @@
 import TextLink from '@/components/text-link';
 import { cn } from '@/lib/utils';
-import { ShieldCheck } from 'lucide-react';
+import { BookOpen } from 'lucide-react';
 
-export default function AuthFooter({ prompt, link, divider, children, securityText = 'Conexão Segura e Dados Protegidos (LGPD)' }) {
+export default function AuthFooter({ prompt, link, divider, children, securityText = 'Seu espaço para descobrir novas leituras' }) {
     const securityNotice = (
-        <div className={cn('flex items-center justify-center gap-1.5 text-[11px] text-slate-400', children ? 'pt-2' : 'pt-1')}>
-            <ShieldCheck className="h-3.5 w-3.5 text-emerald-500" />
+        <div className={cn('flex items-center justify-center gap-1.5 text-center text-[11px] text-slate-500', children ? 'pt-2' : 'pt-1')}>
+            <BookOpen aria-hidden="true" className="h-3.5 w-3.5 shrink-0 text-blue-500" />
             <span>{securityText}</span>
         </div>
     );

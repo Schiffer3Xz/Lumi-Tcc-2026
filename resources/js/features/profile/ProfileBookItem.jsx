@@ -1,6 +1,6 @@
 export default function ProfileBookItem({ book }) {
     return (
-        <div className="flex items-center justify-between gap-3 rounded-xl border border-[#E3DCCE]/60 bg-white/80 p-3 backdrop-blur-xs">
+        <div className="border-lumi-paper-border/60 flex flex-wrap items-center justify-between gap-3 rounded-xl border bg-white/80 p-3 backdrop-blur-xs">
             <div className="flex min-w-0 items-center gap-3">
                 <div className="flex h-8 w-8 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-amber-100/60 text-amber-800">
                     {book.cover ? (

@@ -10,23 +10,24 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\URL;
+use Inertia\Inertia;
 use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 
 class AdminSettingsController extends Controller
 {
     public function index()
     {
-        return view('admin/settings/index');
+        return Inertia::render('admin/settings/index');
     }
 
     public function create()
     {
-        return view('admin/settings/updateCredentials');
+        return Inertia::render('admin/settings/profile');
     }
 
     public function firstLogin()
     {
-        return view('admin/settings/firstLoginSetup');
+        return Inertia::render('admin/settings/first-login');
     }
 
     public function emailVerification()
@@ -60,17 +61,17 @@ class AdminSettingsController extends Controller
 
     public function editEmail()
     {
-        return view('admin/settings/editEmail');
+        return Inertia::render('admin/settings/email');
     }
 
     public function editPassword()
     {
-        return view('admin/settings/editPassword');
+        return Inertia::render('admin/settings/password');
     }
 
     public function adminView()
     {
-        return view('admin/settings/createAdmin');
+        return Inertia::render('admin/settings/create-admin');
     }
 
     public function adminCount()
@@ -78,7 +79,7 @@ class AdminSettingsController extends Controller
         $admins = User::where('is_admin', true)->get();
         $totalAdmins = User::where('is_admin', true)->count();
 
-        return view('admin/settings/countAdmin', compact('totalAdmins', 'admins'));
+        return Inertia::render('admin/settings/admins', compact('totalAdmins', 'admins'));
     }
 
     // Update do first Access

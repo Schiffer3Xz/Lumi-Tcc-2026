@@ -127,7 +127,7 @@
                     <div class="flex flex-col sm:flex-row items-start sm:items-center gap-6 p-4 bg-slate-50/80 rounded-2xl border border-slate-200/60">
                         @if($book->cover_url)
                             <div class="relative group">
-                                <img src="{{ asset('storage/' . $book->cover_url) }}" class="w-20 h-28 object-cover rounded-xl shadow-md border border-slate-200">
+                                <img alt="Capa atual do livro" src="{{ asset('storage/' . $book->cover_url) }}" class="w-20 h-28 object-cover rounded-xl shadow-md border border-slate-200">
                                 <span class="absolute bottom-1 right-1 bg-slate-900/70 text-white text-[9px] px-1.5 py-0.5 rounded font-medium backdrop-blur-xs">Atual</span>
                             </div>
                         @else

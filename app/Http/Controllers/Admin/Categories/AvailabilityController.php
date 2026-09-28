@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin\Categories;
 use App\Http\Controllers\Controller;
 use App\Models\Availability;
 use Illuminate\Http\Request;
+use Inertia\Inertia;
 
 class AvailabilityController extends Controller
 {
@@ -12,7 +13,7 @@ class AvailabilityController extends Controller
     {
         $availabilities = Availability::all();
 
-        return view('admin/categories/availabilities/create', compact('availabilities'));
+        return Inertia::render('admin/categories/manage', ['resource' => 'availability', 'items' => $availabilities]);
     }
 
     public function store(Request $request)
@@ -30,13 +31,13 @@ class AvailabilityController extends Controller
     {
         $availability = Availability::findOrFail($id);
 
-        return view('admin/categories/availabilities/edit', compact('availability'));
+        return Inertia::render('admin/categories/edit', ['resource' => 'availability', 'item' => $availability]);
     }
 
     public function update(Request $request, $id)
     {
         $request->validate([
-            'availability' => ['required', 'string', 'max:255', 'unique:availabilities,availability,' . $id],
+            'availability' => ['required', 'string', 'max:255', 'unique:availabilities,availability,'.$id],
         ]);
 
         Availability::where('id', $id)->update([

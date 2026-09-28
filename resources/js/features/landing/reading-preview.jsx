@@ -15,14 +15,16 @@ export default function ReadingPreview({ initialReadings, title, children, class
     return (
         <div
             className={cn(
-                'w-full max-w-sm space-y-6 rounded-3xl border border-slate-700/60 bg-[#232c42]/90 p-6 shadow-2xl backdrop-blur-md transition-colors duration-300 hover:border-slate-600',
+                'bg-lumi-landing-card/90 w-full max-w-sm space-y-6 rounded-3xl border border-slate-700/60 p-5 shadow-2xl backdrop-blur-md transition-colors duration-300 hover:border-slate-600 sm:p-6',
                 className,
             )}
         >
             <div className="flex items-center justify-between border-b border-slate-700/50 pb-4">
                 <div>
-                    <h3 className="text-xs font-bold tracking-wider text-slate-300 uppercase">{title}</h3>
-                    <p className="mt-0.5 text-xs text-slate-400">{readings.length} em andamento</p>
+                    <h2 className="text-xs font-bold tracking-wider text-slate-300 uppercase">{title}</h2>
+                    <p aria-live="polite" className="mt-0.5 text-xs text-slate-400">
+                        {readings.filter((reading) => reading.progress < 100).length} em andamento · demonstração
+                    </p>
                 </div>
                 <div className="rounded-xl bg-slate-800/90 p-2.5 text-amber-300 shadow-inner">
                     <BookOpen className="h-4 w-4" />
@@ -34,6 +36,7 @@ export default function ReadingPreview({ initialReadings, title, children, class
                 ))}
             </div>
             {children}
+            <p className="text-xs leading-relaxed text-slate-400">Experimente avançar o progresso. Os exemplos desta prévia não são salvos.</p>
         </div>
     );
 }

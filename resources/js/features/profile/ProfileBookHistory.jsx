@@ -1,8 +1,8 @@
 import ProfileBookItem from './ProfileBookItem';
 export default function ProfileBookHistory({ books }) {
     return (
-        <div className="space-y-4 rounded-2xl border border-[#E3DCCE] bg-[#EFEAE1] p-6 text-slate-800">
-            <div className="flex items-center justify-between">
+        <div className="border-lumi-paper-border bg-lumi-paper space-y-4 rounded-2xl border p-4 text-slate-800 sm:p-6">
+            <div className="flex flex-wrap items-center justify-between gap-3">
                 <div className="flex items-center gap-3">
                     <div className="rounded-xl bg-amber-400/30 p-2 text-amber-900">
                         <i className="fa-solid fa-books text-lg" />

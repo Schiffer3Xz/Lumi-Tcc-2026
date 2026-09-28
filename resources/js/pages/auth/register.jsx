@@ -30,7 +30,6 @@ export default function Register() {
                     type="text"
                     required
                     autoFocus
-                    tabIndex={1}
                     autoComplete="name"
                     value={data.name}
                     onChange={(e) => setData('name', e.target.value)}
@@ -43,7 +42,6 @@ export default function Register() {
                     icon={Mail}
                     type="email"
                     required
-                    tabIndex={2}
                     autoComplete="email"
                     value={data.email}
                     onChange={(e) => setData('email', e.target.value)}
@@ -54,7 +52,6 @@ export default function Register() {
                     id="password"
                     label="Senha de Acesso"
                     required
-                    tabIndex={3}
                     autoComplete="new-password"
                     value={data.password}
                     onChange={(e) => setData('password', e.target.value)}
@@ -65,22 +62,17 @@ export default function Register() {
                     id="password_confirmation"
                     label="Confirmar Senha"
                     required
-                    tabIndex={4}
                     autoComplete="new-password"
                     value={data.password_confirmation}
                     onChange={(e) => setData('password_confirmation', e.target.value)}
                     placeholder="••••••••"
                     error={errors.password_confirmation}
                 />
-                <AuthSubmitButton className="mt-3" tabIndex={5} processing={processing} icon={UserPlus}>
+                <AuthSubmitButton className="mt-3" processing={processing} icon={UserPlus}>
                     Criar Minha Conta
                 </AuthSubmitButton>
             </form>
-            <AuthFooter
-                prompt="Já tem uma conta?"
-                link={{ href: route('login'), label: 'Fazer login', tabIndex: 6 }}
-                divider="segurança e privacidade"
-            />
+            <AuthFooter prompt="Já tem uma conta?" link={{ href: route('login'), label: 'Fazer login' }} divider="segurança e privacidade" />
         </ReadingAuthLayout>
     );
 }

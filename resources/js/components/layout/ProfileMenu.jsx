@@ -17,17 +17,26 @@ export default function ProfileMenu({ user, items, variant = 'social', showPhoto
         function handleOutside(event) {
             if (ref.current && !ref.current.contains(event.target)) setIsOpen(false);
         }
-        document.addEventListener('mousedown', handleOutside);
-        return () => document.removeEventListener('mousedown', handleOutside);
-    }, []);
+        if (!isOpen) return;
+        document.addEventListener('pointerdown', handleOutside);
+        return () => document.removeEventListener('pointerdown', handleOutside);
+    }, [isOpen]);
 
+    useEffect(() => {
+        if (isOpen) ref.current?.querySelector('[data-profile-options] a, [data-profile-options] button')?.focus();
+    }, [isOpen]);
     const Trigger = isStatic ? 'div' : 'button';
     return (
         <div
             ref={ref}
             className={clsx(!isStatic && 'relative', className)}
+            onBlur={(event) => {
+                if (!event.currentTarget.contains(event.relatedTarget)) setIsOpen(false);
+            }}
             onKeyDown={(event) => {
                 if (event.key === 'Escape' && isOpen) {
+                    event.preventDefault();
+                    event.stopPropagation();
                     setIsOpen(false);
                     triggerRef.current?.focus();
                 }
@@ -35,7 +44,13 @@ export default function ProfileMenu({ user, items, variant = 'social', showPhoto
         >
             <Trigger
                 ref={triggerRef}
-                {...(!isStatic && { type: 'button', onClick: () => setIsOpen(!isOpen), 'aria-expanded': isOpen, 'aria-controls': id })}
+                {...(!isStatic && {
+                    type: 'button',
+                    onClick: () => setIsOpen(!isOpen),
+                    'aria-label': `Opções da conta de ${displayName}`,
+                    'aria-expanded': isOpen,
+                    'aria-controls': isOpen ? id : undefined,
+                })}
                 className={clsx(
                     isLibrary &&
                         'flex items-center gap-2 rounded-xl p-1 transition-colors hover:bg-gray-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-yellow-400',
@@ -51,7 +66,7 @@ export default function ProfileMenu({ user, items, variant = 'social', showPhoto
                     src={showPhoto ? user.profile_photo : undefined}
                     className={clsx(
                         isLibrary
-                            ? 'flex h-9 w-9 items-center justify-center rounded-full bg-[#1A2332] text-sm font-bold text-yellow-300'
+                            ? 'bg-lumi-navy flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-sm font-bold text-yellow-300'
                             : 'flex h-8 w-8 items-center justify-center rounded-full bg-slate-800 text-xs font-bold text-white',
                         isProfile && 'shadow-xs',
                         showPhoto && 'overflow-hidden',
@@ -62,7 +77,7 @@ export default function ProfileMenu({ user, items, variant = 'social', showPhoto
                 <span
                     className={clsx(
                         isLibrary ? 'hidden text-sm font-medium text-gray-700 sm:block' : 'hidden text-xs font-semibold text-slate-700 sm:block',
-                        isStatic && 'max-w-[120px] truncate',
+                        'max-w-[120px] truncate',
                     )}
                 >
                     {displayName}
@@ -83,10 +98,11 @@ export default function ProfileMenu({ user, items, variant = 'social', showPhoto
             {!isStatic && isOpen && (
                 <div
                     id={id}
+                    data-profile-options
                     className={
                         isLibrary
-                            ? 'animate-in fade-in slide-in-from-top-2 absolute right-0 z-50 mt-2 w-48 rounded-xl border border-gray-100 bg-white py-1 shadow-lg duration-150'
-                            : 'absolute right-0 z-50 mt-2 w-52 rounded-2xl border border-slate-100 bg-white py-1.5 shadow-xl'
+                            ? 'animate-in fade-in slide-in-from-top-2 absolute right-0 z-50 mt-2 max-h-[calc(100dvh-5rem)] w-48 max-w-[calc(100vw-2rem)] overflow-y-auto rounded-xl border border-gray-100 bg-white py-1 shadow-lg duration-150'
+                            : 'absolute right-0 z-50 mt-2 max-h-[calc(100dvh-5rem)] w-52 max-w-[calc(100vw-2rem)] overflow-y-auto rounded-2xl border border-slate-100 bg-white py-1.5 shadow-xl'
                     }
                 >
                     <div className={isLibrary ? 'border-b border-gray-100 px-4 py-2' : 'border-b border-slate-100 px-4 py-2.5'}>
@@ -103,6 +119,7 @@ export default function ProfileMenu({ user, items, variant = 'social', showPhoto
                             href={item.href}
                             method={item.method}
                             as={item.as}
+                            onClick={() => setIsOpen(false)}
                             className={
                                 isLibrary
                                     ? item.id === 'logout'

@@ -2,34 +2,38 @@
 
 namespace App\Http\Controllers\Admin\Catalog;
 
-use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Models\Author;
-use App\Models\Genre;
-use App\Models\Book;
 use App\Models\Availability;
+use App\Models\Book;
+use App\Models\Genre;
+use Illuminate\Http\Request;
+use Inertia\Inertia;
 
 class BookController extends Controller
 {
-    public function index(){
+    public function index()
+    {
         $authors = Author::orderBy('name')->get();
         $genres = Genre::orderBy('name')->get();
         $availabilities = Availability::all();
 
-        return view('admin/catalog/books/create', compact(
+        return Inertia::render('admin/books/create', compact(
             'authors',
             'genres',
             'availabilities',
         ));
     }
 
-    public function updateView(){
+    public function updateView()
+    {
         $books = Book::with(['author', 'genre', 'availability'])->latest()->get();
 
-        return view('admin/catalog/books/update', compact('books'));
+        return Inertia::render('admin/books/availability', compact('books'));
     }
 
-    public function store(Request $request){
+    public function store(Request $request)
+    {
         $request->validate([
             'title' => 'required|string|max:150',
             'page_count' => 'required|integer|min:1',
@@ -43,7 +47,7 @@ class BookController extends Controller
         ]);
 
         $path = null;
-        if($request->hasFile('cover_image')){
+        if ($request->hasFile('cover_image')) {
             $path = $request->file('cover_image')->store('covers', 'public');
         }
 
@@ -64,7 +68,7 @@ class BookController extends Controller
     {
         $books = Book::with(['author', 'genre', 'availability'])->latest()->get();
 
-        return view('admin/catalog/books/list', compact('books'));
+        return Inertia::render('admin/books/index', compact('books'));
     }
 
     public function edit($id)
@@ -74,17 +78,17 @@ class BookController extends Controller
         $genres = Genre::orderBy('name')->get();
         $availabilities = Availability::all();
 
-        return view('admin/catalog/books/edit', compact('authors', 'genres', 'availabilities', 'book'));
+        return Inertia::render('admin/books/edit', compact('authors', 'genres', 'availabilities', 'book'));
     }
 
-    public function toggleAvailability(Request $request, $id){
+    public function toggleAvailability(Request $request, $id)
+    {
         $book = Book::findOrFail($id);
 
         $request->validate([
 
         ]);
     }
-
 
     public function update(Request $request, $id)
     {
@@ -101,7 +105,7 @@ class BookController extends Controller
         ]);
 
         $path = $book->cover_url;
-        if($request->hasFile('cover_image')){
+        if ($request->hasFile('cover_image')) {
             $path = $request->file('cover_image')->store('covers', 'public');
         }
 
@@ -118,7 +122,8 @@ class BookController extends Controller
         return redirect()->route('admin.books.list')->with('success', 'Livro atualizado com sucesso!');
     }
 
-    public function destroy($id){
+    public function destroy($id)
+    {
         Book::where('id', $id)->delete();
 
         return redirect()->route('admin.books.list')->with('success', 'Livro deletado com sucesso!');

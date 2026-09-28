@@ -1,6 +1,6 @@
 export default function ReadingRules({ rules }) {
     return (
-        <div className="space-y-4 rounded-2xl border border-[#E3DCCE] bg-[#EFEAE1] p-6 text-slate-800">
+        <div className="border-lumi-paper-border bg-lumi-paper space-y-4 rounded-2xl border p-6 text-slate-800">
             <div className="flex items-center gap-3">
                 <div className="rounded-xl bg-yellow-400/30 p-2 text-yellow-800">
                     <i className="fa-solid fa-circle-info text-lg" />

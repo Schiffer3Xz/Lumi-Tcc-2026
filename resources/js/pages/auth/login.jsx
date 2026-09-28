@@ -18,7 +18,7 @@ export default function Login({ status, canResetPassword }) {
     };
 
     return (
-        <ReadingAuthLayout title="Log in" subtitle="Plataforma Escolar Web" activePage="login">
+        <ReadingAuthLayout title="Entrar" subtitle="Plataforma Escolar Web" activePage="login">
             {status && (
                 <div
                     role="status"
@@ -35,7 +35,6 @@ export default function Login({ status, canResetPassword }) {
                     type="email"
                     required
                     autoFocus
-                    tabIndex={1}
                     autoComplete="email"
                     value={data.email}
                     onChange={(e) => setData('email', e.target.value)}
@@ -46,7 +45,6 @@ export default function Login({ status, canResetPassword }) {
                     id="password"
                     label="Senha de Acesso"
                     required
-                    tabIndex={2}
                     autoComplete="current-password"
                     value={data.password}
                     onChange={(e) => setData('password', e.target.value)}
@@ -54,33 +52,30 @@ export default function Login({ status, canResetPassword }) {
                     error={errors.password}
                     labelAction={
                         canResetPassword ? (
-                            <TextLink
-                                href={route('password.request')}
-                                className="text-xs font-medium text-slate-500 hover:text-blue-600"
-                                tabIndex={5}
-                            >
+                            <TextLink href={route('password.request')} className="text-xs font-medium text-slate-500 hover:text-blue-600">
                                 Esqueci minha senha
                             </TextLink>
                         ) : null
                     }
                 />
                 <div className="flex items-center space-x-2 pt-1">
-                    <Checkbox id="remember" name="remember" tabIndex={3} className="rounded border-slate-300 text-blue-600 focus:ring-blue-500" />
+                    <Checkbox
+                        id="remember"
+                        name="remember"
+                        checked={data.remember}
+                        onCheckedChange={(checked) => setData('remember', checked === true)}
+                        className="rounded border-slate-300 text-blue-600 focus:ring-blue-500"
+                    />
                     <Label htmlFor="remember" className="cursor-pointer text-xs font-normal text-slate-600">
                         Lembrar meu acesso
                     </Label>
                 </div>
-                <AuthSubmitButton className="mt-2" tabIndex={4} processing={processing} icon={LogIn}>
+                <AuthSubmitButton className="mt-2" processing={processing} icon={LogIn}>
                     Acessar Plataforma
                 </AuthSubmitButton>
             </form>
-            <AuthFooter
-                prompt="Não tem uma conta?"
-                link={{ href: route('register'), label: 'Cadastre-se', tabIndex: 5 }}
-                divider="ou continue sem conta"
-            >
+            <AuthFooter prompt="Não tem uma conta?" link={{ href: route('register'), label: 'Cadastre-se' }} divider="ou continue sem conta">
                 <Link
-                    type="button"
                     href={route('catalogo')}
                     className="flex h-10 w-full items-center justify-center gap-2 rounded-xl border border-slate-200 text-xs font-medium text-slate-700 transition-all hover:bg-slate-50"
                 >

@@ -2,15 +2,15 @@ import { useEffect, useState } from 'react';
 
 export type Appearance = 'light' | 'dark' | 'system';
 
-const prefersDark = () => window.matchMedia('(prefers-color-scheme: dark)').matches;
+const mediaQuery = typeof window === 'undefined' ? null : window.matchMedia('(prefers-color-scheme: dark)');
+const prefersDark = () => mediaQuery?.matches ?? false;
 
 const applyTheme = (appearance: Appearance) => {
+    if (typeof document === 'undefined') return;
     const isDark = appearance === 'dark' || (appearance === 'system' && prefersDark());
 
     document.documentElement.classList.toggle('dark', isDark);
 };
-
-const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
 
 const handleSystemThemeChange = () => {
     const currentAppearance = localStorage.getItem('appearance') as Appearance;
@@ -18,6 +18,7 @@ const handleSystemThemeChange = () => {
 };
 
 export function initializeTheme() {
+    if (!mediaQuery) return;
     const savedAppearance = (localStorage.getItem('appearance') as Appearance) || 'system';
 
     applyTheme(savedAppearance);
@@ -39,7 +40,7 @@ export function useAppearance() {
         const savedAppearance = localStorage.getItem('appearance') as Appearance | null;
         updateAppearance(savedAppearance || 'system');
 
-        return () => mediaQuery.removeEventListener('change', handleSystemThemeChange);
+        // The application owns the system listener; switching pages must not remove it.
     }, []);
 
     return { appearance, updateAppearance };

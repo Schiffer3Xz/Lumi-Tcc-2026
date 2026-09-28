@@ -13,7 +13,7 @@ import { Label } from '@/components/ui/label';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
-        title: 'Password settings',
+        title: 'Alterar senha',
         href: '/settings/password',
     },
 ];
@@ -31,7 +31,7 @@ export default function Password() {
     const updatePassword: FormEventHandler = (e) => {
         e.preventDefault();
 
-        put(route('admin.settings.password.update'), {
+        put(route('password.update'), {
             preserveScroll: true,
             onSuccess: () => reset(),
             onError: (errors) => {
@@ -50,65 +50,79 @@ export default function Password() {
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title="Profile settings" />
+            <Head title="Alterar senha" />
 
             <SettingsLayout>
                 <div className="space-y-6">
-                    <HeadingSmall title="Update password" description="Ensure your account is using a long, random password to stay secure" />
+                    <HeadingSmall title="Alterar senha" description="Use uma senha longa e exclusiva para proteger sua conta." />
 
                     <form onSubmit={updatePassword} className="space-y-6">
                         <div className="grid gap-2">
-                            <Label htmlFor="current_password">Current password</Label>
+                            <Label htmlFor="current_password">Senha atual</Label>
 
                             <Input
                                 id="current_password"
+                                name="current_password"
+                                aria-invalid={Boolean(errors.current_password)}
+                                aria-describedby={errors.current_password ? 'current_password-error' : undefined}
                                 ref={currentPasswordInput}
                                 value={data.current_password}
                                 onChange={(e) => setData('current_password', e.target.value)}
                                 type="password"
+                                required
                                 className="mt-1 block w-full"
                                 autoComplete="current-password"
-                                placeholder="Current password"
+                                placeholder="Senha atual"
                             />
 
-                            <InputError message={errors.current_password} />
+                            <InputError id="current_password-error" message={errors.current_password} />
                         </div>
 
                         <div className="grid gap-2">
-                            <Label htmlFor="password">New password</Label>
+                            <Label htmlFor="password">Nova senha</Label>
 
                             <Input
                                 id="password"
+                                name="password"
+                                aria-invalid={Boolean(errors.password)}
+                                aria-describedby={errors.password ? 'password-error' : undefined}
                                 ref={passwordInput}
                                 value={data.password}
                                 onChange={(e) => setData('password', e.target.value)}
                                 type="password"
+                                required
                                 className="mt-1 block w-full"
                                 autoComplete="new-password"
-                                placeholder="New password"
+                                placeholder="Nova senha"
                             />
 
-                            <InputError message={errors.password} />
+                            <InputError id="password-error" message={errors.password} />
                         </div>
 
                         <div className="grid gap-2">
-                            <Label htmlFor="password_confirmation">Confirm password</Label>
+                            <Label htmlFor="password_confirmation">Confirmar nova senha</Label>
 
                             <Input
                                 id="password_confirmation"
+                                name="password_confirmation"
+                                aria-invalid={Boolean(errors.password_confirmation)}
+                                aria-describedby={errors.password_confirmation ? 'password_confirmation-error' : undefined}
                                 value={data.password_confirmation}
                                 onChange={(e) => setData('password_confirmation', e.target.value)}
                                 type="password"
+                                required
                                 className="mt-1 block w-full"
                                 autoComplete="new-password"
-                                placeholder="Confirm password"
+                                placeholder="Confirmar nova senha"
                             />
 
-                            <InputError message={errors.password_confirmation} />
+                            <InputError id="password_confirmation-error" message={errors.password_confirmation} />
                         </div>
 
                         <div className="flex items-center gap-4">
-                            <Button disabled={processing}>Save password</Button>
+                            <Button type="submit" disabled={processing} aria-busy={processing}>
+                                Salvar senha
+                            </Button>
 
                             <Transition
                                 show={recentlySuccessful}
@@ -117,7 +131,9 @@ export default function Password() {
                                 leave="transition ease-in-out"
                                 leaveTo="opacity-0"
                             >
-                                <p className="text-sm text-neutral-600">Saved</p>
+                                <p role="status" className="text-muted-foreground text-sm">
+                                    Alterações salvas.
+                                </p>
                             </Transition>
                         </div>
                     </form>

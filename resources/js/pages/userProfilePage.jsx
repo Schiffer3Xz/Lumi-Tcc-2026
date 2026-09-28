@@ -1,3 +1,4 @@
+import { Dialog, DialogContent, DialogDescription, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import FollowButton from '@/features/profile/FollowButton';
 import ProfileBookHistory from '@/features/profile/ProfileBookHistory';
 import ProfileReaderSidebar from '@/features/profile/ProfileReaderSidebar';
@@ -55,11 +56,33 @@ export default function UserProfilePage({ auth, targetUser, users = [], isFollow
         >
             <div className="flex flex-1 overflow-hidden">
                 {/* PAINEL PRINCIPAL DO PERFIL */}
-                <main className="flex-1 space-y-6 overflow-y-auto p-6 lg:p-8">
+                <main id="reader-main-content" tabIndex={-1} className="min-w-0 flex-1 space-y-6 overflow-y-auto p-4 sm:p-6 lg:p-8">
                     <div>
                         <span className="text-[10px] font-bold tracking-wider text-slate-400 uppercase">PERFIL SOCIAL</span>
                         <h2 className="text-2xl font-bold text-slate-900">Estante do Leitor</h2>
                     </div>
+
+                    <Dialog>
+                        <DialogTrigger asChild>
+                            <button
+                                type="button"
+                                className="rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-semibold text-blue-600 lg:hidden"
+                            >
+                                Leitores e avaliações
+                            </button>
+                        </DialogTrigger>
+                        <DialogContent className="max-h-[90dvh] overflow-y-auto border-slate-200 bg-white text-slate-800">
+                            <DialogTitle>Leitores e avaliações</DialogTitle>
+                            <DialogDescription>Explore a comunidade e as avaliações deste leitor.</DialogDescription>
+                            <ProfileReaderSidebar
+                                users={users}
+                                selectedUserId={profile.id}
+                                onSelectUser={handleSelectUser}
+                                reviews={ratedBooks}
+                                className="block w-full border-0 p-0"
+                            />
+                        </DialogContent>
+                    </Dialog>
 
                     {/* CARTÃO DE PERFIL */}
                     <ProfileSummary

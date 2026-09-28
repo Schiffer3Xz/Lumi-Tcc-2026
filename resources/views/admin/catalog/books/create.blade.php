@@ -10,7 +10,7 @@
                 <p class="text-sm text-slate-500 mt-1">Preencha os dados abaixo para adicionar uma nova obra ao acervo.</p>
             </div>
 
-            <a href="{{ route('admin.dashboard') }}" class="inline-flex items-center gap-2 bg-white hover:bg-slate-50 text-slate-700 font-medium px-4 py-2.5 rounded-2xl shadow-sm hover:shadow border border-slate-200/80 transition-all text-sm w-fit">
+            <a href="{{ route('admin.books.list') }}" class="inline-flex items-center gap-2 bg-white hover:bg-slate-50 text-slate-700 font-medium px-4 py-2.5 rounded-2xl shadow-sm hover:shadow border border-slate-200/80 transition-all text-sm w-fit">
                 <i class="fa-solid fa-arrow-left text-xs text-slate-400"></i>
                 Voltar ao Catálogo
             </a>
@@ -24,28 +24,28 @@
 
             <div class="md:col-span-5 flex flex-col">
                 <label for="cover_upload" class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-2">Capa da Obra</label>
-                <input type="file" id="cover_upload" name="cover_image" class="hidden" accept="image/*" onchange="previewImage(event)">
+                <input type="file" id="cover_upload" name="cover_image" class="peer sr-only" accept="image/jpeg,image/png,image/webp" onchange="previewImage(event)">
 
-                <label for="cover_upload" class="group w-full aspect-[2/3] border-2 border-dashed border-slate-300 hover:border-blue-500 rounded-2xl flex flex-col items-center justify-center text-slate-400 hover:bg-blue-50/40 transition-all duration-300 cursor-pointer overflow-hidden relative shadow-inner bg-slate-50/50">
+                <label for="cover_upload" class="group w-full aspect-[2/3] border-2 border-dashed border-slate-300 hover:border-blue-500 rounded-2xl flex flex-col items-center justify-center text-slate-400 hover:bg-blue-50/40 transition-all duration-300 cursor-pointer overflow-hidden relative shadow-inner bg-slate-50/50 peer-focus-visible:outline-2 peer-focus-visible:outline-offset-4 peer-focus-visible:outline-blue-600">
                     <div id="preview_container" class="absolute inset-0 flex flex-col items-center justify-center p-6 text-center">
                         <div class="w-12 h-12 rounded-2xl bg-white shadow-sm flex items-center justify-center text-blue-600 group-hover:scale-110 transition-transform mb-3">
                             <i class="fa-solid fa-cloud-arrow-up text-lg"></i>
                         </div>
                         <span class="text-xs font-bold text-slate-700 group-hover:text-blue-700">Adicionar Capa</span>
-                        <span class="text-[10px] text-slate-400 mt-1">PNG, JPG até 10MB</span>
+                        <span class="text-[10px] text-slate-500 mt-1">PNG, JPG ou WebP até 2 MB</span>
                     </div>
-                    <img id="image_preview" class="w-full h-full object-cover hidden">
+                    <img id="image_preview" alt="Prévia da capa selecionada" class="w-full h-full object-cover hidden">
                 </label>
             </div>
 
             <div class="md:col-span-7 space-y-5">
                 <div>
-                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-2">Título do Livro</label>
+                    <label for="admin-title" class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-2">Título do Livro</label>
                     <div class="relative">
                         <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
                             <i class="fa-solid fa-book text-xs"></i>
                         </span>
-                        <input type="text" name="title" required maxlength="150" placeholder="Ex: Dom Casmurro"
+                        <input id="admin-title" type="text" name="title" value="{{ old('title') }}" required maxlength="150" placeholder="Ex: Dom Casmurro"
                                class="w-full pl-10 pr-4 py-3 bg-slate-50/50 border border-slate-200 rounded-2xl text-slate-800 text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all">
                     </div>
                 </div>

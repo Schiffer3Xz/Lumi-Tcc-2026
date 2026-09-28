@@ -1,4 +1,49 @@
-@import './app.css';
+.admin-app {
+    color-scheme: light;
+}
+
+.admin-button-primary,
+.admin-button-secondary,
+.admin-button-danger {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    border: 1px solid transparent;
+    border-radius: 0.75rem;
+    padding: 0.75rem 1rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    transition: background-color 150ms;
+}
+.admin-button-primary {
+    background: var(--color-blue-600);
+    color: white;
+}
+.admin-button-primary:hover {
+    background: var(--color-blue-700);
+}
+.admin-button-secondary {
+    background: white;
+    border-color: var(--color-slate-200);
+    color: var(--color-slate-600);
+}
+.admin-button-secondary:hover {
+    background: var(--color-slate-50);
+}
+.admin-button-danger {
+    background: var(--color-red-600);
+    color: white;
+}
+.admin-button-danger:hover {
+    background: var(--color-red-700);
+}
+.admin-button-primary:disabled,
+.admin-button-secondary:disabled,
+.admin-button-danger:disabled {
+    opacity: 0.6;
+    cursor: wait;
+}
 
 .admin-app [hidden] {
     display: none !important;
@@ -8,21 +53,16 @@
     display: none;
 }
 
-.admin-app :where(a, button, summary):focus-visible {
-    outline: 2px solid #2563eb;
-    outline-offset: 3px;
-}
-
 .admin-content :where(input:not([type='checkbox'], [type='radio'], [type='file']), select, textarea) {
     border-radius: 0.75rem;
-    border-color: #e2e8f0;
-    background-color: #f8fafc;
-    color: #334155;
+    border-color: var(--color-slate-200);
+    background-color: var(--color-lumi-canvas);
+    color: var(--color-slate-700);
 }
 
 .admin-content :where(input, select, textarea):focus-visible {
-    border-color: #3b82f6;
-    outline: 2px solid #bfdbfe;
+    border-color: var(--color-blue-500);
+    outline: 2px solid var(--color-blue-200);
     outline-offset: 1px;
     background-color: white;
 }
@@ -31,11 +71,11 @@
     width: 100%;
 }
 
-@media (prefers-reduced-motion: reduce) {
-    .admin-app *,
-    .admin-app *::before,
-    .admin-app *::after {
-        transition-duration: 0.01ms !important;
-        animation-duration: 0.01ms !important;
-    }
+.admin-content :where(td, th) {
+    overflow-wrap: anywhere;
+}
+
+.admin-content :where(input, select, textarea) {
+    min-width: 0;
+    max-width: 100%;
 }

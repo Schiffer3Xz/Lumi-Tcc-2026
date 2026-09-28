@@ -1,9 +1,9 @@
-import AuthLayoutTemplate from '@/layouts/auth/auth-simple-layout';
+import ReadingAuthLayout from '@/layouts/reading-auth-layout';
 
-export default function AuthLayout({ children, title, description, ...props }: { children: React.ReactNode; title: string; description: string }) {
+export default function AuthLayout({ children, title, description }: { children: React.ReactNode; title: string; description: string }) {
     return (
-        <AuthLayoutTemplate title={title} description={description} {...props}>
+        <ReadingAuthLayout title={title} heading={title} subtitle={description}>
             {children}
-        </AuthLayoutTemplate>
+        </ReadingAuthLayout>
     );
 }

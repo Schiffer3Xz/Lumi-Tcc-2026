@@ -9,13 +9,15 @@ use App\Models\Genre;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Notification;
+use Inertia\Inertia;
+use Inertia\Testing\AssertableInertia as Assert;
 use Tests\TestCase;
 
 class AdminDesignTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_administrative_pages_render_with_shared_navigation(): void
+    public function test_all_administrative_routes_render_react_pages(): void
     {
         $this->withoutVite()->actingAs(User::factory()->create([
             'name' => 'Administrador de teste', 'is_admin' => true, 'first_login' => false,
@@ -29,20 +31,32 @@ class AdminDesignTest extends TestCase
         ]);
 
         $pages = [
-            'admin.dashboard' => [], 'admin.categories.index' => [], 'admin.catalog.index' => [],
-            'admin.settings.index' => [], 'admin.credentials.edit' => [], 'admin.settings.email.edit' => [],
-            'admin.settings.password.edit' => [], 'admin.admins.create' => [], 'admin.admins.index' => [],
-            'admin.genres.index' => [], 'admin.genres.edit' => [$genre->id],
-            'admin.authors.index' => [], 'admin.authors.edit' => [$author->id],
-            'admin.availability.index' => [], 'admin.availability.edit' => [$availability->id],
-            'admin.books.index' => [], 'admin.books.list' => [], 'admin.books.create' => [], 'admin.books.edit' => [$book->id],
+            'admin.dashboard' => ['admin/dashboard', []],
+            'admin.categories.index' => ['admin/categories/index', []],
+            'admin.catalog.index' => ['admin/catalog/index', []],
+            'admin.settings.index' => ['admin/settings/index', []],
+            'admin.credentials.edit' => ['admin/settings/profile', []],
+            'admin.settings.email.edit' => ['admin/settings/email', []],
+            'admin.settings.password.edit' => ['admin/settings/password', []],
+            'admin.admins.create' => ['admin/settings/create-admin', []],
+            'admin.admins.index' => ['admin/settings/admins', []],
+            'admin.genres.index' => ['admin/categories/manage', []],
+            'admin.genres.edit' => ['admin/categories/edit', [$genre->id]],
+            'admin.authors.index' => ['admin/categories/manage', []],
+            'admin.authors.edit' => ['admin/categories/edit', [$author->id]],
+            'admin.availability.index' => ['admin/categories/manage', []],
+            'admin.availability.edit' => ['admin/categories/edit', [$availability->id]],
+            'admin.books.index' => ['admin/books/create', []],
+            'admin.books.list' => ['admin/books/index', []],
+            'admin.books.create' => ['admin/books/availability', []],
+            'admin.books.edit' => ['admin/books/edit', [$book->id]],
         ];
 
-        foreach ($pages as $routeName => $parameters) {
-            $response = $this->get(route($routeName, $parameters));
-            $response->assertOk()->assertSee('admin-sidebar')->assertSee('admin-content')
-                ->assertSee('Sala de Leitura')->assertDontSee('cdn.tailwindcss.com');
-            $this->savePreview($routeName, $response->getContent());
+        foreach ($pages as $routeName => [$component, $parameters]) {
+            $this->withoutHeader('X-Inertia')->get(route($routeName, $parameters))->assertOk()
+                ->assertInertia(fn (Assert $page) => $page->component($component)->where('auth.user.is_admin', true));
+            $this->withHeaders(['X-Inertia' => 'true', 'X-Inertia-Version' => Inertia::getVersion()])->get(route($routeName, $parameters))
+                ->assertOk()->assertHeader('X-Inertia', 'true')->assertJsonPath('component', $component);
         }
     }
 
@@ -52,16 +66,12 @@ class AdminDesignTest extends TestCase
         $this->get(route('admin.dashboard'))->assertRedirect(route('admin.first-login'));
 
         $response = $this->get(route('admin.first-login'));
-        $response->assertOk()->assertSee('Configurar perfil')->assertSee('Verificar e-mail')
-            ->assertSee('name="current_password"', false)->assertSee('name="password_confirmation"', false)
-            ->assertSee(route('admin.credentials.update'))->assertDontSee('id="admin-sidebar"', false);
-        $this->savePreview('first-access', $response->getContent());
+        $response->assertOk()->assertInertia(fn (Assert $page) => $page->component('admin/settings/first-login'));
 
         $this->get(route('admin.email-verification'))->assertRedirect(route('verification.notice'));
         $this->actingAs(User::factory()->unverified()->create(['is_admin' => true, 'first_login' => false]));
         $response = $this->get(route('verification.notice'));
-        $response->assertOk()->assertSee('Verifique seu e-mail')->assertDontSee('id="admin-sidebar"', false);
-        $this->savePreview('verification', $response->getContent());
+        $response->assertOk()->assertInertia(fn (Assert $page) => $page->component('admin/settings/verify-email'));
     }
 
     public function test_first_access_submission_keeps_existing_redirect_and_validation(): void
@@ -76,12 +86,5 @@ class AdminDesignTest extends TestCase
             'current_password' => 'password', 'password' => 'nova-senha-segura', 'password_confirmation' => 'nova-senha-segura',
         ])->assertRedirect(route('verification.notice'));
         $this->assertFalse((bool) $admin->fresh()->first_login);
-    }
-
-    private function savePreview(string $name, string $html): void
-    {
-        if ($directory = getenv('ADMIN_PREVIEW_DIR')) {
-            file_put_contents($directory.DIRECTORY_SEPARATOR.$name.'.html', $html);
-        }
     }
 }

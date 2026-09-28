@@ -37,12 +37,12 @@
                 <h2 class="text-lg font-bold text-slate-800">Autores cadastrados</h2>
             </div>
 
-            <div class="overflow-x-auto">
+            <div class="overflow-x-auto" role="region" aria-label="Registros cadastrados" tabindex="0">
                 <table class="w-full text-left border-collapse">
                     <thead class="bg-slate-50 text-slate-500 uppercase text-[10px] tracking-widest font-bold">
                         <tr>
-                            <th class="px-6 py-4">Nome do Autor</th>
-                            <th class="px-6 py-4 text-right">Ações</th>
+                            <th scope="col" class="px-6 py-4">Nome do Autor</th>
+                            <th scope="col" class="px-6 py-4 text-right">Ações</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-slate-100">

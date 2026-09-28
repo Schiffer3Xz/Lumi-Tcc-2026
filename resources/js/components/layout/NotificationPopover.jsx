@@ -161,7 +161,7 @@ export default function NotificationPopover({ className, iconClassName }) {
                 focus
                 role="dialog"
                 aria-label="Notificações"
-                className="z-[70] w-[380px] max-w-[calc(100vw-24px)] overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-xl outline-none"
+                className="z-[70] max-h-[calc(100dvh-24px)] w-[380px] max-w-[calc(100vw-24px)] overflow-y-auto overscroll-contain rounded-2xl border border-slate-200 bg-white shadow-xl outline-none"
             >
                 {({ close }) => <NotificationList close={close} />}
             </PopoverPanel>

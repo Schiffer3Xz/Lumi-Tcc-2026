@@ -5,12 +5,12 @@ import { Link } from '@inertiajs/react';
 function QuickAccessItem({ item }) {
     const content = (
         <>
-            <span className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg bg-[#1A2332]/5 transition-colors group-hover:bg-yellow-300/10">
+            <span className="bg-lumi-navy/5 flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg transition-colors group-hover:bg-yellow-300/10">
                 <i className={`${item.icon} text-sm text-gray-500 transition-colors group-hover:text-yellow-600`} aria-hidden="true" />
             </span>
-            <span className="text-sm font-medium text-gray-600 transition-colors group-hover:text-gray-900">{item.label}</span>
+            <span className="min-w-0 text-sm font-medium break-words text-gray-600 transition-colors group-hover:text-gray-900">{item.label}</span>
             <i
-                className="fa-solid fa-chevron-right ml-auto text-[10px] text-gray-300 transition-all group-hover:translate-x-1 group-hover:text-gray-400"
+                className="fa-solid fa-chevron-right ml-auto shrink-0 text-[10px] text-gray-300 transition-all group-hover:translate-x-1 group-hover:text-gray-400"
                 aria-hidden="true"
             />
         </>
@@ -43,7 +43,7 @@ function QuickAccessItem({ item }) {
 
 export default function QuickAccessPanel({ title, items, className }) {
     return (
-        <div className={cn('rounded-2xl border border-gray-200 bg-[#FFFFFF] p-5 shadow-sm', className)}>
+        <div className={cn('rounded-2xl border border-gray-200 bg-white p-5 shadow-sm', className)}>
             <h3 className="mb-4 flex items-center gap-2 text-base font-bold text-gray-800">
                 <span className="h-5 w-1 rounded-full bg-yellow-300" />
                 {title}

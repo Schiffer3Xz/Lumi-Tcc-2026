@@ -16,7 +16,7 @@ export default function Estante({ books = [], availableBooks = [], auth }) {
             topbar={{ title: 'Minha estante', subtitle: 'Os livros que você favoritou ficam reunidos aqui.' }}
         >
             <div className="w-full">
-                <div className="mb-8 rounded-3xl bg-[#1A2332] px-6 py-7 text-white shadow-sm sm:px-8">
+                <div className="bg-lumi-navy mb-8 rounded-3xl px-6 py-7 text-white shadow-sm sm:px-8">
                     <div className="flex items-start gap-4">
                         <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-yellow-300/15 text-yellow-300">
                             <i className="fa-solid fa-book-bookmark text-xl" aria-hidden="true" />

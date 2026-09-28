@@ -7,6 +7,23 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme {
+    /* Lumi identity shared by reader, authentication and administration. */
+    --color-lumi-navy: #1a2332;
+    --color-lumi-navy-hover: #27364d;
+    --color-lumi-navy-soft: #253248;
+    --color-lumi-canvas: #f8fafc;
+    --color-lumi-library: #f9f9f9;
+    --color-lumi-profile: #f4f6f9;
+    --color-lumi-cover: #f8f9fa;
+    --color-lumi-paper: #efeae1;
+    --color-lumi-paper-border: #e3dcce;
+    --color-lumi-progress: #81a9d4;
+    --color-lumi-progress-strong: #6b9ac4;
+    --color-lumi-landing: #1b2234;
+    --color-lumi-landing-card: #232c42;
+    --spacing-lumi-sidebar: 5rem;
+    --container-lumi-page: 100rem;
+
     --font-sans:
         'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
 
@@ -154,5 +171,21 @@
 
     body {
         @apply bg-background text-foreground;
+    }
+
+    :where(a, button, input, select, textarea, summary, [tabindex]):focus-visible {
+        outline: 2px solid var(--color-blue-600);
+        outline-offset: 3px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
     }
 }

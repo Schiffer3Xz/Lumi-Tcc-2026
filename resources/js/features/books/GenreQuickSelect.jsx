@@ -13,7 +13,7 @@ export default function GenreQuickSelect({ genres, value, onChange, onMore, disa
                     className={cn(
                         'flex items-center gap-2 rounded-full px-4 py-2 text-xs font-medium transition-all sm:text-sm',
                         value === genre.label
-                            ? 'bg-[#1A2332] text-yellow-300 shadow-md'
+                            ? 'bg-lumi-navy text-yellow-300 shadow-md'
                             : 'border border-gray-200 bg-white text-gray-600 hover:border-gray-300 hover:bg-gray-50',
                     )}
                 >

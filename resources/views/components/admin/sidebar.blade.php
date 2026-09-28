@@ -7,7 +7,8 @@
     ];
 @endphp
 <button type="button" data-admin-overlay hidden aria-label="Fechar navegação" class="fixed inset-0 z-40 bg-slate-900/40 backdrop-blur-xs lg:hidden"></button>
-<aside id="admin-sidebar" aria-label="Navegação administrativa" class="fixed left-0 top-0 z-50 flex h-screen w-20 shrink-0 -translate-x-full flex-col items-center gap-8 bg-[#1A2332] py-6 transition-transform duration-300 ease-in-out lg:sticky lg:translate-x-0">
+<aside id="admin-sidebar" aria-label="Navegação administrativa" class="fixed left-0 top-0 z-50 flex h-dvh w-20 shrink-0 -translate-x-full flex-col items-center gap-6 overflow-y-auto bg-lumi-navy py-4 transition-transform duration-300 ease-in-out lg:sticky lg:translate-x-0 lg:gap-8 lg:py-6">
+    <button type="button" data-admin-menu-close aria-label="Fechar navegação" class="rounded-xl p-3 text-slate-300 hover:bg-white/10 hover:text-white lg:hidden"><i class="fa-solid fa-xmark" aria-hidden="true"></i></button>
     <a href="{{ route('admin.dashboard') }}" aria-label="Sala de Leitura — início" class="text-2xl text-yellow-300"><i class="fa-solid fa-feather-pointed" aria-hidden="true"></i></a>
     <nav class="flex flex-1 flex-col gap-3">
         @foreach ($items as $item)

@@ -8,6 +8,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\URL;
+use Inertia\Testing\AssertableInertia as Assert;
 use Symfony\Component\Mailer\Exception\TransportException;
 use Tests\TestCase;
 
@@ -68,7 +69,8 @@ class AdminEmailVerificationTest extends TestCase
         $this->assertFalse((bool) $admin->fresh()->first_login);
         $this->assertTrue(Hash::check('nova-senha-segura', $admin->fresh()->password));
         $this->get(route('verification.notice'))->assertOk()
-            ->assertSee('Não foi possível enviar')->assertSee(route('verification.send'));
+            ->assertInertia(fn (Assert $page) => $page->component('admin/settings/verify-email')
+                ->has('errors.verification'));
     }
 
     public function test_resend_reports_success_and_transport_errors(): void

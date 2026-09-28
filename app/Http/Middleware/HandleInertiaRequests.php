@@ -42,6 +42,9 @@ class HandleInertiaRequests extends Middleware
         return array_merge(parent::share($request), [
             ...parent::share($request),
             'name' => config('app.name'),
+            'flash' => [
+                'success' => fn () => $request->session()->get('success'),
+            ],
             'unreadNotifications' => fn () => $request->user()
                 ? DB::table('reader_notifications')->where('user_id', $request->user()->id)->whereNull('read_at')->count()
                 : 0,

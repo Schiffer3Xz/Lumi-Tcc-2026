@@ -38,8 +38,8 @@ export default function BookCard({
         <article
             className={cn(
                 variant === 'catalog'
-                    ? 'group relative flex min-h-56 w-full overflow-hidden rounded-2xl border border-slate-200/80 bg-[#F8F9FA] shadow-sm transition-all duration-200 hover:border-slate-300 hover:shadow-md'
-                    : 'group relative aspect-[2/3] w-full overflow-hidden rounded-2xl border border-slate-100 bg-[#1A2332] shadow-sm transition-all duration-200 hover:scale-[1.02]',
+                    ? 'group bg-lumi-cover relative flex min-h-56 w-full overflow-hidden rounded-2xl border border-slate-200/80 shadow-sm transition-all duration-200 hover:border-slate-300 hover:shadow-md'
+                    : 'group bg-lumi-navy relative aspect-[2/3] w-full overflow-hidden rounded-2xl border border-slate-100 shadow-sm transition-all duration-200 hover:scale-[1.02]',
                 variant === 'featured' ? 'hover:shadow-md' : 'hover:shadow-lg',
                 className,
             )}
@@ -70,13 +70,7 @@ export default function BookCard({
             )}
             {variant === 'catalog' ? (
                 <>
-                    <div
-                        className={cn(
-                            'aspect-[2/3] h-56 shrink-0 overflow-hidden bg-slate-100 sm:h-60',
-                            showActions ? 'w-28 sm:w-32' : 'w-40 sm:w-44',
-                            imageClassName,
-                        )}
-                    >
+                    <div className={cn('aspect-[2/3] h-56 shrink-0 overflow-hidden bg-slate-100 sm:h-60', 'w-28 sm:w-32', imageClassName)}>
                         {book.cover_url ? (
                             <img src={book.cover_url} alt={book.title} className="h-full w-full object-cover" />
                         ) : (
@@ -119,13 +113,13 @@ export default function BookCard({
             ) : book.cover_url ? (
                 <img src={book.cover_url} alt={book.title} className="h-full w-full object-cover" />
             ) : (
-                <div className="flex h-full w-full flex-col items-center justify-center bg-gradient-to-b from-[#1A2332] to-[#253248] p-4 text-center">
+                <div className="from-lumi-navy to-lumi-navy-soft flex h-full w-full flex-col items-center justify-center bg-gradient-to-b p-4 text-center">
                     <i className="fa-solid fa-book mb-2 text-3xl text-yellow-300/40" aria-hidden="true" />
                     <span className="line-clamp-3 px-2 text-xs font-semibold text-white/80">{book.title}</span>
                 </div>
             )}
             {showRating && variant !== 'catalog' && (
-                <div className="absolute top-3 right-3 flex items-center gap-1 rounded-lg bg-[#1A2332]/85 px-2.5 py-1 backdrop-blur-sm">
+                <div className="bg-lumi-navy/85 absolute top-3 right-3 flex items-center gap-1 rounded-lg px-2.5 py-1 backdrop-blur-sm">
                     <i className="fa-solid fa-star text-[10px] text-yellow-400" aria-hidden="true" />
                     <span className="text-xs font-bold text-white" aria-label={`Avaliação: ${Number(book.rating || 0).toFixed(1)}`}>
                         {Number(book.rating || 0).toFixed(1)}

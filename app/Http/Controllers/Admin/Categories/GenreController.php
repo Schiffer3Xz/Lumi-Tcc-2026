@@ -3,46 +3,50 @@
 namespace App\Http\Controllers\Admin\Categories;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
 use App\Models\Genre;
-
+use Illuminate\Http\Request;
+use Inertia\Inertia;
 
 class GenreController extends Controller
 {
-
     public function index()
     {
         $genres = Genre::all();
 
-        return view('admin/categories/genres/create', compact('genres'));
+        return Inertia::render('admin/categories/manage', ['resource' => 'genres', 'items' => $genres]);
     }
 
-    public function store(Request $request){
+    public function store(Request $request)
+    {
         $dados = $request->validate([
-        'name' => ['required','string','max:255','unique:genres,name',],
+            'name' => ['required', 'string', 'max:255', 'unique:genres,name'],
         ]);
 
         Genre::create($dados);
+
         return back();
     }
 
-    public function edit($id){
+    public function edit($id)
+    {
         $genre = Genre::findOrFail($id);
 
-        return view('admin/categories/genres/edit', compact('genre'));
+        return Inertia::render('admin/categories/edit', ['resource' => 'genres', 'item' => $genre]);
     }
 
-    public function update(Request $request, $id){
+    public function update(Request $request, $id)
+    {
         Genre::where('id', $id)->update([
             'name' => $request->name,
         ]);
 
-        return redirect('admin/categories/genre');
+        return redirect()->route('admin.genres.index');
     }
 
-    public function destroy($id){
+    public function destroy($id)
+    {
         Genre::where('id', $id)->delete();
 
-        return redirect('admin/categories/genre');
+        return redirect()->route('admin.genres.index');
     }
 }

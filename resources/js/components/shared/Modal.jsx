@@ -1,19 +1,42 @@
-import useFocusTrap from '@/hooks/use-focus-trap';
+import { cn } from '@/lib/utils';
+import * as Dialog from '@radix-ui/react-dialog';
+import { useRef } from 'react';
 
 export default function Modal({ isOpen, onClose, label, labelledBy, className, overlayClassName, closeOnBackdrop = false, children }) {
-    const ref = useFocusTrap(isOpen, onClose);
-    if (!isOpen) return null;
+    const triggerRef = useRef(null);
 
     return (
-        <div
-            className={overlayClassName}
-            onClick={(event) => {
-                if (closeOnBackdrop && event.target === event.currentTarget) onClose?.();
+        <Dialog.Root
+            open={isOpen}
+            onOpenChange={(open) => {
+                if (!open) onClose?.();
             }}
         >
-            <div ref={ref} role="dialog" aria-modal="true" aria-label={label} aria-labelledby={labelledBy} tabIndex={-1} className={className}>
-                {children}
-            </div>
-        </div>
+            <Dialog.Portal>
+                <Dialog.Overlay
+                    className={cn('fixed inset-0 z-[90] flex items-center justify-center overflow-y-auto overscroll-contain p-4', overlayClassName)}
+                >
+                    <Dialog.Content
+                        {...(labelledBy && { 'aria-labelledby': labelledBy })}
+                        aria-describedby={undefined}
+                        aria-label={label}
+                        className={cn('max-h-[calc(100dvh-2rem)] overflow-y-auto overscroll-contain', className)}
+                        onOpenAutoFocus={() => {
+                            triggerRef.current = document.activeElement;
+                        }}
+                        onCloseAutoFocus={(event) => {
+                            event.preventDefault();
+                            if (triggerRef.current?.isConnected) triggerRef.current.focus();
+                        }}
+                        onPointerDownOutside={(event) => {
+                            if (!closeOnBackdrop) event.preventDefault();
+                        }}
+                    >
+                        <Dialog.Title className="sr-only">{label ?? 'Janela de diálogo'}</Dialog.Title>
+                        {children}
+                    </Dialog.Content>
+                </Dialog.Overlay>
+            </Dialog.Portal>
+        </Dialog.Root>
     );
 }

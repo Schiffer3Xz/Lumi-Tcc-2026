@@ -74,8 +74,18 @@
                         Livros por Gênero
                     </h2>
                     <div class="relative h-80 w-full">
-                        <canvas id="booksGenreChart"></canvas>
+                        <canvas id="booksGenreChart" role="img" aria-label="Quantidade de livros por gênero. Os valores também estão disponíveis na tabela abaixo."></canvas>
                     </div>
+                    <details id="genre-chart-data" class="mt-5 rounded-xl border border-slate-200 p-4">
+                        <summary class="cursor-pointer text-sm font-semibold text-blue-700">Ver dados por gênero</summary>
+                        <dl class="mt-4 space-y-2 text-sm">
+                            @forelse ($totalBooksByGenre as $genre)
+                                <div class="flex justify-between gap-4"><dt class="break-words text-slate-600">{{ $genre->name }}</dt><dd class="font-semibold text-slate-900">{{ $genre->books_count }}</dd></div>
+                            @empty
+                                <div><dt class="text-slate-500">Nenhum gênero cadastrado.</dt><dd class="sr-only">0 livros</dd></div>
+                            @endforelse
+                        </dl>
+                    </details>
                 </div>
             </div>
 
@@ -86,6 +96,11 @@
 
         // Inicialização do Gráfico
         document.addEventListener('DOMContentLoaded', function () {
+            if (typeof Chart === 'undefined') {
+                document.getElementById('booksGenreChart').parentElement.hidden = true;
+                document.getElementById('genre-chart-data').open = true;
+                return;
+            }
             const ctx = document.getElementById('booksGenreChart').getContext('2d');
 
             new Chart(ctx, {
@@ -102,6 +117,7 @@
                     }]
                 },
                 options: {
+                    animation: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? false : undefined,
                     responsive: true,
                     maintainAspectRatio: false,
                     plugins: {

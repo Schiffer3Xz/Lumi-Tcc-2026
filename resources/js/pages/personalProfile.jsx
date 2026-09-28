@@ -1,4 +1,3 @@
-import CreatePostModal from '@/features/profile/CreatePostModal';
 import PreferencesPanel from '@/features/profile/PreferencesPanel';
 import { defaultPersonalProfile, readingRules } from '@/features/profile/profile-data';
 import ProfilePosts from '@/features/profile/ProfilePosts';
@@ -11,7 +10,6 @@ import { useState } from 'react';
 
 export default function ConfigPage({ auth, posts = [], profileUser }) {
     const [drawerOpen, setDrawerOpen] = useState(false);
-    const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
 
     const user = auth?.user ?? defaultPersonalProfile;
 
@@ -25,18 +23,21 @@ export default function ConfigPage({ auth, posts = [], profileUser }) {
                 topbar={{
                     actions: (
                         <button
+                            type="button"
+                            aria-label="Preferências"
+                            aria-haspopup="dialog"
                             onClick={() => setDrawerOpen(true)}
                             className="flex items-center gap-2 rounded-xl border border-slate-200 bg-slate-50 px-3 py-1.5 text-xs font-semibold text-slate-700 transition-colors hover:bg-slate-100"
                         >
                             <i className="fa-solid fa-sliders text-xs" />
-                            <span>Preferências</span>
+                            <span className="hidden sm:inline">Preferências</span>
                         </button>
                     ),
                 }}
             >
                 <div className="flex flex-1 overflow-hidden">
                     {/* CONTEÚDO PRINCIPAL */}
-                    <main className="flex-1 space-y-6 overflow-y-auto p-4 md:p-8">
+                    <main id="reader-main-content" tabIndex={-1} className="min-w-0 flex-1 space-y-6 overflow-y-auto p-4 md:p-8">
                         {/* CARTÃO DE PERFIL */}
                         <ProfileSummary
                             user={{ ...user, ...profileUser }}
@@ -70,7 +71,6 @@ export default function ConfigPage({ auth, posts = [], profileUser }) {
                     <PreferencesPanel isOpen={drawerOpen} onClose={() => setDrawerOpen(false)} />
                 </div>
             </ReaderLayout>
-            <CreatePostModal isOpen={isCreateModalOpen} onClose={() => setIsCreateModalOpen(false)} />
         </>
     );
 }

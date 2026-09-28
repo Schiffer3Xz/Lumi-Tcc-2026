@@ -1,27 +1,22 @@
 import PostComposer from '@/features/social/PostComposer';
 import ReaderLayout from '@/layouts/reader-layout';
-import { Link, router } from '@inertiajs/react';
+import { Link, useForm } from '@inertiajs/react';
 
 export default function CreatePost({ auth }) {
     const user = auth?.user ?? { name: 'Estudante', email: '' };
+    const form = useForm({ content: '', image: null });
 
     const handleSubmit = ({ content, image }) => {
-        const formData = new FormData();
-
-        formData.append('content', content);
-
-        if (image) {
-            formData.append('image', image);
-        }
-
-        router.post(route('posts.store'), formData, {
+        if (form.processing) return;
+        form.transform(() => ({ content, image }));
+        form.post(route('posts.store'), {
             forceFormData: true,
         });
     };
     return (
         <>
             <ReaderLayout title="Criar Publicação" user={user} activeItem="usuarios" variant="composer">
-                <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8">
+                <main id="reader-main-content" tabIndex={-1} className="min-w-0 flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8">
                     <div className="mx-auto w-full max-w-[720px]">
                         {/* CABEÇALHO */}
                         <div className="mb-4 sm:mb-5">
@@ -47,7 +42,7 @@ export default function CreatePost({ auth }) {
                         </div>
 
                         {/* CARD */}
-                        <PostComposer user={user} onSubmit={handleSubmit} />
+                        <PostComposer user={user} onSubmit={handleSubmit} processing={form.processing} errors={form.errors} />
 
                         {/* DICA */}
                         <div className="mt-4 flex items-start gap-3 rounded-xl border border-amber-100 bg-amber-50/60 p-3 sm:p-4">

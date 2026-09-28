@@ -20,7 +20,7 @@ export default function ProfilePosts({ posts, user, createPostHref }) {
     return (
         <>
             {/* CABEÇALHO DO FEED + BOTÃO DE NOVO POST */}
-            <div className="flex items-center justify-between border-b border-slate-200/80 pt-2 pb-3">
+            <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-200/80 pt-2 pb-3">
                 <div className="flex items-center gap-4">
                     {tabs.map((tab) => (
                         <button

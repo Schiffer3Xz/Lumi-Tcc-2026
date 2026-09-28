@@ -28,13 +28,19 @@ export default function ReaderLayout({ title, user, activeItem, variant = 'socia
         <BookDetailsProvider>
             <Head title={title} />
             <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+            <a
+                href="#reader-main-content"
+                className="text-lumi-navy fixed top-3 left-3 z-[100] -translate-y-[calc(100%+1rem)] rounded-xl bg-white px-4 py-3 font-semibold shadow-lg focus:translate-y-0"
+            >
+                Pular para o conteúdo principal
+            </a>
             <div
                 className={clsx(
                     isLibrary
-                        ? 'flex min-h-screen bg-[#F9F9F9]'
+                        ? 'bg-lumi-library flex min-h-dvh'
                         : variant === 'profile'
-                          ? 'flex min-h-screen bg-[#F4F6F9] font-sans text-slate-700'
-                          : 'flex min-h-screen bg-[#F8FAFC] font-sans text-slate-700',
+                          ? 'bg-lumi-profile flex min-h-dvh font-sans text-slate-700'
+                          : 'bg-lumi-canvas flex min-h-dvh font-sans text-slate-700',
                     className,
                 )}
             >
@@ -44,15 +50,16 @@ export default function ReaderLayout({ title, user, activeItem, variant = 'socia
                     activeItem={activeItem}
                     isOpen={isMenuOpen}
                     onClose={() => setIsMenuOpen(false)}
-                    onNavigate={variant === 'composer' ? () => setIsMenuOpen(false) : undefined}
                     variant={isLibrary || variant === 'profile' ? 'library' : 'social'}
                 />
-                <div className={isLibrary ? 'flex min-w-0 flex-1 flex-col' : 'flex h-screen min-w-0 flex-1 flex-col overflow-hidden'}>
+                <div className={isLibrary ? 'flex min-w-0 flex-1 flex-col' : 'flex h-dvh min-w-0 flex-1 flex-col overflow-hidden'}>
                     {isLibrary ? (
-                        <main className="mx-auto w-full max-w-[1600px] flex-1 p-4 sm:p-6 lg:p-8">
+                        <div className="max-w-lumi-page mx-auto w-full flex-1 p-4 sm:p-6 lg:p-8">
                             {header}
-                            {children}
-                        </main>
+                            <main id="reader-main-content" tabIndex={-1}>
+                                {children}
+                            </main>
+                        </div>
                     ) : (
                         <>
                             {header}
