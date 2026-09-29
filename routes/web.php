@@ -3,6 +3,7 @@
 use App\Http\Controllers\Admin\AdminCatalogController;
 use App\Http\Controllers\Admin\AdminCategoriesController;
 use App\Http\Controllers\Admin\AdminDashboardController;
+use App\Http\Controllers\Admin\AdminReportController;
 use App\Http\Controllers\Admin\AdminSettingsController;
 use App\Http\Controllers\Admin\Catalog\BookController;
 use App\Http\Controllers\Admin\Categories\AuthorController;
@@ -120,7 +121,7 @@ Route::middleware(['RoleMiddleware'])->group(function () {
         Route::patch('post/{post}', [PostController::class, 'update'])->name('posts.update');
         Route::match(['put', 'delete'], 'post/{post}/like', [PostInteractionController::class, 'like'])->name('posts.like');
         Route::match(['put', 'delete'], 'post/{post}/save', [PostInteractionController::class, 'save'])->name('posts.save');
-        Route::post('post/{post}/report', [ReportController::class, 'store'])->name('posts.report');
+        Route::post('post/{post}/report', [ReportController::class, 'store'])->middleware('throttle:10,1')->name('posts.report');
         Route::post('post/{post}/comments', [PostInteractionController::class, 'comment'])->name('posts.comments.store');
         Route::delete('post/{post}/comments/{comment}', [PostInteractionController::class, 'deleteComment'])->name('posts.comments.destroy');
         Route::delete('post/{id}', [SocialController::class, 'destroyPost'])->name('posts.destroy');
@@ -145,6 +146,9 @@ Route::middleware(['RoleMiddleware'])->group(function () {
 
             Route::get('admin/dashboard', [AdminDashboardController::class, 'index'])
                 ->name('admin.dashboard');
+
+            Route::get('admin/reports', [AdminReportController::class, 'index'])->name('admin.reports.index');
+            Route::patch('admin/reports/{report}', [AdminReportController::class, 'update'])->name('admin.reports.update');
 
             // ========================================================
             // CATEGORIES

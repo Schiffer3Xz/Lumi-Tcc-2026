@@ -32,6 +32,7 @@ class AdminDesignTest extends TestCase
 
         $pages = [
             'admin.dashboard' => ['admin/dashboard', []],
+            'admin.reports.index' => ['admin/reports/index', []],
             'admin.categories.index' => ['admin/categories/index', []],
             'admin.catalog.index' => ['admin/catalog/index', []],
             'admin.settings.index' => ['admin/settings/index', []],
