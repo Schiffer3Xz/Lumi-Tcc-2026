@@ -1,4 +1,5 @@
 import Sidebar from '@/components/layout/Sidebar';
+import FireflyIcon from '@/components/shared/FireflyIcon';
 import AdminTopbar from '@/features/admin/AdminTopbar';
 import { adminNavigation, adminSections } from '@/features/admin/navigation';
 import { Head, Link, usePage } from '@inertiajs/react';
@@ -33,10 +34,9 @@ export default function AdminLayout({ title, section = 'dashboard', firstAccess 
                 >
                     <div className="w-full max-w-2xl">
                         <div className="mb-7 text-center">
-                            <i
-                                className="fa-solid fa-feather-pointed bg-lumi-navy mb-3 rounded-2xl p-4 text-2xl text-yellow-300"
-                                aria-hidden="true"
-                            />
+                            <span className="bg-lumi-navy mb-3 inline-flex rounded-2xl p-4 text-yellow-300">
+                                <FireflyIcon className="size-7" />
+                            </span>
                             <p className="text-xl font-bold text-slate-900">Sala de Leitura</p>
                             <p className="mt-1 text-xs text-slate-500">Plataforma Escolar Web · Administração</p>
                         </div>

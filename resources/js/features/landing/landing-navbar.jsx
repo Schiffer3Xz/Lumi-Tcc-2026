@@ -1,6 +1,6 @@
+import FireflyIcon from '@/components/shared/FireflyIcon';
 import { cn } from '@/lib/utils';
 import { Link } from '@inertiajs/react';
-import { Sparkles } from 'lucide-react';
 
 export default function LandingNavbar({ homeHref, links, action, brand = 'Lumi', className }) {
     return (
@@ -11,7 +11,7 @@ export default function LandingNavbar({ homeHref, links, action, brand = 'Lumi',
             )}
         >
             <Link href={homeHref} className="group flex items-center gap-2 text-2xl font-black tracking-wide">
-                <Sparkles className="h-6 w-6 fill-amber-300 text-amber-300 transition-transform duration-300 group-hover:rotate-12" />
+                <FireflyIcon className="h-7 w-7 text-amber-300 transition-transform duration-300 motion-safe:group-hover:rotate-12" />
                 <span>{brand}</span>
             </Link>
             <nav

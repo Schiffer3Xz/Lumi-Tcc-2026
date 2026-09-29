@@ -1,3 +1,4 @@
+import FireflyIcon from '@/components/shared/FireflyIcon';
 import { Link } from '@inertiajs/react';
 import * as Dialog from '@radix-ui/react-dialog';
 import clsx from 'clsx';
@@ -29,8 +30,8 @@ export default function Sidebar({ id, items, activeItem, isOpen, onClose, onNavi
     };
     const content = (
         <>
-            <div className="text-yellow-300">
-                <i aria-hidden="true" className="fa-solid fa-feather-pointed text-2xl" />
+            <div className="text-yellow-300" role="img" aria-label="Lumi, mascote vagalume">
+                <FireflyIcon className="size-8" />
             </div>
             <nav aria-label="Navegação principal" className="flex flex-1 flex-col gap-3">
                 {items.map((item) => {

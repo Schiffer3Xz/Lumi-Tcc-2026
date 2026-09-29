@@ -1,5 +1,6 @@
+import FireflyIcon from '@/components/shared/FireflyIcon';
 import { Link } from '@inertiajs/react';
-import { ArrowRight, Sparkles } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 
 export default function LandingHero({ badge, title, description, primaryAction, secondaryAction, children }) {
     return (
@@ -10,7 +11,7 @@ export default function LandingHero({ badge, title, description, primaryAction, 
             <div className="grid w-full grid-cols-1 items-center gap-12 lg:grid-cols-12">
                 <div className="space-y-6 lg:col-span-7">
                     <div className="inline-flex items-center gap-2 rounded-full border border-slate-700 bg-slate-800/90 px-4 py-1.5 text-xs font-bold tracking-wider text-amber-300 uppercase shadow-inner">
-                        <Sparkles aria-hidden="true" className="h-3.5 w-3.5" />
+                        <FireflyIcon className="h-4 w-4 shrink-0" />
                         <span>{badge}</span>
                     </div>
                     <h1 id="landing-title" className="text-4xl leading-[1.08] font-black tracking-tight text-white sm:text-6xl md:text-7xl">
