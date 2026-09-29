@@ -31,7 +31,7 @@ export default function Home({ books = [], auth, genres = [], readingProgress = 
     const [isGenresSidebarOpen, setIsGenresSidebarOpen] = useState(false);
     const [isProgressSidebarOpen, setIsProgressSidebarOpen] = useState(false);
     const user = auth?.user ?? { name: 'Visitante', email: '' };
-    const openProgress = () => (auth?.user ? setIsProgressSidebarOpen(true) : router.get(route('login')));
+    const openProgress = () => (auth?.user ? setIsProgressSidebarOpen(true) : router.get(route('reading.history')));
 
     const allGenres = useMemo(() => {
         const genresByLabel = new Map(BOOK_GENRES.map((genre) => [genre.label.toLowerCase(), genre]));
@@ -154,7 +154,7 @@ export default function Home({ books = [], auth, genres = [], readingProgress = 
                             items={QUICK_ACCESS.map((item) => ({
                                 ...item,
                                 ...(item.panel === 'privacy' && !auth?.user
-                                    ? { href: route('login') }
+                                    ? { href: route('privacy') }
                                     : item.routeName
                                       ? { href: route(item.routeName) }
                                       : {

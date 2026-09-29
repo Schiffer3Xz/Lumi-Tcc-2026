@@ -66,7 +66,7 @@ class ReportsTest extends TestCase
         $post = $this->publication();
         $reader = User::factory()->create();
         $report = Report::create(['fk_user_id' => $reader->id, 'fk_post_id' => $post->id, 'content' => 'Motivo']);
-        $this->get(route('admin.reports.index'))->assertRedirect(route('login'));
+        $this->get(route('admin.reports.index'))->assertInertia(fn (Assert $page) => $page->component('auth/required'));
         $this->patch(route('admin.reports.update', $report), ['status' => 'reviewed'])->assertRedirect(route('login'));
         $this->actingAs($reader)->get(route('admin.reports.index'))->assertRedirect(route('dashboard'));
         $this->patch(route('admin.reports.update', $report), ['status' => 'reviewed'])->assertRedirect(route('dashboard'));

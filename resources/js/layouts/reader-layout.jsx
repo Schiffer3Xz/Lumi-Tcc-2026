@@ -1,6 +1,7 @@
 import Sidebar from '@/components/layout/Sidebar';
 import Topbar from '@/components/layout/Topbar';
 import { ACCOUNT_NAVIGATION, READER_NAVIGATION } from '@/constants/navigation';
+import GuestAccessPrompt from '@/features/auth/GuestAccessPrompt';
 import BookDetailsProvider from '@/features/books/BookDetailsProvider';
 import { Head } from '@inertiajs/react';
 import clsx from 'clsx';
@@ -26,6 +27,7 @@ export default function ReaderLayout({ title, user, activeItem, variant = 'socia
 
     return (
         <BookDetailsProvider>
+            <GuestAccessPrompt />
             <Head title={title} />
             <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
             <a

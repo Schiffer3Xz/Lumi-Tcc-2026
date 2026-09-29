@@ -52,6 +52,9 @@ class HandleInertiaRequests extends Middleware
             'auth' => [
                 'user' => $request->user(),
             ],
+            'loginRequiredPaths' => fn () => $request->user() ? [] : collect(app('router')->getRoutes()->getRoutes())
+                ->filter(fn ($route) => collect($route->gatherMiddleware())->contains(fn ($middleware) => $middleware === 'auth' || str_starts_with($middleware, 'auth:')))
+                ->map(fn ($route) => $route->uri())->unique()->values()->all(),
         ]);
     }
 }

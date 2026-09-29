@@ -31,7 +31,7 @@ class ReaderAccountTest extends TestCase
     public function test_quick_access_pages_require_login_and_render_for_readers(): void
     {
         foreach (['/historico', '/regras', '/privacidade', '/notificacoes'] as $url) {
-            $this->get($url)->assertRedirect('/login');
+            $this->withoutVite()->get($url)->assertInertia(fn (Assert $page) => $page->component('auth/required'));
         }
         $this->patch('/privacidade')->assertRedirect('/login');
         $this->post('/notificacoes/lidas')->assertRedirect('/login');

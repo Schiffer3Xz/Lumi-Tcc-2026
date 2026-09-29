@@ -64,6 +64,6 @@ class SocialFeedTest extends TestCase
 
     public function test_guests_cannot_access_the_social_feed(): void
     {
-        $this->get('/social')->assertRedirect('/login');
+        $this->withoutVite()->get('/social')->assertInertia(fn (Assert $page) => $page->component('auth/required'));
     }
 }

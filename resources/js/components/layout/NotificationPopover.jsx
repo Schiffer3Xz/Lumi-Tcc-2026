@@ -145,7 +145,7 @@ export default function NotificationPopover({ className, iconClassName }) {
     const { auth, unreadNotifications = 0 } = usePage().props;
     if (!auth?.user) {
         return (
-            <Link href={route('login')} aria-label="Entrar para ver notificações" className={className}>
+            <Link href={route('notifications')} aria-label="Entrar para ver notificações" className={className}>
                 <i aria-hidden="true" className={iconClassName} />
             </Link>
         );
