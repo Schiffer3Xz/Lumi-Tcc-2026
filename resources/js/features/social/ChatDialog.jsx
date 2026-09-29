@@ -1,5 +1,7 @@
 import Modal from '@/components/shared/Modal';
+import { router } from '@inertiajs/react';
 import { useEffect, useRef, useState } from 'react';
+import GroupManagement from './GroupManagement';
 
 export default function ChatDialog({ recipient, viewerId, messages = [], conversationId, onClose }) {
     const initials = recipient?.name
@@ -11,11 +13,22 @@ export default function ChatDialog({ recipient, viewerId, messages = [], convers
         .toUpperCase();
 
     const [chatMessages, setChatMessages] = useState(messages);
+    const [activeConversationId, setActiveConversationId] = useState(conversationId);
     const [content, setContent] = useState('');
     const [processing, setProcessing] = useState(false);
     const [error, setError] = useState('');
 
     const messagesEndRef = useRef(null);
+    const sendingRef = useRef(false);
+    const onCloseRef = useRef(onClose);
+
+    useEffect(() => {
+        onCloseRef.current = onClose;
+    }, [onClose]);
+
+    useEffect(() => {
+        if (conversationId) setActiveConversationId(conversationId);
+    }, [conversationId]);
 
     const sortMessages = (messageList) =>
         [...messageList].sort((first, second) => new Date(first.created_at).getTime() - new Date(second.created_at).getTime());
@@ -25,7 +38,7 @@ export default function ChatDialog({ recipient, viewerId, messages = [], convers
     useEffect(() => {
         setContent('');
         setError('');
-    }, [recipient]);
+    }, [recipient.id, recipient.is_group]);
 
     useEffect(() => {
         setChatMessages((current) => {
@@ -65,26 +78,26 @@ export default function ChatDialog({ recipient, viewerId, messages = [], convers
     }, [conversation.length]);
 
     useEffect(() => {
-        if (!conversationId || !window.Echo) {
+        if (!activeConversationId || !window.Echo) {
             return;
         }
 
-        console.log('🟡 Entrando no canal:', `conversation.${conversationId}`);
+        const channelName = recipient.is_group ? `conversation.${activeConversationId}.user.${viewerId}` : `conversation.${activeConversationId}`;
+        const channel = window.Echo.private(channelName);
 
-        const channel = window.Echo.private(`conversation.${conversationId}`);
-
-        channel.subscribed(() => {
-            console.log('🟢 INSCRITO NO CANAL:', `conversation.${conversationId}`);
-        });
-
-        channel.error((error) => {
-            console.log('🔴 ERRO NO CANAL:', error);
+        channel.listen('GroupUpdated', (event) => {
+            if (event.deleted || Number(event.removedUserId) === Number(viewerId)) {
+                onCloseRef.current();
+                return;
+            }
+            router.reload({ only: ['groupConversations'] });
         });
 
         channel.listen('MessageSent', (event) => {
             const receivedMessage = {
                 id: event.message.id,
                 user_id: event.message.fk_user_id,
+                user_name: event.message.user_name,
                 content: event.message.content,
                 created_at: event.message.created_at,
             };
@@ -112,22 +125,21 @@ export default function ChatDialog({ recipient, viewerId, messages = [], convers
         });
 
         return () => {
-            window.Echo.leave(`conversation.${conversationId}`);
-
-            console.log('⚪ Saiu do canal:', `conversation.${conversationId}`);
+            window.Echo.leave(channelName);
         };
-    }, [conversationId]);
+    }, [activeConversationId, recipient.is_group, viewerId]);
 
     const enviar = (event) => {
         event.preventDefault();
 
         const messageContent = content.trim();
 
-        if (!messageContent || !recipient || processing) {
+        if (!messageContent || !recipient || sendingRef.current) {
             return;
         }
 
         const temporaryId = `pending-${Date.now()}`;
+        sendingRef.current = true;
 
         setChatMessages((current) => [
             ...current,
@@ -144,7 +156,7 @@ export default function ChatDialog({ recipient, viewerId, messages = [], convers
         setError('');
         setProcessing(true);
 
-        fetch('/chat/send', {
+        fetch(recipient.is_group ? route('chat.groups.messages.store', recipient.id) : route('chat'), {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -152,7 +164,7 @@ export default function ChatDialog({ recipient, viewerId, messages = [], convers
                 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') ?? '',
             },
             body: JSON.stringify({
-                user_id: recipient.id,
+                ...(recipient.is_group ? {} : { user_id: recipient.id }),
                 content: messageContent,
             }),
         })
@@ -161,15 +173,15 @@ export default function ChatDialog({ recipient, viewerId, messages = [], convers
                     throw new Error('Não foi possível enviar a mensagem.');
                 }
 
+                return response.json();
+            })
+            .then((data) => {
+                setActiveConversationId(data.conversation_id);
                 setChatMessages((current) =>
-                    current.map((message) =>
-                        message.id === temporaryId
-                            ? {
-                                  ...message,
-                                  pending: false,
-                              }
-                            : message,
-                    ),
+                    sortMessages([
+                        ...current.filter((message) => message.id !== temporaryId && String(message.id) !== String(data.message.id)),
+                        data.message,
+                    ]),
                 );
             })
             .catch(() => {
@@ -179,6 +191,7 @@ export default function ChatDialog({ recipient, viewerId, messages = [], convers
                 setError('Não foi possível enviar a mensagem.');
             })
             .finally(() => {
+                sendingRef.current = false;
                 setProcessing(false);
             });
     };
@@ -210,10 +223,19 @@ export default function ChatDialog({ recipient, viewerId, messages = [], convers
 
                         <p className="mt-0.5 flex items-center gap-1.5 text-xs text-slate-500">
                             <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
-                            Conversa privada
+                            {recipient.is_group ? `${recipient.participants.length} participantes` : 'Conversa privada'}
                         </p>
                     </div>
                 </div>
+
+                {recipient.is_group && (
+                    <>
+                        <p className="mt-3 max-h-12 overflow-y-auto text-xs text-slate-500">
+                            {recipient.participants.map((member) => member.name).join(', ')}
+                        </p>
+                        <GroupManagement group={recipient} onDeleted={onClose} />
+                    </>
+                )}
 
                 <button
                     type="button"
@@ -246,6 +268,13 @@ export default function ChatDialog({ recipient, viewerId, messages = [], convers
                                                 : 'rounded-bl-md border border-slate-100 bg-white text-slate-700'
                                         }`}
                                     >
+                                        {recipient.is_group && !mine && (
+                                            <p className="mb-1 text-xs font-semibold text-blue-600">
+                                                {message.user_name ??
+                                                    recipient.participants.find((member) => Number(member.id) === Number(message.user_id))?.name ??
+                                                    'Participante'}
+                                            </p>
+                                        )}
                                         <p className="break-words whitespace-pre-wrap">{message.content}</p>
 
                                         <p className={`mt-1 text-[10px] ${mine ? 'text-blue-100' : 'text-slate-400'}`}>

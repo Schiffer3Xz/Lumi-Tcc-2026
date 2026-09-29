@@ -6,7 +6,9 @@ import {
 } from '@/components/ui/dropdown-menu';
 
 import { Link, router, useForm } from '@inertiajs/react';
-import { useRef, useState } from 'react';
+import { CircleCheck, Flag, Loader2, ShieldCheck, X } from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 
 import PostBookCard from './PostBookCard';
 import PostComments from './PostComments';
@@ -30,9 +32,18 @@ export default function PostCard({ post, user }) {
     const [message, setMessage] = useState('');
     const [shareFallback, setShareFallback] = useState(false);
     const [editing, setEditing] = useState(false);
+    const [showComments, setShowComments] = useState(false);
 
     const [showReportModal, setShowReportModal] = useState(false);
-    const [reportText, setReportText] = useState('');
+    const [reportSuccess, setReportSuccess] = useState(false);
+    const reportForm = useForm({ content: '' });
+
+    useEffect(() => {
+        if (!reportSuccess) return;
+
+        const timeout = window.setTimeout(() => setReportSuccess(false), 5000);
+        return () => window.clearTimeout(timeout);
+    }, [reportSuccess]);
 
     const editForm = useForm({
         content: post.content,
@@ -120,25 +131,23 @@ export default function PostCard({ post, user }) {
     };
 
     const openReportModal = () => {
-        setReportText('');
+        setReportSuccess(false);
+        reportForm.reset();
+        reportForm.clearErrors();
         setShowReportModal(true);
     };
 
     const submitReport = () => {
-        if (!reportText.trim()) return;
+        if (!reportForm.data.content.trim() || reportForm.processing) return;
 
-        console.log('Post:', post.id);
-        console.log('Motivo:', reportText);
-
-        // Aqui você poderá enviar a denúncia para o Laravel.
-        // Exemplo:
-        //
-        // router.post(route('posts.report', post.id), {
-        //     reason: reportText,
-        // });
-
-        setShowReportModal(false);
-        setReportText('');
+        reportForm.post(route('posts.report', post.id), {
+            preserveScroll: true,
+            onSuccess: () => {
+                setShowReportModal(false);
+                reportForm.reset();
+                setReportSuccess(true);
+            },
+        });
     };
 
     return (
@@ -346,13 +355,17 @@ export default function PostCard({ post, user }) {
 
                 <button
                     type="button"
-                    onClick={() => inputRef.current?.focus()}
-                    aria-label="Comentar publicação"
+                    onClick={() => setShowComments((visible) => !visible)}
+                    aria-expanded={showComments}
+                    aria-controls={`post-comments-${post.id}`}
+                    aria-label={showComments ? 'Ocultar comentários' : 'Mostrar comentários'}
                     className="flex items-center gap-1.5 transition-colors hover:text-blue-600"
                 >
                     <i className="fa-regular fa-comment text-sm" />
 
-                    <span>{post.commentsCount ?? 0}</span>
+                    <span>
+                        {showComments ? 'Ocultar comentários' : 'Comentários'} ({post.commentsCount ?? 0})
+                    </span>
                 </button>
 
                 <button
@@ -397,6 +410,22 @@ export default function PostCard({ post, user }) {
                 </button>
             </div>
 
+            {reportSuccess && createPortal(
+                <div role="status" className="fixed top-4 right-4 z-[100] flex max-w-[calc(100vw-2rem)] items-center gap-2 rounded-xl border border-emerald-200 bg-emerald-50 px-3 py-2.5 text-emerald-800 shadow-lg sm:top-6 sm:right-6">
+                    <CircleCheck className="h-4 w-4 shrink-0 text-emerald-600" aria-hidden="true" />
+                    <p className="text-xs font-medium">Denúncia enviada com sucesso!</p>
+                    <button
+                        type="button"
+                        onClick={() => setReportSuccess(false)}
+                        aria-label="Fechar mensagem de sucesso"
+                        className="rounded-lg p-1 text-emerald-600 transition-colors hover:bg-emerald-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500"
+                    >
+                        <X className="h-4 w-4" aria-hidden="true" />
+                    </button>
+                </div>,
+                document.body,
+            )}
+
             {message && (
                 <p role="status" className="text-xs text-slate-600">
                     {message}
@@ -413,56 +442,86 @@ export default function PostCard({ post, user }) {
                 />
             )}
 
-            <PostComments
-                postId={post.id}
-                comments={post.comments}
-                user={user}
-                inputRef={inputRef}
-                busy={busy || editForm.processing}
-                onDelete={(commentId) => {
-                    if (window.confirm('Excluir este comentário?')) {
-                        mutate(
-                            'delete',
-                            route('posts.comments.destroy', [
-                                post.id,
-                                commentId,
-                            ])
-                        );
-                    }
-                }}
-            />
+            <div id={`post-comments-${post.id}`} hidden={!showComments}>
+                <PostComments
+                    postId={post.id}
+                    comments={post.comments}
+                    user={user}
+                    inputRef={inputRef}
+                    busy={busy || editForm.processing}
+                    onDelete={(commentId) => {
+                        if (window.confirm('Excluir este comentário?')) {
+                            mutate(
+                                'delete',
+                                route('posts.comments.destroy', [
+                                    post.id,
+                                    commentId,
+                                ])
+                            );
+                        }
+                    }}
+                />
+            </div>
 
             <Dialog
                 open={showReportModal}
                 onOpenChange={setShowReportModal}
             >
-                <DialogContent>
-                    <DialogHeader>
-                        <DialogTitle>
+                <DialogContent
+                    overlayClassName="bg-slate-900/35 backdrop-blur-sm"
+                    className="max-h-[90dvh] w-[calc(100%-2rem)] max-w-md gap-0 overflow-y-auto rounded-3xl border-slate-200 bg-white p-0 text-slate-800 shadow-2xl sm:rounded-3xl [&>button]:rounded-full [&>button]:text-slate-500 [&>button]:data-[state=open]:bg-slate-100 [&>button]:data-[state=open]:text-slate-500"
+                >
+                    <DialogHeader className="space-y-3 rounded-t-3xl bg-gradient-to-br from-blue-50 via-slate-50 to-white px-6 pt-7 pb-5 text-left">
+                        <div className="mb-1 flex h-12 w-12 items-center justify-center rounded-2xl border border-rose-100 bg-rose-50 text-rose-500">
+                            <Flag className="h-5 w-5" aria-hidden="true" />
+                        </div>
+                        <DialogTitle className="text-xl font-bold tracking-tight text-slate-900">
                             Denunciar publicação
                         </DialogTitle>
 
-                        <DialogDescription>
-                            Explique o motivo da denúncia. Sua informação
-                            será analisada.
+                        <DialogDescription className="text-sm leading-relaxed text-slate-500">
+                            Ajude a cuidar da comunidade Lumi. Conte o que
+                            aconteceu para que possamos analisar a publicação.
                         </DialogDescription>
                     </DialogHeader>
 
-                    <div className="py-4">
+                    <div className="space-y-3 px-6 py-5">
+                        <label htmlFor={`report-content-${post.id}`} className="block text-sm font-semibold text-slate-700">
+                            Motivo da denúncia
+                        </label>
                         <textarea
+                            id={`report-content-${post.id}`}
+                            aria-invalid={Boolean(reportForm.errors.content)}
+                            aria-describedby={`report-hint-${post.id}${reportForm.errors.content ? ` report-error-${post.id}` : ''}`}
                             placeholder="Descreva o motivo da denúncia..."
-                            value={reportText}
+                            value={reportForm.data.content}
                             onChange={(event) =>
-                                setReportText(event.target.value)
+                                reportForm.setData('content', event.target.value)
                             }
                             rows={5}
-                            className="w-full rounded-xl border border-slate-200 p-3 text-sm text-slate-700 outline-none focus:border-blue-500"
+                            maxLength={100}
+                            disabled={reportForm.processing}
+                            className="block min-h-32 w-full resize-y rounded-2xl border border-slate-200 bg-slate-50/80 p-4 text-sm leading-relaxed text-slate-700 outline-none transition-colors placeholder:text-slate-400 focus:border-blue-400 focus:bg-white focus:ring-4 focus:ring-blue-50 disabled:opacity-60 aria-invalid:border-rose-400"
                         />
+                        <div id={`report-hint-${post.id}`} className="flex justify-between gap-3 text-xs text-slate-500">
+                            <span>Descreva o motivo em até 100 caracteres.</span>
+                            <span className="shrink-0 tabular-nums">{reportForm.data.content.length}/100</span>
+                        </div>
+                        {reportForm.errors.content && (
+                            <p id={`report-error-${post.id}`} role="alert" className="rounded-xl bg-rose-50 px-3 py-2 text-sm text-rose-600">
+                                {reportForm.errors.content}
+                            </p>
+                        )}
+                        <div className="flex items-start gap-2.5 rounded-xl bg-blue-50 px-3 py-3 text-xs leading-relaxed text-blue-700">
+                            <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0" aria-hidden="true" />
+                            <p>Sua denúncia é anônima e será analisada com atenção. Obrigado por ajudar a manter um espaço respeitoso.</p>
+                        </div>
                     </div>
 
-                    <DialogFooter>
+                    <DialogFooter className="gap-2 border-t border-slate-100 bg-slate-50/80 px-6 py-4 sm:space-x-0">
                         <Button
                             variant="outline"
+                            className="h-11 rounded-xl border-slate-200 bg-white text-slate-600 hover:bg-slate-100 hover:text-slate-800 focus-visible:ring-blue-400"
                             onClick={() =>
                                 setShowReportModal(false)
                             }
@@ -471,11 +530,12 @@ export default function PostCard({ post, user }) {
                         </Button>
 
                         <Button
-                            variant="destructive"
-                            disabled={!reportText.trim()}
+                            className="h-11 rounded-xl bg-blue-600 text-white shadow-sm hover:bg-blue-700 focus-visible:ring-blue-400"
+                            disabled={!reportForm.data.content.trim() || reportForm.processing}
                             onClick={submitReport}
                         >
-                            Enviar denúncia
+                            {reportForm.processing ? <Loader2 className="animate-spin" aria-hidden="true" /> : <Flag aria-hidden="true" />}
+                            {reportForm.processing ? 'Enviando...' : 'Enviar denúncia'}
                         </Button>
                     </DialogFooter>
                 </DialogContent>

@@ -3,7 +3,7 @@ import { Link } from '@inertiajs/react';
 import { useState } from 'react';
 import ReaderListItem from './ReaderListItem';
 
-export default function CommunitySidebar({ suggestedUsers, followedUsers, allUsers, conversationUsers, trendingPosts, onChat }) {
+export default function CommunitySidebar({ suggestedUsers, followedUsers, allUsers, conversationUsers, groupConversations = [], trendingPosts, onChat, onCreateGroup }) {
     const [search, setSearch] = useState('');
     const conversations = Array.isArray(conversationUsers) ? conversationUsers : [];
     const query = search.trim().replace(/^@/, '').toLocaleLowerCase('pt-BR');
@@ -47,7 +47,18 @@ export default function CommunitySidebar({ suggestedUsers, followedUsers, allUse
                     )}
                 </section>
                 <section className="border-t border-slate-100 pt-5">
-                    <h3 className="mb-3 text-[10px] font-bold text-slate-400 uppercase">Conversas</h3>
+                    <div className="mb-3 flex items-center justify-between">
+                        <h3 className="text-[10px] font-bold text-slate-400 uppercase">Conversas</h3>
+                        <button type="button" onClick={onCreateGroup} className="rounded-lg px-2 py-1 text-xs font-semibold text-blue-600 hover:bg-blue-50">
+                            <i className="fa-solid fa-plus mr-1" aria-hidden="true" /> Criar grupo
+                        </button>
+                    </div>
+                    {groupConversations.map((group) => (
+                        <button key={group.id} type="button" onClick={() => onChat(group)} className="mb-2 flex w-full items-center gap-3 rounded-xl border border-slate-100 p-3 text-left hover:bg-blue-50">
+                            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-blue-100 text-blue-600"><i className="fa-solid fa-users" aria-hidden="true" /></span>
+                            <span className="min-w-0"><span className="block truncate text-xs font-semibold text-slate-700">{group.name}</span><span className="text-[11px] text-slate-500">{group.participants.length} participantes</span></span>
+                        </button>
+                    ))}
                     {conversations.map(renderUser)}
                     {!conversations.length && <p className="text-xs text-slate-500">Clique no balão ao lado de um leitor para conversar.</p>}
                 </section>

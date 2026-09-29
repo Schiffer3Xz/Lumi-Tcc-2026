@@ -1,10 +1,11 @@
 import { Dialog, DialogContent, DialogDescription, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import ChatDialog from '@/features/social/ChatDialog';
 import CommunitySidebar from '@/features/social/CommunitySidebar';
+import CreateGroupDialog from '@/features/social/CreateGroupDialog';
 import PostFeed from '@/features/social/PostFeed';
 
 import ReaderLayout from '@/layouts/reader-layout';
-import { Link } from '@inertiajs/react';
+import { Link, router } from '@inertiajs/react';
 import { useEffect, useRef, useState } from 'react';
 
 export default function Feed({
@@ -17,15 +18,19 @@ export default function Feed({
     posts = [],
     filters = {},
     directMessages = {},
+    groupConversations = [],
 }) {
     const user = auth?.user ?? { name: 'Estudante', email: '' };
     const [chatUser, setChatUser] = useState(null);
     const [peopleOpen, setPeopleOpen] = useState(false);
+    const [createGroupOpen, setCreateGroupOpen] = useState(false);
+    const activeGroup = chatUser?.is_group ? groupConversations.find((group) => group.id === chatUser.id) : null;
     const openChatTimerRef = useRef(null);
 
     useEffect(() => () => window.clearTimeout(openChatTimerRef.current), []);
 
     const openChat = (reader) => {
+        router.reload({ only: ['directMessages', 'groupConversations', 'conversationUsers'] });
         if (!peopleOpen) {
             setChatUser(reader);
             return;
@@ -41,8 +46,14 @@ export default function Feed({
         followedUsers,
         allUsers,
         conversationUsers,
+        groupConversations,
         trendingPosts,
         onChat: openChat,
+        onCreateGroup: () => {
+            setPeopleOpen(false);
+            window.clearTimeout(openChatTimerRef.current);
+            openChatTimerRef.current = window.setTimeout(() => setCreateGroupOpen(true), 200);
+        },
     };
 
     return (
@@ -112,14 +123,28 @@ export default function Feed({
                         <CommunitySidebar {...sidebarProps} />
                     </aside>
                 </div>
-                {chatUser && (
+                {createGroupOpen && (
+                    <CreateGroupDialog
+                        users={allUsers}
+                        onClose={() => setCreateGroupOpen(false)}
+                        onCreated={(group) => {
+                            setCreateGroupOpen(false);
+                            window.clearTimeout(openChatTimerRef.current);
+                            openChatTimerRef.current = window.setTimeout(() => setChatUser(group), 200);
+                        }}
+                    />
+                )}
+                {chatUser && (!chatUser.is_group || activeGroup) && (
                     <ChatDialog
-                        key={chatUser.id}
-                        recipient={chatUser}
+                        key={`${chatUser.is_group ? 'group' : 'user'}-${chatUser.id}`}
+                        recipient={activeGroup ?? chatUser}
                         viewerId={user.id}
-                        messages={directMessages?.[chatUser.id]?.messages ?? []}
-                        conversationId={directMessages?.[chatUser.id]?.conversation_id}
-                        onClose={() => setChatUser(null)}
+                        messages={chatUser.is_group ? (activeGroup?.messages ?? []) : (directMessages?.[chatUser.id]?.messages ?? [])}
+                        conversationId={chatUser.is_group ? chatUser.id : directMessages?.[chatUser.id]?.conversation_id}
+                        onClose={() => {
+                            setChatUser(null);
+                            router.reload({ only: ['directMessages', 'groupConversations', 'conversationUsers'] });
+                        }}
                     />
                 )}
             </ReaderLayout>
