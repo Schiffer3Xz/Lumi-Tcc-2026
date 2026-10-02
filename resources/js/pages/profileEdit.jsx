@@ -44,7 +44,7 @@ export default function ProfileEdit() {
                 <div className="mx-auto max-w-5xl space-y-6">
                     <header className="flex flex-col justify-between gap-4 border-b border-slate-200/80 pb-6 sm:flex-row sm:items-end">
                         <div>
-                            <span className="text-[10px] font-bold tracking-[0.2em] text-blue-600 uppercase">Minha conta</span>
+                            <span className="text-caption-sm font-bold tracking-[0.2em] text-blue-600 uppercase">Minha conta</span>
                             <h1 className="mt-2 text-2xl font-bold tracking-tight text-slate-900">Editar perfil</h1>
                             <p className="mt-1 max-w-xl text-sm text-slate-500">
                                 Mantenha suas informações atualizadas para que outros leitores reconheçam você.
@@ -54,7 +54,7 @@ export default function ProfileEdit() {
                             href={route('profile')}
                             className="inline-flex items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-xs font-semibold text-slate-600 transition-colors hover:border-slate-300 hover:bg-slate-50"
                         >
-                            <i className="fa-solid fa-arrow-left text-[11px]" />
+                            <i className="fa-solid fa-arrow-left text-caption" />
                             Voltar ao perfil
                         </Link>
                     </header>
@@ -184,7 +184,7 @@ export default function ProfileEdit() {
                                         disabled={processing}
                                         className="inline-flex items-center justify-center gap-2 rounded-xl bg-blue-600 px-5 py-3 text-xs font-bold text-white shadow-sm shadow-blue-200 transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60"
                                     >
-                                        <i className={`fa-solid ${processing ? 'fa-spinner fa-spin' : 'fa-check'} text-[11px]`} />
+                                        <i className={`fa-solid ${processing ? 'fa-spinner fa-spin' : 'fa-check'} text-caption`} />
                                         {processing ? 'Salvando...' : 'Salvar alterações'}
                                     </button>
                                 </div>

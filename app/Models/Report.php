@@ -23,7 +23,7 @@ class Report extends Model
 
     protected function casts(): array
     {
-        return ['reviewed_at' => 'datetime', 'target_snapshot' => 'array'];
+        return ['reviewed_at' => 'datetime', 'target_snapshot' => 'array', 'moderation_result' => 'array', 'moderated_at' => 'datetime'];
     }
 
     public function reporter(): BelongsTo

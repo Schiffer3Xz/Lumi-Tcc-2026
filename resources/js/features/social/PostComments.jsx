@@ -19,7 +19,7 @@ export default function PostComments({ postId, comments = [], user, inputRef, bu
     return (
         <div className="flex flex-col gap-3 pt-1">
             <form onSubmit={submit} className="flex items-center gap-2">
-                <div className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full bg-slate-800 text-[10px] font-bold text-white">
+                <div className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full bg-slate-800 text-caption-sm font-bold text-white">
                     {user.name?.charAt(0).toUpperCase()}
                 </div>
                 <div className="relative flex-1">
@@ -59,7 +59,7 @@ export default function PostComments({ postId, comments = [], user, inputRef, bu
                             type="button"
                             disabled={busy || processing}
                             onClick={() => onDelete(comment.id)}
-                            className="ml-9 text-[10px] text-slate-500 hover:text-red-600 disabled:opacity-40"
+                            className="ml-9 text-caption-sm text-slate-500 hover:text-red-600 disabled:opacity-40"
                         >
                             Excluir comentário
                         </button>

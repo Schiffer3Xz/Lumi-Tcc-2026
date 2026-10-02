@@ -82,24 +82,24 @@ export default function BookCard({
                     <div className="flex min-w-0 flex-1 flex-col p-3 sm:p-4">
                         <h3 className={cn('line-clamp-2 text-sm leading-tight font-bold text-slate-900', showActions && 'pr-9')}>{book.title}</h3>
                         <div className="mt-2 flex items-center gap-1 text-xs font-semibold text-slate-600">
-                            <i className="fa-solid fa-star text-[10px] text-yellow-400" aria-hidden="true" />
+                            <i className="fa-solid fa-star text-caption-sm text-yellow-400" aria-hidden="true" />
                             <span>{Number(book.rating || 0).toFixed(1)}</span>
                         </div>
-                        <div className="mt-auto grid grid-cols-2 gap-x-2 gap-y-2 border-t border-slate-200/80 pt-3 text-[10px] text-slate-500">
+                        <div className="mt-auto grid grid-cols-2 gap-x-2 gap-y-2 border-t border-slate-200/80 pt-3 text-caption-sm text-slate-500">
                             <span className="flex min-w-0 items-center gap-1">
-                                <i className="fa-solid fa-building text-[9px] text-slate-400" />
+                                <i className="fa-solid fa-building text-caption-xs text-slate-400" />
                                 <span className="truncate">{book.publisher ?? 'Editora não informada'}</span>
                             </span>
                             <span className="flex items-center gap-1">
-                                <i className="fa-solid fa-file-lines text-[9px] text-slate-400" />
+                                <i className="fa-solid fa-file-lines text-caption-xs text-slate-400" />
                                 {book.page_count ?? '-'} págs.
                             </span>
                             <span className="flex items-center gap-1">
-                                <i className="fa-regular fa-calendar text-[9px] text-slate-400" />
+                                <i className="fa-regular fa-calendar text-caption-xs text-slate-400" />
                                 {book.publication_year ?? '-'}
                             </span>
                             <span className="flex items-center gap-1">
-                                <i className="fa-solid fa-users text-[9px] text-slate-400" />
+                                <i className="fa-solid fa-users text-caption-xs text-slate-400" />
                                 {book.readers_count ?? 0} leitores
                             </span>
                         </div>
@@ -120,7 +120,7 @@ export default function BookCard({
             )}
             {showRating && variant !== 'catalog' && (
                 <div className="bg-lumi-navy/85 absolute top-3 right-3 flex items-center gap-1 rounded-lg px-2.5 py-1 backdrop-blur-sm">
-                    <i className="fa-solid fa-star text-[10px] text-yellow-400" aria-hidden="true" />
+                    <i className="fa-solid fa-star text-caption-sm text-yellow-400" aria-hidden="true" />
                     <span className="text-xs font-bold text-white" aria-label={`Avaliação: ${Number(book.rating || 0).toFixed(1)}`}>
                         {Number(book.rating || 0).toFixed(1)}
                     </span>

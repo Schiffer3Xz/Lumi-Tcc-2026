@@ -10,7 +10,7 @@ function QuickAccessItem({ item }) {
             </span>
             <span className="min-w-0 text-sm font-medium break-words text-gray-600 transition-colors group-hover:text-gray-900">{item.label}</span>
             <i
-                className="fa-solid fa-chevron-right ml-auto shrink-0 text-[10px] text-gray-300 transition-all group-hover:translate-x-1 group-hover:text-gray-400"
+                className="fa-solid fa-chevron-right ml-auto shrink-0 text-caption-sm text-gray-300 transition-all group-hover:translate-x-1 group-hover:text-gray-400"
                 aria-hidden="true"
             />
         </>

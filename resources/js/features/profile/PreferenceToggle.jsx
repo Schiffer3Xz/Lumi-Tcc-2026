@@ -3,7 +3,7 @@ export default function PreferenceToggle({ title, description, enabled, onChange
         <div className="flex items-start justify-between gap-2 rounded-xl border border-slate-200/60 bg-slate-50 p-3">
             <div>
                 <h4 className="text-xs font-bold text-slate-800">{title}</h4>
-                <p className="mt-0.5 text-[11px] leading-tight text-slate-400">{description}</p>
+                <p className="mt-0.5 text-caption leading-tight text-slate-400">{description}</p>
             </div>
             <button
                 type="button"

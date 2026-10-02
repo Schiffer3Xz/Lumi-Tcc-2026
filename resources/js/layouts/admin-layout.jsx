@@ -99,7 +99,7 @@ export default function AdminLayout({ title, section = 'dashboard', firstAccess 
                             {messages}
                             {children}
                         </main>
-                        <footer className="px-6 py-5 text-center text-[11px] text-slate-500">Sala de Leitura · Painel administrativo</footer>
+                        <footer className="px-6 py-5 text-center text-caption text-slate-500">Sala de Leitura · Painel administrativo</footer>
                     </div>
                 </div>
             )}

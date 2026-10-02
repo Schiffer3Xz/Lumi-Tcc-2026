@@ -11,13 +11,13 @@ export default function ProfileBookItem({ book }) {
                 </div>
                 <div className="min-w-0">
                     <h5 className="truncate text-xs font-bold text-slate-800">{book.title || 'Título indisponível'}</h5>
-                    <p className="truncate text-[11px] text-slate-500">{book.author || 'Autor não informado'}</p>
+                    <p className="truncate text-caption text-slate-500">{book.author || 'Autor não informado'}</p>
                 </div>
             </div>
 
             <div className="flex shrink-0 items-center gap-3">
                 <span
-                    className={`rounded-md px-2 py-0.5 text-[10px] font-bold ${
+                    className={`rounded-md px-2 py-0.5 text-caption-sm font-bold ${
                         book.status === 'Lendo'
                             ? 'bg-blue-100 text-blue-700'
                             : book.status === 'Lido'

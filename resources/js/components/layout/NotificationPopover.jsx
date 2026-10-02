@@ -93,7 +93,7 @@ function NotificationList({ close }) {
                             <p className="text-sm text-slate-700">
                                 <strong>{notification.actor}</strong> {messages[notification.kind]}.
                             </p>
-                            <p className="mt-1.5 text-[11px] text-slate-500">
+                            <p className="mt-1.5 text-caption text-slate-500">
                                 {new Date(notification.created_at.replace(' ', 'T') + 'Z').toLocaleString('pt-BR')} ·{' '}
                                 {notification.read_at ? 'Lida' : 'Não lida'}
                             </p>

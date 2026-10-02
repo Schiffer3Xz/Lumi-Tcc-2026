@@ -17,7 +17,7 @@ export default function GenreQuickSelect({ genres, value, onChange, onMore, disa
                             : 'border border-gray-200 bg-white text-gray-600 hover:border-gray-300 hover:bg-gray-50',
                     )}
                 >
-                    <i className={`${genre.icon} text-[10px]`} aria-hidden="true" />
+                    <i className={`${genre.icon} text-caption-sm`} aria-hidden="true" />
                     {genre.label}
                 </button>
             ))}
@@ -28,7 +28,7 @@ export default function GenreQuickSelect({ genres, value, onChange, onMore, disa
                     className="flex items-center gap-1 rounded-full border border-gray-200 bg-white px-4 py-2 text-xs font-semibold text-gray-600 transition-all hover:border-gray-300 hover:bg-gray-50 sm:text-sm"
                 >
                     Ver mais
-                    <i className="fa-solid fa-chevron-right text-[10px]" aria-hidden="true" />
+                    <i className="fa-solid fa-chevron-right text-caption-sm" aria-hidden="true" />
                 </button>
             )}
         </div>

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Post;
+use App\Services\Moderation\PublicationModeration;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -13,7 +14,7 @@ class PostController extends Controller
         return Inertia::render('newPost');
     }
 
-    public function store(Request $request)
+    public function store(Request $request, PublicationModeration $moderation)
     {
         $validated = $request->validate([
             'content' => ['nullable', 'string', 'max:5000'],
@@ -23,6 +24,8 @@ class PostController extends Controller
         if (blank($validated['content'] ?? null) && ! $request->hasFile('image')) {
             return back()->withErrors(['content' => 'Escreva algo ou adicione uma imagem.']);
         }
+
+        $moderation->validate($validated['content'] ?? null);
 
         $post = new Post([
             'fk_user_id' => $request->user()->id,
@@ -38,12 +41,13 @@ class PostController extends Controller
         return redirect()->route('list')->with('success', 'Publicação criada com sucesso.');
     }
 
-    public function update(Request $request, Post $post)
+    public function update(Request $request, Post $post, PublicationModeration $moderation)
     {
         abort_unless($post->fk_user_id === $request->user()->id, 403);
         $validated = $request->validate([
             'content' => [$post->media_url ? 'nullable' : 'required', 'string', 'max:5000'],
         ]);
+        $moderation->validate($validated['content'] ?? null);
         $post->update(['content' => $validated['content'] ?? '']);
 
         return back();

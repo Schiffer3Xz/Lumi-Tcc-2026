@@ -17,7 +17,7 @@ export default function ProfileSummary({ user, variant = 'personal', action }) {
                         <div className="min-w-0">
                             <div className="flex flex-wrap items-center gap-2">
                                 <h2 className="text-xl font-bold break-words text-slate-900">{user.name}</h2>
-                                <span className="rounded-full border border-blue-100 bg-blue-50 px-2 py-0.5 text-[10px] font-medium text-blue-600">
+                                <span className="rounded-full border border-blue-100 bg-blue-50 px-2 py-0.5 text-caption-sm font-medium text-blue-600">
                                     🛡️ Aluno Verificado
                                 </span>
                             </div>

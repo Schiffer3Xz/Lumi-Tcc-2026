@@ -63,7 +63,7 @@ export default function ProfilePosts({ posts, user, createPostHref }) {
                     href={createPostHref}
                     className="flex items-center gap-1.5 rounded-xl bg-blue-600 px-3 py-1.5 text-xs font-semibold text-white shadow-xs transition-colors hover:bg-blue-700"
                 >
-                    <i className="fa-solid fa-plus text-[10px]" />
+                    <i className="fa-solid fa-plus text-caption-sm" />
                     <span>Novo Post</span>
                 </Link>
             </div>

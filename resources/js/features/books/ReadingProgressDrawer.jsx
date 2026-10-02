@@ -109,7 +109,7 @@ export default function ReadingProgressDrawer({ books, readingProgress, onClose 
                                 <div className="min-w-0 flex-1">
                                     <h3 className="text-sm font-bold text-slate-800">{book.title}</h3>
                                     <p className="truncate text-xs text-slate-500">{textValue(book.author) || 'Autor não informado'}</p>
-                                    <p className="mt-1 text-[11px] text-slate-500">{book.page_count || '-'} páginas</p>
+                                    <p className="mt-1 text-caption text-slate-500">{book.page_count || '-'} páginas</p>
                                 </div>
                                 <i className="fa-solid fa-plus text-lumi-progress-strong text-xs" aria-hidden="true" />
                             </button>

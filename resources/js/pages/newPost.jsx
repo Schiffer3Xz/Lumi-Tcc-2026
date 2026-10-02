@@ -20,7 +20,7 @@ export default function CreatePost({ auth }) {
                     <div className="mx-auto w-full max-w-[720px]">
                         {/* CABEÇALHO */}
                         <div className="mb-4 sm:mb-5">
-                            <span className="mb-0.5 block text-[9px] font-bold tracking-widest text-blue-600 uppercase sm:text-[10px]">
+                            <span className="mb-0.5 block text-caption-xs font-bold tracking-widest text-blue-600 uppercase sm:text-caption-sm">
                                 COMUNIDADE LITERÁRIA
                             </span>
 
@@ -35,7 +35,7 @@ export default function CreatePost({ auth }) {
                                 href={route('profile')}
                                 className="group inline-flex items-center gap-2 rounded-xl px-2.5 py-2 text-xs font-semibold text-slate-400 transition-all hover:bg-white hover:text-slate-700"
                             >
-                                <i className="fa-solid fa-arrow-left text-[11px] transition-transform duration-200 group-hover:-translate-x-0.5" />
+                                <i className="fa-solid fa-arrow-left text-caption transition-transform duration-200 group-hover:-translate-x-0.5" />
 
                                 <span>Voltar</span>
                             </Link>
@@ -48,7 +48,7 @@ export default function CreatePost({ auth }) {
                         <div className="mt-4 flex items-start gap-3 rounded-xl border border-amber-100 bg-amber-50/60 p-3 sm:p-4">
                             <i className="fa-solid fa-lightbulb mt-0.5 text-sm text-amber-500" />
 
-                            <p className="text-[10px] leading-relaxed text-amber-800 sm:text-[11px]">
+                            <p className="text-caption-sm leading-relaxed text-amber-800 sm:text-caption">
                                 Você pode publicar apenas um texto ou adicionar uma imagem à sua publicação.
                             </p>
                         </div>

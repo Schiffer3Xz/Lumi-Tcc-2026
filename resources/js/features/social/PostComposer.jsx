@@ -67,11 +67,15 @@ export default function PostComposer({ user, onSubmit, processing = false, error
                 <div className="min-w-0">
                     <p className="truncate text-xs font-bold text-slate-800">{user.name}</p>
 
-                    <p className="text-[10px] text-slate-400">Nova publicação</p>
+                    <p className="text-caption-sm text-slate-400">Nova publicação</p>
                 </div>
             </div>
 
             {/* TEXTO */}
+            <p className="text-xs leading-relaxed text-slate-500">
+                O texto é analisado antes de publicar na rede social. Se for sinalizado, você poderá revisá-lo e tentar novamente. Imagens não são
+                analisadas automaticamente.
+            </p>
             <textarea
                 value={content}
                 maxLength={5000}
@@ -166,7 +170,7 @@ export default function PostComposer({ user, onSubmit, processing = false, error
                     className="flex w-full items-center justify-center gap-2 rounded-xl bg-blue-600 px-4 py-2.5 text-xs font-bold text-white shadow-xs transition-all hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-40 sm:w-auto"
                 >
                     <i className="fa-solid fa-paper-plane" />
-                    {processing ? 'Publicando...' : 'Publicar'}
+                    {processing ? 'Analisando e publicando...' : 'Publicar na rede social'}
                 </button>
             </div>
         </form>

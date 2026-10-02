@@ -87,10 +87,10 @@ export default function ProfileMenu({ user, items, variant = 'social', showPhoto
                     className={clsx(
                         'fa-solid fa-chevron-down',
                         isLibrary
-                            ? 'text-[10px] text-gray-400 transition-transform duration-200'
+                            ? 'text-caption-sm text-gray-400 transition-transform duration-200'
                             : isStatic
-                              ? 'text-[9px] text-slate-400'
-                              : 'text-[10px] text-slate-400',
+                              ? 'text-caption-xs text-slate-400'
+                              : 'text-caption-sm text-slate-400',
                         isLibrary && isOpen && 'rotate-180',
                     )}
                 />
@@ -106,7 +106,7 @@ export default function ProfileMenu({ user, items, variant = 'social', showPhoto
                     }
                 >
                     <div className={isLibrary ? 'border-b border-gray-100 px-4 py-2' : 'border-b border-slate-100 px-4 py-2.5'}>
-                        <p className={isLibrary ? 'text-xs text-gray-400' : 'text-[10px] font-bold tracking-wider text-slate-400 uppercase'}>
+                        <p className={isLibrary ? 'text-xs text-gray-400' : 'text-caption-sm font-bold tracking-wider text-slate-400 uppercase'}>
                             {isLibrary ? 'Logado como' : 'Conta'}
                         </p>
                         <p className={isLibrary ? 'truncate text-sm font-semibold text-gray-800' : 'truncate text-xs font-bold text-slate-800'}>

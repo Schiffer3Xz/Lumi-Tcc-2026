@@ -58,7 +58,7 @@ export default function UserProfilePage({ auth, targetUser, users = [], isFollow
                 {/* PAINEL PRINCIPAL DO PERFIL */}
                 <main id="reader-main-content" tabIndex={-1} className="min-w-0 flex-1 space-y-6 overflow-y-auto p-4 sm:p-6 lg:p-8">
                     <div>
-                        <span className="text-[10px] font-bold tracking-wider text-slate-400 uppercase">PERFIL SOCIAL</span>
+                        <span className="text-caption-sm font-bold tracking-wider text-slate-400 uppercase">PERFIL SOCIAL</span>
                         <h2 className="text-2xl font-bold text-slate-900">Estante do Leitor</h2>
                     </div>
 

@@ -9,7 +9,7 @@ export default function ReadingProgressItem({ reading, onAdvance, className }) {
                     <div className={cn('h-6 w-6 flex-shrink-0 rounded-full shadow-sm', reading.color)} />
                     <div>
                         <p className="font-bold text-white transition-colors group-hover:text-amber-300">{reading.title}</p>
-                        <p className="text-[11px] text-slate-400">{reading.author}</p>
+                        <p className="text-caption text-slate-400">{reading.author}</p>
                     </div>
                 </div>
                 <div className="flex shrink-0 items-center gap-1">

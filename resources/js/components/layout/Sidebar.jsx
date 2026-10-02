@@ -57,7 +57,7 @@ export default function Sidebar({ id, items, activeItem, isOpen, onClose, onNavi
                                 />
                             )}
                             <i aria-hidden="true" className={`${item.icon} text-lg`} />
-                            <span className="text-[10px] font-medium">{item.label}</span>
+                            <span className="text-caption-sm font-medium">{item.label}</span>
                         </Link>
                     );
                 })}

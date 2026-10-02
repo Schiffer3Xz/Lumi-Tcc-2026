@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Post;
 use App\Models\Report;
+use App\Services\Moderation\ReportModeration;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -16,7 +17,7 @@ class ReportController extends Controller
             'content' => ['required', 'string', 'max:100'],
         ]);
 
-        DB::transaction(function () use ($request, $post, $validated) {
+        $report = DB::transaction(function () use ($request, $post, $validated) {
             // Serialize submissions for this post to avoid duplicate pending reports.
             $post = Post::with('user')->lockForUpdate()->findOrFail($post->id);
             $exists = Report::where('fk_user_id', $request->user()->id)
@@ -24,7 +25,7 @@ class ReportController extends Controller
                 ->where('status', 'pending')->exists();
 
             if (! $exists) {
-                Report::create([
+                return Report::create([
                     'content' => $validated['content'],
                     'fk_user_id' => $request->user()->id,
                     'fk_post_id' => $post->id,
@@ -36,6 +37,10 @@ class ReportController extends Controller
                 ]);
             }
         });
+
+        if ($report) {
+            app(ReportModeration::class)->enqueue($report);
+        }
 
         return back()->with('success', 'Sua denúncia está na fila de análise.');
     }

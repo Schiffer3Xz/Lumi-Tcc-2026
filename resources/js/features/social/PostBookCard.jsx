@@ -8,11 +8,11 @@ export default function PostBookCard({ book }) {
             </div>
 
             <div className="min-w-0">
-                <span className="rounded-md bg-amber-100 px-2 py-0.5 text-[9px] font-bold tracking-wider text-amber-800 uppercase">{book.badge}</span>
+                <span className="rounded-md bg-amber-100 px-2 py-0.5 text-caption-xs font-bold tracking-wider text-amber-800 uppercase">{book.badge}</span>
 
                 <p className="mt-1 truncate text-xs font-bold text-slate-800">{book.title}</p>
 
-                <p className="text-[10px] text-slate-500">{book.author}</p>
+                <p className="text-caption-sm text-slate-500">{book.author}</p>
             </div>
         </div>
     );

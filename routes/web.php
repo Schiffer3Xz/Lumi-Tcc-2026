@@ -149,6 +149,7 @@ Route::middleware(['RoleMiddleware'])->group(function () {
 
             Route::get('admin/reports', [AdminReportController::class, 'index'])->name('admin.reports.index');
             Route::patch('admin/reports/{report}', [AdminReportController::class, 'update'])->name('admin.reports.update');
+            Route::post('admin/reports/{report}/moderation', [AdminReportController::class, 'moderate'])->middleware('throttle:6,1')->name('admin.reports.moderate');
 
             // ========================================================
             // CATEGORIES

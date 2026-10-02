@@ -5,7 +5,7 @@ export default function ProfileReaderSidebar({ users, selectedUserId, onSelectUs
     return (
         <aside className={cn('hidden w-80 shrink-0 space-y-6 overflow-y-auto border-l border-slate-200/80 bg-white p-6 lg:block', className)}>
             <div>
-                <span className="text-[10px] font-bold tracking-wider text-slate-400 uppercase">COMUNIDADE</span>
+                <span className="text-caption-sm font-bold tracking-wider text-slate-400 uppercase">COMUNIDADE</span>
                 <h3 className="text-base font-bold text-slate-900">Outros Usuários</h3>
             </div>
 

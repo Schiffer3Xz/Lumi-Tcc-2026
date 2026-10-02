@@ -2,6 +2,7 @@ import Modal from '@/components/shared/Modal';
 import { useForm } from '@inertiajs/react';
 import AdminField from '../AdminField';
 import AdminForm from '../AdminForm';
+import ReportModerationPanel from './ReportModerationPanel';
 import ReportStatusBadge from './ReportStatusBadge';
 import { reportDate, reportStatuses } from './report-utils';
 
@@ -36,6 +37,7 @@ export default function ReportReviewDialog({ report, onClose }) {
                     </header>
                     <div className="mb-6 space-y-5">
                         <ReportStatusBadge status={report.status} />
+                        <ReportModerationPanel report={report} />
                         <section>
                             <h3 className="text-xs font-bold tracking-wide text-slate-500 uppercase">Motivo informado por {report.reporter}</h3>
                             <p className="mt-2 text-sm break-words whitespace-pre-wrap">{report.content}</p>

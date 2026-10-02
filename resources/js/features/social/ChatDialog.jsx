@@ -277,7 +277,7 @@ export default function ChatDialog({ recipient, viewerId, messages = [], convers
                                         )}
                                         <p className="break-words whitespace-pre-wrap">{message.content}</p>
 
-                                        <p className={`mt-1 text-[10px] ${mine ? 'text-blue-100' : 'text-slate-400'}`}>
+                                        <p className={`mt-1 text-caption-sm ${mine ? 'text-blue-100' : 'text-slate-400'}`}>
                                             {message.pending
                                                 ? 'Enviando...'
                                                 : new Date(message.created_at).toLocaleTimeString('pt-BR', {

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Report;
+use App\Services\Moderation\ReportModeration;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
@@ -39,6 +40,11 @@ class AdminReportController extends Controller
                 'reviewer' => $report->reviewer?->name,
                 'review_note' => $report->review_note,
                 'reviewed_at' => $report->reviewed_at?->toIso8601String(),
+                'moderation' => [
+                    'status' => $report->moderation_status,
+                    'result' => $report->moderation_result,
+                    'analyzed_at' => $report->moderated_at?->toIso8601String(),
+                ],
                 'target' => [
                     'type' => $snapshot['type'] ?? ($report->fk_comment_id ? 'comment' : 'post'),
                     'author' => $snapshot['author'] ?? $target?->user?->name ?? 'Conta removida',
@@ -72,5 +78,13 @@ class AdminReportController extends Controller
         ]);
 
         return back()->with('success', 'Análise da denúncia atualizada.');
+    }
+
+    public function moderate(Request $request, Report $report, ReportModeration $moderation): RedirectResponse
+    {
+        abort_unless($request->user()->is_admin, 403);
+        $moderation->enqueue($report);
+
+        return back()->with('success', 'Solicitação registrada. Consulte a análise automática no painel.');
     }
 }

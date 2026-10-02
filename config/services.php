@@ -2,6 +2,12 @@
 
 return [
 
+    'openai' => [
+        'key' => env('OPENAI_API_KEY'),
+        'moderation_enabled' => env('OPENAI_MODERATION_ENABLED', false),
+        'moderation_model' => 'omni-moderation-latest',
+    ],
+
     /*
     |--------------------------------------------------------------------------
     | Third Party Services

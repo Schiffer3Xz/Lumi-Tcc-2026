@@ -21,11 +21,11 @@ export default function AdminTopbar({ isMenuOpen, onMenuToggle }) {
                 </div>
                 <div>
                     <p className="text-sm font-bold text-slate-800">Sala de Leitura</p>
-                    <p className="hidden text-[11px] text-slate-500 sm:block">Plataforma Escolar Web</p>
+                    <p className="hidden text-caption text-slate-500 sm:block">Plataforma Escolar Web</p>
                 </div>
             </div>
             <div className="flex items-center gap-3">
-                <span className="hidden rounded-full border border-blue-100 bg-blue-50 px-3 py-1 text-[10px] font-bold text-blue-600 sm:block">
+                <span className="hidden rounded-full border border-blue-100 bg-blue-50 px-3 py-1 text-caption-sm font-bold text-blue-600 sm:block">
                     ADMINISTRADOR
                 </span>
                 <Dropdown.Root>
@@ -37,7 +37,7 @@ export default function AdminTopbar({ isMenuOpen, onMenuToggle }) {
                             {auth.user.name.slice(0, 1).toLocaleUpperCase('pt-BR')}
                         </span>
                         <span className="hidden max-w-36 truncate text-xs font-semibold sm:block">{auth.user.name}</span>
-                        <i className="fa-solid fa-chevron-down text-[10px]" aria-hidden="true" />
+                        <i className="fa-solid fa-chevron-down text-caption-sm" aria-hidden="true" />
                     </Dropdown.Trigger>
                     <Dropdown.Portal>
                         <Dropdown.Content

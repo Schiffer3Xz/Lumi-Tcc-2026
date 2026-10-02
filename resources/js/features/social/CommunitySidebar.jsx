@@ -29,7 +29,7 @@ export default function CommunitySidebar({ suggestedUsers, followedUsers, allUse
                 <section>
                     <div className="mb-3 flex items-center justify-between gap-2">
                         <h3 className="text-xs font-bold text-slate-800 uppercase">{query ? 'Resultados da busca' : 'Sugestões para você'}</h3>
-                        <span className="rounded-full border border-emerald-200 bg-emerald-50 px-2 py-0.5 text-[10px] font-bold text-emerald-600">
+                        <span className="rounded-full border border-emerald-200 bg-emerald-50 px-2 py-0.5 text-caption-sm font-bold text-emerald-600">
                             {users.length} encontrados
                         </span>
                     </div>
@@ -39,8 +39,8 @@ export default function CommunitySidebar({ suggestedUsers, followedUsers, allUse
                     )}
                 </section>
                 <section className="border-t border-slate-100 pt-5">
-                    <h3 className="mb-2 text-[10px] font-bold text-slate-400 uppercase">Amigos adicionados · {followedUsers.length}</h3>
-                    <p className="mb-3 text-[11px] text-slate-500">Leitores que você segue.</p>
+                    <h3 className="mb-2 text-caption-sm font-bold text-slate-400 uppercase">Amigos adicionados · {followedUsers.length}</h3>
+                    <p className="mb-3 text-caption text-slate-500">Leitores que você segue.</p>
                     {followedUsers.map(renderUser)}
                     {!followedUsers.length && (
                         <p className="text-xs text-slate-500">Use o botão de seguir nas sugestões para adicionar leitores aqui.</p>
@@ -48,7 +48,7 @@ export default function CommunitySidebar({ suggestedUsers, followedUsers, allUse
                 </section>
                 <section className="border-t border-slate-100 pt-5">
                     <div className="mb-3 flex items-center justify-between">
-                        <h3 className="text-[10px] font-bold text-slate-400 uppercase">Conversas</h3>
+                        <h3 className="text-caption-sm font-bold text-slate-400 uppercase">Conversas</h3>
                         <button type="button" onClick={onCreateGroup} className="rounded-lg px-2 py-1 text-xs font-semibold text-blue-600 hover:bg-blue-50">
                             <i className="fa-solid fa-plus mr-1" aria-hidden="true" /> Criar grupo
                         </button>
@@ -56,18 +56,18 @@ export default function CommunitySidebar({ suggestedUsers, followedUsers, allUse
                     {groupConversations.map((group) => (
                         <button key={group.id} type="button" onClick={() => onChat(group)} className="mb-2 flex w-full items-center gap-3 rounded-xl border border-slate-100 p-3 text-left hover:bg-blue-50">
                             <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-blue-100 text-blue-600"><i className="fa-solid fa-users" aria-hidden="true" /></span>
-                            <span className="min-w-0"><span className="block truncate text-xs font-semibold text-slate-700">{group.name}</span><span className="text-[11px] text-slate-500">{group.participants.length} participantes</span></span>
+                            <span className="min-w-0"><span className="block truncate text-xs font-semibold text-slate-700">{group.name}</span><span className="text-caption text-slate-500">{group.participants.length} participantes</span></span>
                         </button>
                     ))}
                     {conversations.map(renderUser)}
                     {!conversations.length && <p className="text-xs text-slate-500">Clique no balão ao lado de um leitor para conversar.</p>}
                 </section>
                 <section className="border-t border-slate-100 pt-5">
-                    <h3 className="mb-2 flex items-center gap-1.5 text-[10px] font-bold text-slate-400 uppercase">
+                    <h3 className="mb-2 flex items-center gap-1.5 text-caption-sm font-bold text-slate-400 uppercase">
                         <i className="fa-solid fa-fire text-amber-500" aria-hidden="true" />
                         Em alta na escola
                     </h3>
-                    <p className="mb-3 text-[11px] text-slate-500">Mais interações nos últimos 7 dias.</p>
+                    <p className="mb-3 text-caption text-slate-500">Mais interações nos últimos 7 dias.</p>
                     {trendingPosts.map((post) => (
                         <Link
                             key={post.id}
@@ -76,7 +76,7 @@ export default function CommunitySidebar({ suggestedUsers, followedUsers, allUse
                         >
                             <p className="text-xs font-semibold text-slate-700">{post.author}</p>
                             <p className="mt-1 line-clamp-2 text-xs text-slate-500">{post.content}</p>
-                            <span className="mt-2 block text-[10px] text-blue-600">
+                            <span className="mt-2 block text-caption-sm text-blue-600">
                                 {post.interactions} {post.interactions === 1 ? 'interação' : 'interações'}
                             </span>
                         </Link>

@@ -17,7 +17,7 @@ export default function ReaderListItem({ user, variant = 'profile', isActive = f
                     </div>
                     <div className="min-w-0 flex-1">
                         <p className="truncate text-xs font-bold text-slate-800">{user.name}</p>
-                        {user.nickname && <p className="truncate text-[10px] text-slate-400">@{user.nickname.replace(/^@/, '')}</p>}
+                        {user.nickname && <p className="truncate text-caption-sm text-slate-400">@{user.nickname.replace(/^@/, '')}</p>}
                     </div>
                 </Link>
                 <FollowButton userId={user.id} initialIsFollowing={user.isFollowing} compact />
@@ -31,7 +31,7 @@ export default function ReaderListItem({ user, variant = 'profile', isActive = f
                     >
                         <i className="fa-regular fa-comment text-sm" aria-hidden="true" />
                         {user.unreadMessages > 0 && (
-                            <span className="absolute -top-1 -right-1 rounded-full bg-rose-500 px-1 text-[9px] text-white">
+                            <span className="absolute -top-1 -right-1 rounded-full bg-rose-500 px-1 text-caption-xs text-white">
                                 {user.unreadMessages}
                                 <span className="sr-only"> mensagens não lidas</span>
                             </span>
@@ -60,10 +60,10 @@ export default function ReaderListItem({ user, variant = 'profile', isActive = f
                 </div>
                 <div className="min-w-0">
                     <p className="truncate text-xs font-bold text-slate-800">{user.name}</p>
-                    {user.nickname && <p className="truncate text-[10px] text-slate-400">@{user.nickname.replace('@', '')}</p>}
+                    {user.nickname && <p className="truncate text-caption-sm text-slate-400">@{user.nickname.replace('@', '')}</p>}
                 </div>
             </div>
-            <i className="fa-solid fa-chevron-right text-[10px] text-slate-400" />
+            <i className="fa-solid fa-chevron-right text-caption-sm text-slate-400" />
         </button>
     );
 }

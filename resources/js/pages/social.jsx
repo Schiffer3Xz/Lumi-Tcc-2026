@@ -66,16 +66,25 @@ export default function Feed({
                             {/* CABEÇALHO DO FEED */}
                             <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-slate-200/70 bg-white p-5 shadow-xs">
                                 <div>
-                                    <span className="mb-0.5 block text-[10px] font-bold tracking-widest text-blue-600 uppercase">
+                                    <span className="mb-0.5 block text-caption-sm font-bold tracking-widest text-blue-600 uppercase">
                                         COMUNIDADE LITERÁRIA
                                     </span>
 
                                     <h2 className="text-lg font-bold text-slate-800">Atividades e Publicações</h2>
                                 </div>
 
-                                <div className="flex items-center gap-2 rounded-xl border border-slate-200/60 bg-slate-50 px-3 py-1.5 text-xs font-medium text-slate-600">
-                                    <i className="fa-solid fa-arrow-down-wide-short text-blue-500" />
-                                    <span>Mais recentes</span>
+                                <div className="flex w-full flex-wrap items-center gap-3 sm:w-auto">
+                                    <div className="flex items-center gap-2 rounded-xl border border-slate-200/60 bg-slate-50 px-3 py-1.5 text-xs font-medium text-slate-600">
+                                        <i className="fa-solid fa-arrow-down-wide-short text-blue-500" aria-hidden="true" />
+                                        <span>Mais recentes</span>
+                                    </div>
+                                    <Link
+                                        href={route('post')}
+                                        className="inline-flex items-center justify-center gap-2 rounded-xl bg-blue-600 px-4 py-2.5 text-xs font-bold text-white shadow-xs transition-colors hover:bg-blue-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600"
+                                    >
+                                        <i className="fa-solid fa-plus" aria-hidden="true" />
+                                        Novo post
+                                    </Link>
                                 </div>
                             </div>
 

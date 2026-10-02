@@ -63,7 +63,7 @@ export default function Topbar({
                             <h1 className="truncate text-sm leading-tight font-bold text-slate-800" title={title}>
                                 {title}
                             </h1>
-                            <p className={clsx('truncate text-[11px] font-medium text-slate-400', isComposer && 'hidden sm:block')}>{subtitle}</p>
+                            <p className={clsx('truncate text-caption font-medium text-slate-400', isComposer && 'hidden sm:block')}>{subtitle}</p>
                         </div>
                     </div>
                 )}

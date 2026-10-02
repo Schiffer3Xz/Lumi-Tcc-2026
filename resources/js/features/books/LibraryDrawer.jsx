@@ -16,7 +16,7 @@ export default function LibraryDrawer({ isOpen = true, onClose, title, eyebrow, 
         >
             <div className="mb-5 flex shrink-0 items-start justify-between gap-3 border-b border-slate-100 pb-4">
                 <div className="min-w-0">
-                    {eyebrow && <p className="text-[10px] font-bold tracking-widest text-blue-600 uppercase">{eyebrow}</p>}
+                    {eyebrow && <p className="text-caption-sm font-bold tracking-widest text-blue-600 uppercase">{eyebrow}</p>}
                     <h2 id={titleId} className="text-lg font-bold text-slate-800">
                         {title}
                     </h2>

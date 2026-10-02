@@ -68,7 +68,7 @@ export default function LandingPage() {
                             className="relative z-10 mx-auto flex flex-col items-center justify-center gap-2 rounded px-4 pb-6 text-xs text-slate-300"
                         >
                             <span aria-hidden="true" className="h-6 w-px bg-slate-600" />
-                            <span className="text-[10px] font-bold tracking-widest">CONHEÇA A PLATAFORMA</span>
+                            <span className="text-caption-sm font-bold tracking-widest">CONHEÇA A PLATAFORMA</span>
                         </a>
                     </div>
                     <LandingSections />

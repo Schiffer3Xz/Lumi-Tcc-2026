@@ -125,7 +125,7 @@ export default function BookDetailsContent({ book, similarBooks = [], comments =
                         </div>
 
                         <div className="w-full rounded-2xl border border-slate-200/60 bg-white/80 p-4 text-center shadow-sm backdrop-blur-md">
-                            <span className="text-[11px] font-semibold tracking-wider text-slate-400 uppercase">Formato do Acervo</span>
+                            <span className="text-caption font-semibold tracking-wider text-slate-400 uppercase">Formato do Acervo</span>
                             <p className="mt-1 flex items-center justify-center gap-2 text-sm font-medium text-slate-800">
                                 <i className="fa-solid fa-barcode text-blue-600" />
                                 ISBN / Código: {book.isbn || 'Não informado'}
@@ -138,7 +138,7 @@ export default function BookDetailsContent({ book, similarBooks = [], comments =
                         <div className="space-y-6">
                             <div>
                                 <div className="flex items-center gap-2">
-                                    <span className="rounded-md bg-blue-50 px-2.5 py-1 text-[11px] font-bold tracking-wider text-blue-600 uppercase">
+                                    <span className="rounded-md bg-blue-50 px-2.5 py-1 text-caption font-bold tracking-wider text-blue-600 uppercase">
                                         {relationName(book.genre)}
                                     </span>
                                     <span className="text-slate-300">•</span>
@@ -153,7 +153,7 @@ export default function BookDetailsContent({ book, similarBooks = [], comments =
                             {/* Metrics Grid */}
                             <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
                                 <div className="rounded-2xl border border-slate-100 bg-slate-50 p-4">
-                                    <span className="block text-[11px] font-bold tracking-wider text-slate-400 uppercase">Avaliação</span>
+                                    <span className="block text-caption font-bold tracking-wider text-slate-400 uppercase">Avaliação</span>
                                     <div className="mt-1.5 flex items-center gap-1.5">
                                         <i className="fa-solid fa-star text-sm text-yellow-400" />
                                         <strong className="text-base text-slate-900">{Number(book.rating || 0).toFixed(1)}</strong>
@@ -161,15 +161,15 @@ export default function BookDetailsContent({ book, similarBooks = [], comments =
                                     </div>
                                 </div>
                                 <div className="rounded-2xl border border-slate-100 bg-slate-50 p-4">
-                                    <span className="block text-[11px] font-bold tracking-wider text-slate-400 uppercase">Páginas</span>
+                                    <span className="block text-caption font-bold tracking-wider text-slate-400 uppercase">Páginas</span>
                                     <strong className="mt-1.5 block text-base text-slate-900">{book.page_count ?? '-'}</strong>
                                 </div>
                                 <div className="rounded-2xl border border-slate-100 bg-slate-50 p-4">
-                                    <span className="block text-[11px] font-bold tracking-wider text-slate-400 uppercase">Publicação</span>
+                                    <span className="block text-caption font-bold tracking-wider text-slate-400 uppercase">Publicação</span>
                                     <strong className="mt-1.5 block text-base text-slate-900">{book.publication_year ?? '-'}</strong>
                                 </div>
                                 <div className="rounded-2xl border border-slate-100 bg-slate-50 p-4">
-                                    <span className="block text-[11px] font-bold tracking-wider text-slate-400 uppercase">Leitores</span>
+                                    <span className="block text-caption font-bold tracking-wider text-slate-400 uppercase">Leitores</span>
                                     <strong className="mt-1.5 block text-base text-slate-900">{book.readers_count ?? 0}</strong>
                                 </div>
                             </div>
@@ -312,7 +312,7 @@ export default function BookDetailsContent({ book, similarBooks = [], comments =
                             <div className="min-w-0 flex-1">
                                 <h4 className="truncate text-sm font-bold text-slate-900">{item.title}</h4>
                                 <p className="mt-0.5 text-xs text-slate-500">{relationName(item.author)}</p>
-                                <span className="mt-2 inline-block cursor-pointer text-[11px] font-semibold text-blue-600 hover:underline">
+                                <span className="mt-2 inline-block cursor-pointer text-caption font-semibold text-blue-600 hover:underline">
                                     Ver detalhes →
                                 </span>
                             </div>
@@ -330,15 +330,15 @@ export default function BookDetailsContent({ book, similarBooks = [], comments =
                     <div className="mt-5 space-y-3">
                         {comments.map((item) => (
                             <article key={item.id} className="flex items-start gap-2.5 pt-1 text-xs">
-                                <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-slate-800 text-[11px] font-bold text-white">
+                                <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-slate-800 text-caption font-bold text-white">
                                     {item.author.charAt(0).toUpperCase()}
                                 </div>
                                 <div className="flex-1 rounded-xl border border-slate-100 bg-slate-50/80 p-3">
                                     <div className="flex items-center justify-between gap-3">
                                         <div className="flex min-w-0 items-center gap-2">
-                                            <span className="truncate text-[11px] font-bold text-slate-800">{item.author}</span>
-                                            <span className="flex items-center gap-1 text-[10px] font-semibold text-slate-500">
-                                                <i className="fa-solid fa-star text-[9px] text-yellow-400" aria-hidden="true" />
+                                            <span className="truncate text-caption font-bold text-slate-800">{item.author}</span>
+                                            <span className="flex items-center gap-1 text-caption-sm font-semibold text-slate-500">
+                                                <i className="fa-solid fa-star text-caption-xs text-yellow-400" aria-hidden="true" />
                                                 {Number(item.rating).toFixed(1)}
                                             </span>
                                         </div>
@@ -368,7 +368,7 @@ export default function BookDetailsContent({ book, similarBooks = [], comments =
                                             </div>
                                         )}
                                     </div>
-                                    <p className="mt-1.5 text-[11px] leading-relaxed text-slate-600">{item.comment}</p>
+                                    <p className="mt-1.5 text-caption leading-relaxed text-slate-600">{item.comment}</p>
                                 </div>
                             </article>
                         ))}

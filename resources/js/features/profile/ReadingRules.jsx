@@ -14,7 +14,7 @@ export default function ReadingRules({ rules }) {
             <ol className="space-y-2 text-xs text-slate-700">
                 {rules.map((rule, idx) => (
                     <li key={rule} className="flex items-start gap-2.5">
-                        <span className="mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-yellow-400/40 text-[10px] font-bold text-yellow-900">
+                        <span className="mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-yellow-400/40 text-caption-sm font-bold text-yellow-900">
                             {idx + 1}
                         </span>
                         <span>{rule}</span>

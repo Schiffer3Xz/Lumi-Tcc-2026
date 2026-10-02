@@ -143,10 +143,10 @@ export default function PostCard({ post, user }) {
                                 {post.author?.name}
                             </Link>
 
-                            {post.author?.username && <span className="text-[11px] text-slate-400">@{post.author.username}</span>}
+                            {post.author?.username && <span className="text-caption text-slate-400">@{post.author.username}</span>}
                         </div>
 
-                        <p className="text-[10px] text-slate-400">{post.time}</p>
+                        <p className="text-caption-sm text-slate-400">{post.time}</p>
                     </div>
                 </div>
 
