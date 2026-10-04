@@ -2,8 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use App\Events\MessageSent;
+use App\Events\ConversationUpdated;
 use App\Events\GroupUpdated;
+use App\Events\MessageSent;
 use App\Models\Conversation;
 use App\Models\Message;
 use App\Models\User;
@@ -32,7 +33,7 @@ class DirectMessageController extends Controller
                 ->whereHas('participants', fn ($query) => $query->where('users.id', $userId))
                 ->first();
 
-            if (!$conversation) {
+            if (! $conversation) {
                 $conversation = Conversation::create(['is_group' => false]);
                 $conversation->participants()->attach([$myId, $userId]);
             }
@@ -64,6 +65,8 @@ class DirectMessageController extends Controller
             return $conversation;
         });
 
+        event(new ConversationUpdated($conversation->id, $conversation->participants()->pluck('users.id')->all()));
+
         return to_route('list', ['group' => $conversation->id]);
     }
 
@@ -91,6 +94,7 @@ class DirectMessageController extends Controller
         });
 
         event(new GroupUpdated($conversation->id, $participantIds, $user->id));
+        event(new ConversationUpdated($conversation->id, $participantIds, $user->id));
 
         return response()->noContent();
     }
@@ -109,6 +113,7 @@ class DirectMessageController extends Controller
         });
 
         event(new GroupUpdated($conversation->id, $participantIds, deleted: true));
+        event(new ConversationUpdated($conversation->id, $participantIds, deleted: true));
 
         return response()->noContent();
     }
@@ -134,6 +139,7 @@ class DirectMessageController extends Controller
         });
 
         event(new MessageSent($message));
+        event(new ConversationUpdated($conversation->id, $conversation->participants()->pluck('users.id')->all()));
 
         return response()->json([
             'sent' => true,

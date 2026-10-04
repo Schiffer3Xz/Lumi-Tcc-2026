@@ -2,10 +2,15 @@
 
 namespace Tests\Feature;
 
+use App\Events\ConversationUpdated;
+use App\Events\MessageSent;
+use App\Models\Conversation;
+use App\Models\Message;
 use App\Models\Post;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Event;
 use Inertia\Testing\AssertableInertia as Assert;
 use Tests\TestCase;
 
@@ -77,68 +82,72 @@ class SocialCommunityTest extends TestCase
 
     public function test_private_messages_are_persistent_and_only_participants_can_see_them(): void
     {
-        $sender = User::factory()->create();
-        $recipient = User::factory()->create();
-        $stranger = User::factory()->create();
-        $this->actingAs($sender)->postJson('/messages/'.$recipient->id, ['content' => 'Uma leitura para você', 'sender_id' => $stranger->id])->assertCreated();
-        $this->assertDatabaseHas('direct_messages', ['sender_id' => $sender->id, 'recipient_id' => $recipient->id, 'content' => 'Uma leitura para você']);
-        $this->getJson('/messages/'.$recipient->id)->assertOk()->assertJsonCount(1, 'messages');
-        $this->actingAs($recipient)->getJson('/messages/'.$sender->id)->assertOk()
-            ->assertJsonPath('messages.0.content', 'Uma leitura para você')->assertJsonPath('messages.0.sender_id', $sender->id);
-        $this->actingAs($stranger)->getJson('/messages/'.$recipient->id)->assertOk()->assertJsonCount(0, 'messages');
-        $this->getJson('/messages/'.$sender->id)->assertOk()->assertJsonCount(0, 'messages');
+        Event::fake([MessageSent::class, ConversationUpdated::class]);
+        [$sender, $recipient, $stranger] = User::factory()->count(3)->create()->all();
+        $response = $this->actingAs($sender)->postJson(route('chat'), [
+            'user_id' => $recipient->id, 'content' => 'Uma leitura para você', 'fk_user_id' => $stranger->id,
+        ])->assertCreated()->assertJsonPath('message.user_id', $sender->id);
+        $this->assertDatabaseHas('messages', [
+            'fk_user_id' => $sender->id, 'fk_conversation_id' => $response->json('conversation_id'), 'content' => 'Uma leitura para você',
+        ]);
+        $this->withoutVite()->get('/social')->assertInertia(fn (Assert $page) => $page
+            ->where('directMessages.'.$recipient->id.'.messages.0.user_id', $sender->id));
+        $this->actingAs($recipient)->get('/social')->assertInertia(fn (Assert $page) => $page
+            ->where('directMessages.'.$sender->id.'.messages.0.content', 'Uma leitura para você'));
+        $this->actingAs($stranger)->get('/social')->assertInertia(fn (Assert $page) => $page->has('directMessages', 0));
     }
 
     public function test_messages_require_authentication_valid_recipient_and_nonempty_content(): void
     {
-        $reader = User::factory()->create();
-        $recipient = User::factory()->create();
+        Event::fake([MessageSent::class, ConversationUpdated::class]);
+        [$reader, $recipient] = User::factory()->count(2)->create()->all();
         $admin = User::factory()->create(['is_admin' => true]);
-        $this->getJson('/messages/'.$recipient->id)->assertUnauthorized();
-        $this->postJson('/messages/'.$recipient->id, ['content' => 'Olá'])->assertUnauthorized();
-        $this->postJson('/messages/'.$recipient->id.'/read', ['through' => 1])->assertUnauthorized();
-        $this->actingAs($reader)->postJson('/messages/'.$reader->id, ['content' => 'Olá'])->assertStatus(422);
-        $this->postJson('/messages/'.$admin->id, ['content' => 'Olá'])->assertNotFound();
-        $this->postJson('/messages/99999', ['content' => 'Olá'])->assertNotFound();
-        foreach (['', '  ', str_repeat('a', 2001)] as $content) {
-            $this->postJson('/messages/'.$recipient->id, ['content' => $content])->assertUnprocessable()->assertJsonValidationErrors('content');
+        $this->postJson(route('chat'), ['user_id' => $recipient->id, 'content' => 'Olá'])->assertUnauthorized();
+        $this->actingAs($reader)->postJson(route('chat'), ['user_id' => $reader->id, 'content' => 'Olá'])->assertUnprocessable();
+        $this->postJson(route('chat'), ['user_id' => $admin->id, 'content' => 'Olá'])->assertNotFound();
+        $this->postJson(route('chat'), ['user_id' => 99999, 'content' => 'Olá'])->assertUnprocessable();
+        foreach (['', '  ', str_repeat('a', 5001)] as $content) {
+            $this->postJson(route('chat'), ['user_id' => $recipient->id, 'content' => $content])
+                ->assertUnprocessable()->assertJsonValidationErrors('content');
         }
-        $this->assertDatabaseCount('direct_messages', 0);
+        $this->assertDatabaseCount('messages', 0);
+        $this->assertDatabaseCount('conversations', 0);
     }
 
-    public function test_message_history_is_paginated_without_exposing_other_conversations(): void
+    public function test_message_history_preserves_order_without_exposing_other_conversations(): void
     {
-        $sender = User::factory()->create();
-        $recipient = User::factory()->create();
-        $stranger = User::factory()->create();
+        Event::fake([MessageSent::class, ConversationUpdated::class]);
+        [$sender, $recipient, $stranger] = User::factory()->count(3)->create()->all();
+        $conversation = Conversation::create(['is_group' => false]);
+        $conversation->participants()->attach([$sender->id, $recipient->id]);
         foreach (range(1, 55) as $index) {
-            DB::table('direct_messages')->insert(['sender_id' => $sender->id, 'recipient_id' => $recipient->id, 'content' => 'Mensagem '.$index, 'created_at' => now(), 'updated_at' => now()]);
+            Message::create([
+                'fk_user_id' => $sender->id, 'fk_conversation_id' => $conversation->id,
+                'content' => 'Mensagem '.$index, 'created_at' => now()->addSeconds($index),
+            ]);
         }
-        $this->actingAs($stranger)->postJson('/messages/'.$recipient->id, ['content' => 'Outra conversa']);
-        $response = $this->actingAs($recipient)->getJson('/messages/'.$sender->id)->assertOk()
-            ->assertJsonCount(50, 'messages')->assertJsonPath('hasOlder', true)
-            ->assertJsonPath('messages.0.content', 'Mensagem 6')->assertJsonPath('messages.49.content', 'Mensagem 55');
-        $this->getJson('/messages/'.$sender->id.'?before='.$response->json('messages.0.id'))
-            ->assertOk()->assertJsonCount(5, 'messages')->assertJsonPath('hasOlder', false)->assertJsonPath('messages.0.content', 'Mensagem 1');
+        $this->actingAs($stranger)->postJson(route('chat'), ['user_id' => $recipient->id, 'content' => 'Outra conversa'])->assertCreated();
+        $this->withoutVite()->actingAs($recipient)->get('/social')->assertInertia(fn (Assert $page) => $page
+            ->has('directMessages.'.$sender->id.'.messages', 55)
+            ->where('directMessages.'.$sender->id.'.messages.0.content', 'Mensagem 1')
+            ->where('directMessages.'.$sender->id.'.messages.54.content', 'Mensagem 55')
+            ->has('directMessages.'.$stranger->id.'.messages', 1));
+        $this->actingAs($stranger)->get('/social')->assertInertia(fn (Assert $page) => $page
+            ->has('directMessages', 1)->missing('directMessages.'.$sender->id));
     }
 
-    public function test_inbox_shows_unread_messages_and_read_action_only_marks_received_messages_through_cursor(): void
+    public function test_inbox_discovers_new_conversations_without_requiring_a_follow(): void
     {
-        $sender = User::factory()->create();
-        $recipient = User::factory()->create();
-        $stranger = User::factory()->create();
-        $this->actingAs($sender)->postJson('/messages/'.$recipient->id, ['content' => 'Primeira']);
-        $first = DB::table('direct_messages')->value('id');
-        $this->postJson('/messages/'.$recipient->id, ['content' => 'Segunda']);
-        $second = DB::table('direct_messages')->max('id');
-        $this->postJson('/messages/'.$recipient->id.'/read', ['through' => $second])->assertNoContent();
-        $this->assertDatabaseHas('direct_messages', ['id' => $first, 'read_at' => null]);
+        Event::fake([MessageSent::class, ConversationUpdated::class]);
+        [$sender, $recipient, $stranger] = User::factory()->count(3)->create()->all();
+        $this->actingAs($sender)->postJson(route('chat'), ['user_id' => $recipient->id, 'content' => 'Primeira'])->assertCreated();
+        $this->postJson(route('chat'), ['user_id' => $recipient->id, 'content' => 'Segunda'])->assertCreated();
+        $this->assertDatabaseCount('conversations', 1);
+        $this->assertDatabaseCount('follows', 0);
         $this->withoutVite()->actingAs($recipient)->get('/social')->assertInertia(fn (Assert $page) => $page
-            ->has('conversationUsers', 1)->where('conversationUsers.0.id', $sender->id)->where('conversationUsers.0.unreadMessages', 2));
-        $this->postJson('/messages/'.$sender->id.'/read', ['through' => $first])->assertNoContent();
-        $this->assertNotNull(DB::table('direct_messages')->where('id', $first)->value('read_at'));
-        $this->assertDatabaseHas('direct_messages', ['id' => $second, 'read_at' => null]);
-        $this->get('/social')->assertInertia(fn (Assert $page) => $page->where('conversationUsers.0.unreadMessages', 1));
-        $this->actingAs($stranger)->get('/social')->assertInertia(fn (Assert $page) => $page->has('conversationUsers', 0));
+            ->has('conversationUsers', 1)->where('conversationUsers.0.id', $sender->id)
+            ->has('directMessages.'.$sender->id.'.messages', 2));
+        $this->actingAs($stranger)->get('/social')->assertInertia(fn (Assert $page) => $page
+            ->has('conversationUsers', 0)->has('directMessages', 0));
     }
 }

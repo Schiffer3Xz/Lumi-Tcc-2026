@@ -3,6 +3,7 @@ import ChatDialog from '@/features/social/ChatDialog';
 import CommunitySidebar from '@/features/social/CommunitySidebar';
 import CreateGroupDialog from '@/features/social/CreateGroupDialog';
 import PostFeed from '@/features/social/PostFeed';
+import subscribeToChat from '@/features/social/subscribeToChat';
 
 import ReaderLayout from '@/layouts/reader-layout';
 import { Link, router } from '@inertiajs/react';
@@ -28,6 +29,21 @@ export default function Feed({
     const openChatTimerRef = useRef(null);
 
     useEffect(() => () => window.clearTimeout(openChatTimerRef.current), []);
+
+    useEffect(
+        () =>
+            subscribeToChat({
+                echo: window.Echo,
+                viewerId: user.id,
+                reload: (options) => router.reload(options),
+                onUpdate: (event) => {
+                    if (event.deleted || Number(event.removedUserId) === Number(user.id)) {
+                        setChatUser((current) => (current?.is_group && Number(current.id) === Number(event.conversationId) ? null : current));
+                    }
+                },
+            }),
+        [user.id],
+    );
 
     const openChat = (reader) => {
         router.reload({ only: ['directMessages', 'groupConversations', 'conversationUsers'] });
@@ -66,7 +82,7 @@ export default function Feed({
                             {/* CABEÇALHO DO FEED */}
                             <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-slate-200/70 bg-white p-5 shadow-xs">
                                 <div>
-                                    <span className="mb-0.5 block text-caption-sm font-bold tracking-widest text-blue-600 uppercase">
+                                    <span className="text-caption-sm mb-0.5 block font-bold tracking-widest text-blue-600 uppercase">
                                         COMUNIDADE LITERÁRIA
                                     </span>
 
