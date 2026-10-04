@@ -25,6 +25,7 @@ class PublicationModeration
         if ($analysis['result']['flagged']) {
             throw ValidationException::withMessages([
                 'content' => 'Este texto foi sinalizado pela moderação. Revise possíveis ofensas ou conteúdo prejudicial antes de publicar na rede social.',
+                'moderation' => 'Nossa equipe identificou possível conteúdo ofensivo ou inadequado. A publicação foi bloqueada.',
             ]);
         }
     }

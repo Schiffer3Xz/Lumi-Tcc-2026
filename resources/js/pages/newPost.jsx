@@ -1,26 +1,33 @@
+import ModerationAlert from '@/features/social/ModerationAlert';
 import PostComposer from '@/features/social/PostComposer';
 import ReaderLayout from '@/layouts/reader-layout';
 import { Link, useForm } from '@inertiajs/react';
+import { useState } from 'react';
 
 export default function CreatePost({ auth }) {
     const user = auth?.user ?? { name: 'Estudante', email: '' };
     const form = useForm({ content: '', image: null });
+    const [moderationMessage, setModerationMessage] = useState('');
 
     const handleSubmit = ({ content, image }) => {
         if (form.processing) return;
         form.transform(() => ({ content, image }));
         form.post(route('posts.store'), {
             forceFormData: true,
+            onError: (errors) => {
+                if (errors.moderation) setModerationMessage(errors.moderation);
+            },
         });
     };
     return (
         <>
+            <ModerationAlert message={moderationMessage} onClose={() => setModerationMessage('')} />
             <ReaderLayout title="Criar Publicação" user={user} activeItem="usuarios" variant="composer">
                 <main id="reader-main-content" tabIndex={-1} className="min-w-0 flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8">
                     <div className="mx-auto w-full max-w-[720px]">
                         {/* CABEÇALHO */}
                         <div className="mb-4 sm:mb-5">
-                            <span className="mb-0.5 block text-caption-xs font-bold tracking-widest text-blue-600 uppercase sm:text-caption-sm">
+                            <span className="text-caption-xs sm:text-caption-sm mb-0.5 block font-bold tracking-widest text-blue-600 uppercase">
                                 COMUNIDADE LITERÁRIA
                             </span>
 
@@ -48,7 +55,7 @@ export default function CreatePost({ auth }) {
                         <div className="mt-4 flex items-start gap-3 rounded-xl border border-amber-100 bg-amber-50/60 p-3 sm:p-4">
                             <i className="fa-solid fa-lightbulb mt-0.5 text-sm text-amber-500" />
 
-                            <p className="text-caption-sm leading-relaxed text-amber-800 sm:text-caption">
+                            <p className="text-caption-sm sm:text-caption leading-relaxed text-amber-800">
                                 Você pode publicar apenas um texto ou adicionar uma imagem à sua publicação.
                             </p>
                         </div>

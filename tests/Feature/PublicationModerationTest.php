@@ -53,7 +53,7 @@ class PublicationModerationTest extends TestCase
         $this->post(route('posts.store'), [
             'content' => 'Texto sinalizado', 'image' => $this->image(),
             'moderation_result' => ['flagged' => false], 'skip_moderation' => true,
-        ])->assertSessionHasErrors('content');
+        ])->assertSessionHasErrors(['content', 'moderation']);
         $this->assertDatabaseCount('posts', 0);
         $this->assertSame([], Storage::disk('public')->allFiles());
     }
@@ -62,6 +62,7 @@ class PublicationModerationTest extends TestCase
     {
         Http::fake(['api.openai.com/v1/moderations' => Http::response([], 503)]);
         $this->post(route('posts.store'), ['content' => 'Texto'])->assertSessionHasErrors('content');
+        $this->assertArrayNotHasKey('moderation', session('errors')->getBag('default')->messages());
         $this->assertDatabaseCount('posts', 0);
     }
 
@@ -69,7 +70,7 @@ class PublicationModerationTest extends TestCase
     {
         Http::fake(['api.openai.com/v1/moderations' => Http::response($this->response(true))]);
         $post = Post::create(['fk_user_id' => auth()->id(), 'content' => 'Original']);
-        $this->patch(route('posts.update', $post), ['content' => 'Sinalizado'])->assertSessionHasErrors('content');
+        $this->patch(route('posts.update', $post), ['content' => 'Sinalizado'])->assertSessionHasErrors(['content', 'moderation']);
         $this->assertSame('Original', $post->fresh()->content);
         Http::assertSentCount(1);
         $this->actingAs(User::factory()->create())->patch(route('posts.update', $post), ['content' => 'Outro'])->assertForbidden();

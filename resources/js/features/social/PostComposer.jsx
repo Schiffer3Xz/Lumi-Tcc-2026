@@ -72,10 +72,6 @@ export default function PostComposer({ user, onSubmit, processing = false, error
             </div>
 
             {/* TEXTO */}
-            <p className="text-xs leading-relaxed text-slate-500">
-                O texto é analisado antes de publicar na rede social. Se for sinalizado, você poderá revisá-lo e tentar novamente. Imagens não são
-                analisadas automaticamente.
-            </p>
             <textarea
                 value={content}
                 maxLength={5000}

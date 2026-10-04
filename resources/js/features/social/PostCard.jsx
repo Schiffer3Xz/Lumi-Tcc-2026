@@ -5,6 +5,7 @@ import { CircleCheck, X } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 
+import ModerationAlert from './ModerationAlert';
 import PostBookCard from './PostBookCard';
 import PostComments from './PostComments';
 
@@ -19,6 +20,7 @@ export default function PostCard({ post, user }) {
     const [message, setMessage] = useState('');
     const [shareFallback, setShareFallback] = useState(false);
     const [editing, setEditing] = useState(false);
+    const [moderationMessage, setModerationMessage] = useState('');
     const [showComments, setShowComments] = useState(false);
 
     const [showReportModal, setShowReportModal] = useState(false);
@@ -107,6 +109,9 @@ export default function PostCard({ post, user }) {
 
         editForm.patch(route('posts.update', post.id), {
             preserveScroll: true,
+            onError: (errors) => {
+                if (errors.moderation) setModerationMessage(errors.moderation);
+            },
 
             onSuccess: () => {
                 setEditing(false);
@@ -346,6 +351,7 @@ export default function PostCard({ post, user }) {
                 />
             </div>
 
+            <ModerationAlert message={moderationMessage} onClose={() => setModerationMessage('')} />
             <ReportPostDialog
                 postId={post.id}
                 open={showReportModal}
