@@ -7,9 +7,7 @@ use App\Models\Post;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Str;
 
 class PostSeeder extends Seeder
 {
@@ -79,22 +77,8 @@ class PostSeeder extends Seeder
         }
 
         $stats = DB::transaction(function () use ($publications, $books, $commentsByBook, $photoBooks) {
-            // Use only demonstration accounts, never attribute sample posts to real readers.
-            $readers = User::where('is_admin', false)->where(function ($query) {
-                foreach (['example.com', 'example.org', 'example.net'] as $domain) {
-                    $query->orWhere('email', 'like', '%@'.$domain);
-                }
-            })->orderBy('id')->limit(5)->get();
-
-            for ($index = 0; $readers->count() < 5; $index++) {
-                $readers->push(User::firstOrCreate(['email' => 'reader'.$index.'@lumi.example'], [
-                    'name' => 'Leitor Lumi '.($index + 1),
-                    'nickname' => 'leitor_lumi_demo_'.$index,
-                    'description' => 'Perfil de demonstração do clube de leitura.',
-                    'password' => Hash::make(Str::random(64)),
-                    'is_admin' => false,
-                ]));
-            }
+            $this->call(DemoUserSeeder::class);
+            $readers = User::whereIn('email', array_keys(DemoUserSeeder::READERS))->orderBy('id')->get();
 
             $stats = ['posts' => 0, 'likes' => 0, 'comments' => 0, 'photos' => 0];
             foreach ($publications as $title => $content) {

@@ -14,24 +14,7 @@ class UserSeeder extends Seeder
      */
     public function run(): void
     {
-        // 1. Criar os 5 usuários aleatórios com a estrutura correta
-        for ($i = 0; $i < 5; $i++) {
-            User::firstOrCreate(
-                ['email' => fake()->unique()->safeEmail()],
-                [
-                    'name' => fake()->name(),
-                    'nickname' => fake()->unique()->userName(),
-                    'password' => Hash::make('password'),
-                    'description' => fake()->sentence(),
-                    'profile_photo' => null,
-                    'read_books' => fake()->numberBetween(0, 30),
-                    'reading_books' => fake()->numberBetween(0, 5),
-                    'shelf_books' => fake()->numberBetween(0, 15),
-                    'rated_books' => fake()->numberBetween(0, 25),
-                    'is_admin' => false,
-                ]
-            );
-        }
+        $this->call(DemoUserSeeder::class);
 
         // 2. Usuário: ramon
         User::firstOrCreate(
