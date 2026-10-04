@@ -122,6 +122,7 @@ Route::middleware(['RoleMiddleware'])->group(function () {
         Route::match(['put', 'delete'], 'post/{post}/like', [PostInteractionController::class, 'like'])->name('posts.like');
         Route::match(['put', 'delete'], 'post/{post}/save', [PostInteractionController::class, 'save'])->name('posts.save');
         Route::post('post/{post}/report', [ReportController::class, 'store'])->middleware('throttle:10,1')->name('posts.report');
+        Route::post('post/{post}/comments/{comment}/report', [ReportController::class, 'storeComment'])->middleware('throttle:10,1')->name('posts.comments.report');
         Route::post('post/{post}/comments', [PostInteractionController::class, 'comment'])->name('posts.comments.store');
         Route::delete('post/{post}/comments/{comment}', [PostInteractionController::class, 'deleteComment'])->name('posts.comments.destroy');
         Route::delete('post/{id}', [SocialController::class, 'destroyPost'])->name('posts.destroy');
@@ -149,6 +150,7 @@ Route::middleware(['RoleMiddleware'])->group(function () {
 
             Route::get('admin/reports', [AdminReportController::class, 'index'])->name('admin.reports.index');
             Route::patch('admin/reports/{report}', [AdminReportController::class, 'update'])->name('admin.reports.update');
+            Route::delete('admin/reports/{report}/target', [AdminReportController::class, 'removeTarget'])->name('admin.reports.target.destroy');
             Route::post('admin/reports/{report}/moderation', [AdminReportController::class, 'moderate'])->middleware('throttle:6,1')->name('admin.reports.moderate');
 
             // ========================================================

@@ -23,6 +23,8 @@ Não adicionar a chave a variáveis `VITE_*`, ao React, ao Git ou à conversa. C
 - Identidade do denunciante, nome do autor, motivo da denúncia, e-mails, imagens e conversas privadas não são incluídos como campos da requisição. O próprio texto pode conter dados pessoais escritos pelo autor; considere isso antes de habilitar a integração.
 - O painel administrativo exibe o estado da análise e as categorias sinalizadas. Enquanto o modal está aberto com uma análise pendente, os dados são atualizados a cada cinco segundos, preservando as observações digitadas.
 - A equipe mantém a decisão final. A classificação não exclui conteúdo, não altera a situação manual da denúncia nem aplica sanções.
+- Comentários também podem ser denunciados pelo botão "Denunciar comentário". O registro guarda o texto e o autor do comentário, e a análise automática segue o mesmo fluxo das publicações.
+- No painel, a equipe pode escolher "Remover comentário" ou "Remover publicação", inclusive quando a API não sinaliza infração ou está indisponível. A ação exige confirmação, preserva a denúncia e registra a revisão e o administrador responsável. Remover um comentário mantém a publicação e os demais comentários.
 - Denúncias antigas sem texto original registrado e publicações somente com imagens seguem para revisão manual.
 
 ## Falhas e proteção

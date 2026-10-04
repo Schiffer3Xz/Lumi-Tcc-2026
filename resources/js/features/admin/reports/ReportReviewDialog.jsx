@@ -8,6 +8,12 @@ import { reportDate, reportStatuses } from './report-utils';
 
 export default function ReportReviewDialog({ report, onClose }) {
     const form = useForm({ status: report?.status ?? 'pending', review_note: report?.review_note ?? '' });
+    const removeContent = () => {
+        if (form.processing || report.target.deleted) return;
+        const target = report.target.type === 'comment' ? 'comentário' : 'publicação';
+        if (!window.confirm(`Remover este ${target} da comunidade? Essa ação não pode ser desfeita. O registro da denúncia será preservado.`)) return;
+        form.delete(route('admin.reports.target.destroy', report.id), { preserveScroll: true, onSuccess: onClose });
+    };
     return (
         <Modal
             isOpen={Boolean(report)}
@@ -92,6 +98,21 @@ export default function ReportReviewDialog({ report, onClose }) {
                             A análise registra a decisão da equipe. Alterar a situação da denúncia mantém a publicação no feed.
                         </p>
                     </AdminForm>
+                    {!report.target.deleted && (
+                        <section className="mt-6 rounded-xl border border-red-200 bg-red-50 p-4">
+                            <p className="mb-3 text-xs leading-relaxed text-red-800">
+                                A equipe pode remover o conteúdo mesmo que a análise automática não tenha sinalizado uma infração.
+                            </p>
+                            <button
+                                type="button"
+                                disabled={form.processing}
+                                onClick={removeContent}
+                                className="rounded-lg bg-red-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-red-700 disabled:opacity-50"
+                            >
+                                {report.target.type === 'comment' ? 'Remover comentário' : 'Remover publicação'}
+                            </button>
+                        </section>
+                    )}
                 </>
             )}
         </Modal>

@@ -4,9 +4,11 @@ import { useForm } from '@inertiajs/react';
 import { Flag, Loader2, ShieldCheck } from 'lucide-react';
 import { useRef } from 'react';
 
-export default function ReportPostDialog({ postId, open, onClose, onSuccess, returnFocusRef }) {
+export default function ReportPostDialog({ postId, commentId, open, onClose, onSuccess, returnFocusRef }) {
     const form = useForm({ content: '' });
     const inputRef = useRef(null);
+    const targetLabel = commentId ? 'comentário' : 'publicação';
+    const targetKey = commentId ? `${postId}-comment-${commentId}` : postId;
     const close = () => {
         if (form.processing) return;
         form.reset();
@@ -17,7 +19,7 @@ export default function ReportPostDialog({ postId, open, onClose, onSuccess, ret
         event.preventDefault();
         if (!form.data.content.trim() || form.processing) return;
         form.transform((data) => ({ content: data.content.trim() }));
-        form.post(route('posts.report', postId), {
+        form.post(commentId ? route('posts.comments.report', [postId, commentId]) : route('posts.report', postId), {
             preserveScroll: true,
             onSuccess: () => {
                 form.reset();
@@ -38,7 +40,7 @@ export default function ReportPostDialog({ postId, open, onClose, onSuccess, ret
             <DialogContent
                 onCloseAutoFocus={(event) => {
                     event.preventDefault();
-                    returnFocusRef.current?.focus();
+                    returnFocusRef?.current?.focus();
                 }}
                 overlayClassName="bg-slate-900/35 backdrop-blur-sm"
                 className="max-h-[90dvh] w-[calc(100%-2rem)] max-w-md gap-0 overflow-y-auto rounded-3xl border-slate-200 bg-white p-0 text-slate-800 shadow-2xl sm:rounded-3xl [&>button]:rounded-full [&>button]:text-slate-500 [&>button]:data-[state=open]:bg-slate-100 [&>button]:data-[state=open]:text-slate-500"
@@ -47,23 +49,24 @@ export default function ReportPostDialog({ postId, open, onClose, onSuccess, ret
                     <div className="mb-1 flex h-12 w-12 items-center justify-center rounded-2xl border border-rose-100 bg-rose-50 text-rose-500">
                         <Flag className="h-5 w-5" aria-hidden="true" />
                     </div>
-                    <DialogTitle className="text-xl font-bold tracking-tight text-slate-900">Denunciar publicação</DialogTitle>
+                    <DialogTitle className="text-xl font-bold tracking-tight text-slate-900">Denunciar {targetLabel}</DialogTitle>
 
                     <DialogDescription className="text-sm leading-relaxed text-slate-500">
-                        Ajude a cuidar da comunidade Lumi. Conte o que aconteceu para que possamos analisar a publicação.
+                        Ajude a cuidar da comunidade Lumi. Conte o que aconteceu para que possamos analisar{' '}
+                        {commentId ? 'o comentário' : 'a publicação'}.
                     </DialogDescription>
                 </DialogHeader>
                 <form onSubmit={submit} aria-busy={form.processing}>
                     <div className="space-y-3 px-6 py-5">
-                        <label htmlFor={`report-content-${postId}`} className="block text-sm font-semibold text-slate-700">
+                        <label htmlFor={`report-content-${targetKey}`} className="block text-sm font-semibold text-slate-700">
                             Motivo da denúncia
                         </label>
                         <textarea
                             ref={inputRef}
                             required
-                            id={`report-content-${postId}`}
+                            id={`report-content-${targetKey}`}
                             aria-invalid={Boolean(form.errors.content)}
-                            aria-describedby={`report-hint-${postId}${form.errors.content ? ` report-error-${postId}` : ''}`}
+                            aria-describedby={`report-hint-${targetKey}${form.errors.content ? ` report-error-${targetKey}` : ''}`}
                             placeholder="Descreva o motivo da denúncia..."
                             value={form.data.content}
                             onChange={(event) => form.setData('content', event.target.value)}
@@ -72,12 +75,12 @@ export default function ReportPostDialog({ postId, open, onClose, onSuccess, ret
                             disabled={form.processing}
                             className="block min-h-32 w-full resize-y rounded-2xl border border-slate-200 bg-slate-50/80 p-4 text-sm leading-relaxed text-slate-700 transition-colors outline-none placeholder:text-slate-400 focus:border-blue-400 focus:bg-white focus:ring-4 focus:ring-blue-50 disabled:opacity-60 aria-invalid:border-rose-400"
                         />
-                        <div id={`report-hint-${postId}`} className="flex justify-between gap-3 text-xs text-slate-500">
+                        <div id={`report-hint-${targetKey}`} className="flex justify-between gap-3 text-xs text-slate-500">
                             <span>Descreva o motivo em até 100 caracteres.</span>
                             <span className="shrink-0 tabular-nums">{form.data.content.length}/100</span>
                         </div>
                         {form.errors.content && (
-                            <p id={`report-error-${postId}`} role="alert" className="rounded-xl bg-rose-50 px-3 py-2 text-sm text-rose-600">
+                            <p id={`report-error-${targetKey}`} role="alert" className="rounded-xl bg-rose-50 px-3 py-2 text-sm text-rose-600">
                                 {form.errors.content}
                             </p>
                         )}

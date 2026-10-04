@@ -1,8 +1,13 @@
 import { useForm } from '@inertiajs/react';
+import { useRef, useState } from 'react';
 import PostComment from './PostComment';
+import ReportPostDialog from './ReportPostDialog';
 
 export default function PostComments({ postId, comments = [], user, inputRef, busy, onDelete }) {
     const { data, setData, post, processing, errors, reset } = useForm({ content: '' });
+    const [reportedComment, setReportedComment] = useState(null);
+    const [reportSuccess, setReportSuccess] = useState(false);
+    const reportTriggerRef = useRef(null);
 
     const submit = (event) => {
         event.preventDefault();
@@ -19,7 +24,7 @@ export default function PostComments({ postId, comments = [], user, inputRef, bu
     return (
         <div className="flex flex-col gap-3 pt-1">
             <form onSubmit={submit} className="flex items-center gap-2">
-                <div className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full bg-slate-800 text-caption-sm font-bold text-white">
+                <div className="text-caption-sm flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full bg-slate-800 font-bold text-white">
                     {user.name?.charAt(0).toUpperCase()}
                 </div>
                 <div className="relative flex-1">
@@ -54,18 +59,46 @@ export default function PostComments({ postId, comments = [], user, inputRef, bu
             {comments.map((comment) => (
                 <div key={comment.id}>
                     <PostComment comment={comment} />
-                    {comment.canDelete && (
+                    <div className="ml-9 flex flex-wrap gap-3">
+                        {comment.canDelete && (
+                            <button
+                                type="button"
+                                disabled={busy || processing}
+                                onClick={() => onDelete(comment.id)}
+                                className="text-caption-sm text-slate-500 hover:text-red-600 disabled:opacity-40"
+                            >
+                                Excluir comentário
+                            </button>
+                        )}
                         <button
                             type="button"
                             disabled={busy || processing}
-                            onClick={() => onDelete(comment.id)}
-                            className="ml-9 text-caption-sm text-slate-500 hover:text-red-600 disabled:opacity-40"
+                            onClick={(event) => {
+                                reportTriggerRef.current = event.currentTarget;
+                                setReportSuccess(false);
+                                setReportedComment(comment.id);
+                            }}
+                            className="text-caption-sm text-slate-500 hover:text-red-600 disabled:opacity-40"
                         >
-                            Excluir comentário
+                            Denunciar comentário
                         </button>
-                    )}
+                    </div>
                 </div>
             ))}
+            {reportSuccess && (
+                <p role="status" className="text-xs text-emerald-700">
+                    Denúncia enviada com sucesso!
+                </p>
+            )}
+            <ReportPostDialog
+                key={reportedComment ?? 'closed'}
+                postId={postId}
+                commentId={reportedComment}
+                open={reportedComment !== null}
+                onClose={() => setReportedComment(null)}
+                onSuccess={() => setReportSuccess(true)}
+                returnFocusRef={reportTriggerRef}
+            />
         </div>
     );
 }
