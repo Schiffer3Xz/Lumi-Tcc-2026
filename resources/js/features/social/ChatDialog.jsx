@@ -2,6 +2,7 @@ import Modal from '@/components/shared/Modal';
 import { router } from '@inertiajs/react';
 import { useEffect, useRef, useState } from 'react';
 import GroupManagement from './GroupManagement';
+import chatRequest from './chatRequest';
 
 export default function ChatDialog({ recipient, viewerId, messages = [], conversationId, onClose }) {
     const initials = recipient?.name
@@ -156,12 +157,10 @@ export default function ChatDialog({ recipient, viewerId, messages = [], convers
         setError('');
         setProcessing(true);
 
-        fetch(recipient.is_group ? route('chat.groups.messages.store', recipient.id) : route('chat'), {
+        chatRequest(recipient.is_group ? route('chat.groups.messages.store', recipient.id, false) : route('chat', undefined, false), {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                Accept: 'application/json',
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') ?? '',
             },
             body: JSON.stringify({
                 ...(recipient.is_group ? {} : { user_id: recipient.id }),
@@ -169,10 +168,6 @@ export default function ChatDialog({ recipient, viewerId, messages = [], convers
             }),
         })
             .then((response) => {
-                if (!response.ok) {
-                    throw new Error('Não foi possível enviar a mensagem.');
-                }
-
                 return response.json();
             })
             .then((data) => {
@@ -184,11 +179,15 @@ export default function ChatDialog({ recipient, viewerId, messages = [], convers
                     ]),
                 );
             })
-            .catch(() => {
+            .catch((failure) => {
                 setChatMessages((current) => current.filter((message) => message.id !== temporaryId));
 
                 setContent(messageContent);
-                setError('Não foi possível enviar a mensagem.');
+                setError(
+                    failure.message === 'Failed to fetch'
+                        ? 'Não foi possível conectar ao chat. Verifique sua conexão e tente novamente.'
+                        : failure.message || 'Não foi possível enviar a mensagem.',
+                );
             })
             .finally(() => {
                 sendingRef.current = false;
@@ -277,7 +276,7 @@ export default function ChatDialog({ recipient, viewerId, messages = [], convers
                                         )}
                                         <p className="break-words whitespace-pre-wrap">{message.content}</p>
 
-                                        <p className={`mt-1 text-caption-sm ${mine ? 'text-blue-100' : 'text-slate-400'}`}>
+                                        <p className={`text-caption-sm mt-1 ${mine ? 'text-blue-100' : 'text-slate-400'}`}>
                                             {message.pending
                                                 ? 'Enviando...'
                                                 : new Date(message.created_at).toLocaleTimeString('pt-BR', {
