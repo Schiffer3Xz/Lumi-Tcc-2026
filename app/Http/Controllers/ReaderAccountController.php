@@ -73,6 +73,16 @@ class ReaderAccountController extends Controller
     {
         $notification = DB::table('reader_notifications')->where('user_id', $request->user()->id)->where('id', $id)->first();
         abort_unless($notification, 404);
+        if ($notification->kind === 'message') {
+            $conversation = \App\Models\Conversation::whereKey($notification->conversation_id)
+                ->whereHas('participants', fn ($query) => $query->where('users.id', $request->user()->id))->first();
+            abort_unless($conversation, 404);
+            DB::table('reader_notifications')->where('id', $notification->id)->update(['read_at' => now(), 'updated_at' => now()]);
+
+            return redirect()->route('list', $conversation->is_group
+                ? ['group' => $conversation->id]
+                : ['chat' => $notification->actor_id]);
+        }
         DB::table('reader_notifications')->where('id', $notification->id)->whereNull('read_at')->update(['read_at' => now(), 'updated_at' => now()]);
 
         return $notification->post_id

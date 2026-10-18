@@ -28,6 +28,13 @@ export default function Feed({
     const activeGroup = chatUser?.is_group ? groupConversations.find((group) => group.id === chatUser.id) : null;
     const openChatTimerRef = useRef(null);
 
+    useEffect(() => {
+        const target = filters.group
+            ? groupConversations.find((group) => Number(group.id) === Number(filters.group))
+            : conversationUsers.find((reader) => Number(reader.id) === Number(filters.chat));
+        if (target) setChatUser(target);
+    }, [filters.group, filters.chat]);
+
     useEffect(() => () => window.clearTimeout(openChatTimerRef.current), []);
 
     useEffect(

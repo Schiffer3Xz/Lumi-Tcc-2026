@@ -1,0 +1,40 @@
+.library-drawer-overlay[data-state='open'] {
+    animation: library-backdrop-in 280ms ease-out both;
+}
+
+.library-drawer-panel[data-state='open'] {
+    animation: library-drawer-in 360ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.library-drawer-overlay[data-state='closed'] {
+    animation: library-backdrop-out 200ms ease-in both;
+}
+
+.library-drawer-panel[data-state='closed'] {
+    animation: library-drawer-out 200ms ease-in both;
+}
+
+@keyframes library-backdrop-in {
+    from { background-color: transparent; }
+}
+
+@keyframes library-backdrop-out {
+    to { background-color: transparent; }
+}
+
+@keyframes library-drawer-in {
+    from { transform: translateX(100%); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+}
+
+@keyframes library-drawer-out {
+    from { transform: translateX(0); opacity: 1; }
+    to { transform: translateX(100%); opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .library-drawer-overlay[data-state],
+    .library-drawer-panel[data-state] {
+        animation: none;
+    }
+}

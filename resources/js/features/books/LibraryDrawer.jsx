@@ -1,6 +1,7 @@
 import Modal from '@/components/shared/Modal';
 import { cn } from '@/lib/utils';
 import { useId } from 'react';
+import '../../../css/library-drawer.css';
 
 export default function LibraryDrawer({ isOpen = true, onClose, title, eyebrow, description, children, className, busy = false }) {
     const titleId = useId();
@@ -11,8 +12,8 @@ export default function LibraryDrawer({ isOpen = true, onClose, title, eyebrow, 
             onClose={busy ? undefined : onClose}
             labelledBy={titleId}
             closeOnBackdrop={!busy}
-            overlayClassName="fixed inset-0 z-50 flex items-stretch justify-end bg-slate-900/25 p-0"
-            className={cn('relative flex h-dvh max-h-dvh w-full max-w-md flex-col bg-white p-5 text-slate-800 shadow-2xl', className)}
+            overlayClassName="library-drawer-overlay fixed inset-0 z-50 flex items-stretch justify-end bg-slate-900/25 p-0"
+            className={cn('library-drawer-panel relative flex h-dvh max-h-dvh w-full max-w-md flex-col bg-white p-5 text-slate-800 shadow-2xl', className)}
         >
             <div className="mb-5 flex shrink-0 items-start justify-between gap-3 border-b border-slate-100 pb-4">
                 <div className="min-w-0">

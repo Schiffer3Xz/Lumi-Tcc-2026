@@ -11,8 +11,9 @@ import PrivacySettings from '@/features/profile/PrivacySettings';
 import ReadingRules from '@/features/profile/ReadingRules';
 import { readingRules } from '@/features/profile/profile-data';
 import ReaderLayout from '@/layouts/reader-layout';
+import ReadingAssistant from '@/features/books/ReadingAssistant';
 import { Link, router } from '@inertiajs/react';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 const QUICK_ACCESS = [
     { label: 'Consultar Histórico', icon: 'fa-solid fa-clock-rotate-left', routeName: 'reading.history' },
@@ -26,6 +27,12 @@ const getTextValue = (value) => {
 };
 
 export default function Home({ books = [], auth, genres = [], readingProgress = [] }) {
+    const [isAssistantOpen, setIsAssistantOpen] = useState(() => window.location.hash === '#assistente-leitura');
+    useEffect(() => {
+        const syncHash = () => setIsAssistantOpen(window.location.hash === '#assistente-leitura');
+        window.addEventListener('hashchange', syncHash);
+        return () => window.removeEventListener('hashchange', syncHash);
+    }, []);
     const [generoAtivo, setGeneroAtivo] = useState('Todos');
     const [searchQuery, setSearchQuery] = useState('');
     const [isGenresSidebarOpen, setIsGenresSidebarOpen] = useState(false);
@@ -92,6 +99,7 @@ export default function Home({ books = [], auth, genres = [], readingProgress = 
             variant="library"
             topbar={{ title: 'Descubra sua próxima história.', subtitle: 'Explore nosso catálogo e encontre livros que combinam com você.' }}
         >
+
             <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1fr_280px]">
                 {/* ==================== COLUNA PRINCIPAL ==================== */}
                 <div className="min-w-0">
@@ -151,7 +159,7 @@ export default function Home({ books = [], auth, genres = [], readingProgress = 
                     <div className="sticky top-6">
                         <QuickAccessPanel
                             title="Acesso Rápido"
-                            items={QUICK_ACCESS.map((item) => ({
+                            items={[{ label: 'Qual vai ser sua próxima leitura?', icon: 'fa-solid fa-wand-magic-sparkles', onClick: () => { window.location.hash = 'assistente-leitura'; } }, ...QUICK_ACCESS.map((item) => ({
                                 ...item,
                                 ...(item.panel === 'privacy' && !auth?.user
                                     ? { href: route('privacy') }
@@ -169,7 +177,7 @@ export default function Home({ books = [], auth, genres = [], readingProgress = 
                                                           content: <PrivacySettings />,
                                                       },
                                         }),
-                            }))}
+                            }))]}
                         />
                     </div>
                 </div>
@@ -185,6 +193,7 @@ export default function Home({ books = [], auth, genres = [], readingProgress = 
                 value={generoAtivo}
                 onChange={setGeneroAtivo}
             />
+            <ReadingAssistant isOpen={isAssistantOpen} onClose={() => { window.location.hash = ''; }} />
         </ReaderLayout>
     );
 }

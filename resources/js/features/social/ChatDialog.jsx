@@ -18,6 +18,9 @@ export default function ChatDialog({ recipient, viewerId, messages = [], convers
     const [content, setContent] = useState('');
     const [processing, setProcessing] = useState(false);
     const [error, setError] = useState('');
+    const [typingUsers, setTypingUsers] = useState({});
+    const typingTimersRef = useRef({});
+    const lastTypingRef = useRef(0);
 
     const messagesEndRef = useRef(null);
     const sendingRef = useRef(false);
@@ -39,7 +42,17 @@ export default function ChatDialog({ recipient, viewerId, messages = [], convers
     useEffect(() => {
         setContent('');
         setError('');
+        setTypingUsers({});
+        lastTypingRef.current = 0;
     }, [recipient.id, recipient.is_group]);
+
+    function notifyTyping(text) {
+        setContent(text);
+        if (!text.trim() || !activeConversationId || !window.Echo || Date.now() - lastTypingRef.current < 1000) return;
+        lastTypingRef.current = Date.now();
+        // Typing is temporary: a failed notification must not interrupt sending messages.
+        chatRequest(route('chat.typing', activeConversationId, false), { method: 'POST' }).catch(() => {});
+    }
 
     useEffect(() => {
         setChatMessages((current) => {
@@ -86,6 +99,23 @@ export default function ChatDialog({ recipient, viewerId, messages = [], convers
         const channelName = recipient.is_group ? `conversation.${activeConversationId}.user.${viewerId}` : `conversation.${activeConversationId}`;
         const channel = window.Echo.private(channelName);
 
+        function clearTyping(userId) {
+            clearTimeout(typingTimersRef.current[userId]);
+            delete typingTimersRef.current[userId];
+            setTypingUsers((current) => {
+                const updated = { ...current };
+                delete updated[userId];
+                return updated;
+            });
+        }
+
+        channel.listen('UserTyping', (event) => {
+            if (Number(event.user_id) === Number(viewerId)) return;
+            clearTimeout(typingTimersRef.current[event.user_id]);
+            setTypingUsers((current) => ({ ...current, [event.user_id]: event.user_name }));
+            typingTimersRef.current[event.user_id] = setTimeout(() => clearTyping(event.user_id), 3000);
+        });
+
         channel.listen('GroupUpdated', (event) => {
             if (event.deleted || Number(event.removedUserId) === Number(viewerId)) {
                 onCloseRef.current();
@@ -95,6 +125,7 @@ export default function ChatDialog({ recipient, viewerId, messages = [], convers
         });
 
         channel.listen('MessageSent', (event) => {
+            clearTyping(event.message.fk_user_id);
             const receivedMessage = {
                 id: event.message.id,
                 user_id: event.message.fk_user_id,
@@ -126,6 +157,8 @@ export default function ChatDialog({ recipient, viewerId, messages = [], convers
         });
 
         return () => {
+            Object.values(typingTimersRef.current).forEach(clearTimeout);
+            typingTimersRef.current = {};
             window.Echo.leave(channelName);
         };
     }, [activeConversationId, recipient.is_group, viewerId]);
@@ -307,6 +340,15 @@ export default function ChatDialog({ recipient, viewerId, messages = [], convers
             </div>
 
             {/* Campo de mensagem */}
+            <div role="status" aria-live="polite" className="shrink-0 px-5 text-xs text-blue-600">
+                {Object.keys(typingUsers).length > 0 && (
+                    <p className="py-2 motion-safe:animate-pulse">
+                        {recipient.is_group
+                            ? `${Object.values(typingUsers).join(', ')} ${Object.keys(typingUsers).length > 1 ? 'estão digitando...' : 'está digitando...'}`
+                            : 'Digitando...'}
+                    </p>
+                )}
+            </div>
             <form onSubmit={enviar} className="border-t border-slate-100 bg-white p-3 sm:p-4">
                 <div className="flex items-end gap-2 rounded-2xl border border-slate-200 bg-slate-50 p-2 transition focus-within:border-blue-400 focus-within:bg-white focus-within:ring-4 focus-within:ring-blue-100">
                     <textarea
@@ -314,7 +356,7 @@ export default function ChatDialog({ recipient, viewerId, messages = [], convers
                         maxLength={5000}
                         disabled={processing}
                         value={content}
-                        onChange={(event) => setContent(event.target.value)}
+                        onChange={(event) => notifyTyping(event.target.value)}
                         onKeyDown={(event) => {
                             if (event.key === 'Enter' && !event.shiftKey && !event.nativeEvent.isComposing) {
                                 enviar(event);

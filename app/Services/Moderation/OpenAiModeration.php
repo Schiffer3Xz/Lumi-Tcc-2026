@@ -3,6 +3,7 @@
 namespace App\Services\Moderation;
 
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 use Throwable;
 
 class OpenAiModeration
@@ -27,10 +28,13 @@ class OpenAiModeration
                     'input' => $text,
                 ]);
         } catch (Throwable) {
+            Log::warning('Moderation API connection failed.');
             throw new ModerationUnavailable('Não foi possível conectar à moderação.');
         }
 
         if (! $response->successful()) {
+            // Never log the request, response body, user content, or API credentials.
+            Log::warning('Moderation API request failed.', ['status' => $response->status()]);
             throw new ModerationUnavailable('Serviço de moderação indisponível.');
         }
 

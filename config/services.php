@@ -2,6 +2,11 @@
 
 return [
 
+    'gemini' => [
+        'key' => env('GEMINI_API_KEY'),
+        'model' => env('GEMINI_MODEL', 'gemini-3.5-flash-lite'),
+    ],
+
     'openai' => [
         'key' => env('OPENAI_API_KEY'),
         'moderation_enabled' => env('OPENAI_MODERATION_ENABLED', false),

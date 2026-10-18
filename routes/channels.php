@@ -4,6 +4,8 @@ use App\Models\Conversation;
 use App\Models\ConversationUser;
 use Illuminate\Support\Facades\Broadcast;
 
+Broadcast::channel('notifications.user.{userId}', fn ($user, $userId) => (int) $userId === $user->id);
+
 Broadcast::channel('chat.user.{userId}', function ($user, $userId) {
     return ! $user->is_admin && (int) $userId === $user->id;
 });

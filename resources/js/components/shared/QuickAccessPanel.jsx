@@ -34,6 +34,10 @@ function QuickAccessItem({ item }) {
         );
     }
 
+    if (item.onClick && !item.href) {
+        return <button type="button" onClick={item.onClick} className={className}>{content}</button>;
+    }
+
     return (
         <Link href={item.href} onClick={item.onClick} className={className}>
             {content}

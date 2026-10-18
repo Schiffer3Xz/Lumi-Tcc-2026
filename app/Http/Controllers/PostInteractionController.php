@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Post;
 use App\Models\PostComment;
+use App\Services\Moderation\PublicationModeration;
 use App\Services\ReaderNotificationService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -36,9 +37,10 @@ class PostInteractionController extends Controller
         return back();
     }
 
-    public function comment(Request $request, Post $post)
+    public function comment(Request $request, Post $post, PublicationModeration $moderation)
     {
         $validated = $request->validate(['content' => ['required', 'string', 'max:2000']]);
+        $moderation->validate($validated['content']);
         $post->comments()->create($validated + ['user_id' => $request->user()->id]);
         ReaderNotificationService::send($post->fk_user_id, $request->user()->id, 'comment', $post->id);
 

@@ -23,6 +23,9 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
+Route::post('/api/gemini', [\App\Http\Controllers\ReadingAssistantController::class, 'chat'])
+    ->middleware(['auth', 'throttle:10,1'])->name('reading-assistant.chat');
+
 Route::get('/', function () {
     return Inertia::render('welcome');
 })->name('home');
@@ -134,6 +137,7 @@ Route::middleware(['RoleMiddleware'])->group(function () {
         Route::delete('books/{bookId}/comments/{ratingId}', [PublicBookController::class, 'deleteComment'])->name('book.comment.destroy');
 
         Route::post('/chat/send', [DirectMessageController::class, 'start'])->name('chat');
+        Route::post('/chat/{conversation}/typing', [DirectMessageController::class, 'typing'])->middleware('throttle:90,1')->name('chat.typing');
         Route::post('/chat/groups', [DirectMessageController::class, 'createGroup'])->name('chat.groups.store');
         Route::post('/chat/groups/{conversation}/messages', [DirectMessageController::class, 'sendToGroup'])->name('chat.groups.messages.store');
         Route::delete('/chat/groups/{conversation}', [DirectMessageController::class, 'destroyGroup'])->name('chat.groups.destroy');

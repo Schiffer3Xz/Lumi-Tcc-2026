@@ -1,10 +1,11 @@
 import { Popover, PopoverButton, PopoverPanel } from '@headlessui/react';
-import { Link, useForm, usePage } from '@inertiajs/react';
+import { Link, router, useForm, usePage } from '@inertiajs/react';
 import { useEffect, useState } from 'react';
 
 const messages = { like: 'curtiu sua publicação', comment: 'comentou na sua publicação', follow: 'começou a seguir você' };
 
 function NotificationList({ close }) {
+    messages.message = 'enviou uma mensagem no chat';
     const [page, setPage] = useState(1);
     const [refresh, setRefresh] = useState(0);
     const [notifications, setNotifications] = useState(null);
@@ -34,7 +35,7 @@ function NotificationList({ close }) {
                 if (!controller.signal.aborted) setLoading(false);
             });
         return () => controller.abort();
-    }, [page, refresh]);
+    }, [page, refresh, unreadNotifications]);
 
     return (
         <>
@@ -143,6 +144,13 @@ function NotificationList({ close }) {
 
 export default function NotificationPopover({ className, iconClassName }) {
     const { auth, unreadNotifications = 0 } = usePage().props;
+    useEffect(() => {
+        if (!auth?.user?.id || !window.Echo) return;
+        const channelName = `notifications.user.${auth.user.id}`;
+        const refresh = () => router.reload({ only: ['unreadNotifications'], async: true });
+        window.Echo.private(channelName).listen('ReaderNotificationCreated', refresh).subscribed(refresh);
+        return () => window.Echo.leave(channelName);
+    }, [auth?.user?.id]);
     if (!auth?.user) {
         return (
             <Link href={route('notifications')} aria-label="Entrar para ver notificações" className={className}>

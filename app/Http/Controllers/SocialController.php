@@ -76,7 +76,7 @@ class SocialController extends Controller
         ];
 
         return Inertia::render('social', [
-            'filters' => ['saved' => $request->boolean('saved'), 'post' => $request->input('post'), 'group' => $request->integer('group')],
+            'filters' => ['saved' => $request->boolean('saved'), 'post' => $request->input('post'), 'group' => $request->integer('group'), 'chat' => $request->integer('chat')],
             'directMessages' => $directMessages,
             'groupConversations' => $groupConversations,
             'conversationUsers' => User::whereIn('id', array_keys($directMessages))->where('is_admin', false)->get()->map($userSummary),
@@ -132,7 +132,7 @@ class SocialController extends Controller
         $profileUser->setAttribute('posts_count', DB::table('posts')->where('fk_user_id', $profileUser->id)->count());
 
         $posts = Post::where('fk_user_id', auth()->id())
-            ->with('book.author')
+            ->with(['book.author', 'book' => fn ($query) => $query->withAvg('ratings', 'rating')])
             ->withCount(['likes', 'comments'])
             ->latest()
             ->get()
@@ -149,7 +149,7 @@ class SocialController extends Controller
                     'page_count' => $post->book->page_count,
                     'publication_year' => $post->book->publication_year,
                     'readers_count' => $post->book->readers_count,
-                    'rating' => $post->book->rating,
+                    'rating' => (float) ($post->book->ratings_avg_rating ?? 0),
                 ] : null,
             ]);
 

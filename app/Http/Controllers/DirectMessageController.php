@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Events\ConversationUpdated;
 use App\Events\GroupUpdated;
 use App\Events\MessageSent;
+use App\Events\UserTyping;
 use App\Models\Conversation;
 use App\Models\Message;
 use App\Models\User;
@@ -14,6 +15,21 @@ use Illuminate\Validation\Rule;
 
 class DirectMessageController extends Controller
 {
+    public function typing(Request $request, Conversation $conversation)
+    {
+        abort_unless($conversation->participants()->where('users.id', $request->user()->id)->exists(), 403);
+
+        event(new UserTyping(
+            $conversation->id,
+            $request->user()->id,
+            $request->user()->name,
+            (bool) $conversation->is_group,
+            $conversation->participants()->pluck('users.id')->all(),
+        ));
+
+        return response()->noContent();
+    }
+
     public function start(Request $request)
     {
         $validated = $request->validate([
@@ -139,6 +155,9 @@ class DirectMessageController extends Controller
         });
 
         event(new MessageSent($message));
+        foreach ($conversation->participants()->pluck('users.id') as $participantId) {
+            \App\Services\ReaderNotificationService::send($participantId, $request->user()->id, 'message', conversationId: $conversation->id);
+        }
         event(new ConversationUpdated($conversation->id, $conversation->participants()->pluck('users.id')->all()));
 
         return response()->json([

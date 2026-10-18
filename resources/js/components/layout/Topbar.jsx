@@ -71,12 +71,8 @@ export default function Topbar({
             <div className={clsx('flex shrink-0 items-center gap-1.5', isLibrary ? 'sm:gap-4' : actions ? 'sm:gap-3' : 'sm:gap-4')}>
                 {actions}
                 <NotificationPopover
-                    className={
-                        isLibrary
-                            ? 'relative rounded-lg p-2 text-gray-600 transition-colors hover:bg-gray-100'
-                            : clsx('relative rounded-full text-slate-600 transition-colors hover:bg-slate-100', isComposer ? 'p-2 sm:p-2.5' : 'p-2.5')
-                    }
-                    iconClassName={clsx(isLibrary ? 'fa-solid fa-bell' : 'fa-regular fa-bell', isComposer ? 'text-base sm:text-lg' : 'text-lg')}
+                    className="relative rounded-full p-2.5 text-slate-600 transition-colors hover:bg-slate-100"
+                    iconClassName="fa-regular fa-bell text-lg"
                 />
                 <ProfileMenu user={user} items={accountItems} variant={variant} showPhoto={showPhoto} />
             </div>

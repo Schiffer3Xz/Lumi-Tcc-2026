@@ -5,6 +5,7 @@ import { Link, useForm } from '@inertiajs/react';
 const messages = { like: 'curtiu sua publicação', comment: 'comentou na sua publicação', follow: 'começou a seguir você' };
 
 export default function Notifications({ auth, notifications, unreadNotifications }) {
+    messages.message = 'enviou uma mensagem no chat';
     const { post, processing } = useForm({});
     return (
         <ReaderLayout

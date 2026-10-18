@@ -17,6 +17,24 @@ class PostSeederTest extends TestCase
 {
     use RefreshDatabase;
 
+    public function test_unified_book_seed_preserves_reader_ratings(): void
+    {
+        Storage::fake('public');
+        $this->seed([AvailabilitySeeder::class, AuthorSeeder::class, GenreSeeder::class, BookSeeder::class]);
+        $this->assertDatabaseCount('books', 60);
+        $this->assertDatabaseCount('book_ratings', 0);
+        $this->assertSame(0, \App\Models\Book::where('rating', '!=', 0)->count());
+
+        $reader = User::factory()->create();
+        $book = \App\Models\Book::where('title', '1984')->firstOrFail();
+        \App\Models\BookRating::create(['user_id' => $reader->id, 'book_id' => $book->id, 'rating' => 5]);
+        $this->seed(BookSeeder::class);
+
+        $this->assertDatabaseCount('books', 60);
+        $this->assertDatabaseHas('book_ratings', ['user_id' => $reader->id, 'book_id' => $book->id, 'rating' => 5]);
+        $this->assertSame(5.0, (float) $book->ratings()->avg('rating'));
+    }
+
     public function test_sample_feed_is_reproducible_without_existing_demo_readers(): void
     {
         Storage::fake('public');

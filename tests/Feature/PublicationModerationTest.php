@@ -37,6 +37,49 @@ class PublicationModerationTest extends TestCase
         return UploadedFile::fake()->createWithContent('photo.png', base64_decode('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+jRZkAAAAASUVORK5CYII='));
     }
 
+    public function test_safe_comment_is_analyzed_and_saved(): void
+    {
+        Http::fake(['api.openai.com/v1/moderations' => Http::response($this->response(false))]);
+        $post = Post::create(['fk_user_id' => auth()->id(), 'content' => 'Original']);
+        $this->post(route('posts.comments.store', $post), ['content' => 'Gostei da leitura.'])
+            ->assertSessionHasNoErrors()->assertRedirect();
+        $this->assertDatabaseHas('post_comments', ['post_id' => $post->id, 'content' => 'Gostei da leitura.']);
+        Http::assertSent(fn ($request) => $request->data()['input'] === 'Gostei da leitura.');
+    }
+
+    public function test_flagged_comment_is_not_saved_even_with_spoofed_result(): void
+    {
+        Http::fake(['api.openai.com/v1/moderations' => Http::response($this->response(true))]);
+        $post = Post::create(['fk_user_id' => auth()->id(), 'content' => 'Original']);
+        $this->post(route('posts.comments.store', $post), [
+            'content' => 'Texto sinalizado', 'skip_moderation' => true,
+            'moderation_result' => ['flagged' => false],
+        ])->assertSessionHasErrors(['content', 'moderation']);
+        $this->assertDatabaseCount('post_comments', 0);
+        $this->assertDatabaseCount('reader_notifications', 0);
+    }
+
+    public function test_api_failure_or_invalid_response_does_not_save_comment(): void
+    {
+        $post = Post::create(['fk_user_id' => auth()->id(), 'content' => 'Original']);
+        foreach ([Http::response([], 503), Http::response(['results' => []])] as $response) {
+            Http::fake(['api.openai.com/v1/moderations' => $response]);
+            $this->post(route('posts.comments.store', $post), ['content' => 'Comentário'])
+                ->assertSessionHasErrors('content');
+        }
+        $this->assertDatabaseCount('post_comments', 0);
+    }
+
+    public function test_missing_key_does_not_save_unchecked_comment(): void
+    {
+        config(['services.openai.key' => '']);
+        $post = Post::create(['fk_user_id' => auth()->id(), 'content' => 'Original']);
+        $this->post(route('posts.comments.store', $post), ['content' => 'Comentário'])
+            ->assertSessionHasErrors('content');
+        $this->assertDatabaseCount('post_comments', 0);
+        Http::assertNothingSent();
+    }
+
     public function test_safe_text_is_analyzed_before_publication(): void
     {
         Http::fake(['api.openai.com/v1/moderations' => Http::response($this->response(false))]);
