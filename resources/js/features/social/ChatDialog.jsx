@@ -238,11 +238,11 @@ export default function ChatDialog({ recipient, viewerId, messages = [], convers
             onClose={onClose}
             closeOnBackdrop
             labelledBy="chat-dialog-title"
-            overlayClassName="fixed inset-0 z-[60] flex items-center justify-center bg-slate-950/70 p-4"
-            className="relative flex max-h-[90dvh] w-full max-w-lg flex-col overflow-hidden rounded-3xl border border-slate-200 bg-white text-slate-800 shadow-2xl"
+            overlayClassName="fixed inset-0 z-[60] flex items-center justify-center bg-slate-950/70 p-0 sm:p-4"
+            className="relative flex h-dvh max-h-dvh min-w-0 w-full max-w-none flex-col overflow-hidden rounded-none border-0 bg-white pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)] text-slate-800 shadow-2xl sm:h-[85dvh] sm:max-h-[90dvh] sm:max-w-lg sm:rounded-3xl sm:border"
         >
             {/* Cabeçalho */}
-            <div className="border-b border-slate-100 bg-gradient-to-r from-blue-50 via-white to-indigo-50 px-6 py-5 pr-12">
+            <div className="shrink-0 border-b border-slate-100 bg-gradient-to-r from-blue-50 via-white to-indigo-50 px-4 py-4 pr-14 sm:px-6 sm:py-5 sm:pr-14">
                 <div className="flex items-center gap-3">
                     <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-600 text-sm font-bold text-white shadow-md shadow-blue-200">
                         {initials}
@@ -349,7 +349,7 @@ export default function ChatDialog({ recipient, viewerId, messages = [], convers
                     </p>
                 )}
             </div>
-            <form onSubmit={enviar} className="border-t border-slate-100 bg-white p-3 sm:p-4">
+            <form onSubmit={enviar} className="shrink-0 border-t border-slate-100 bg-white p-3 sm:p-4">
                 <div className="flex items-end gap-2 rounded-2xl border border-slate-200 bg-slate-50 p-2 transition focus-within:border-blue-400 focus-within:bg-white focus-within:ring-4 focus-within:ring-blue-100">
                     <textarea
                         rows={1}
@@ -364,7 +364,7 @@ export default function ChatDialog({ recipient, viewerId, messages = [], convers
                         }}
                         aria-label="Sua mensagem"
                         placeholder="Escreva uma mensagem..."
-                        className="max-h-28 min-h-10 flex-1 resize-y bg-transparent px-2 py-2 text-sm leading-5 text-slate-700 outline-none placeholder:text-slate-400"
+                        className="max-h-28 min-h-10 min-w-0 flex-1 resize-y bg-transparent px-2 py-2 text-base leading-5 text-slate-700 outline-none placeholder:text-slate-400 sm:text-sm"
                     />
 
                     <button

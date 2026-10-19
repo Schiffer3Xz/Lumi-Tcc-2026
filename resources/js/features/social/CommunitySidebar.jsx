@@ -12,8 +12,8 @@ export default function CommunitySidebar({ suggestedUsers, followedUsers, allUse
         : suggestedUsers;
     const renderUser = (user) => <ReaderListItem key={user.id} user={user} variant="featured" onChat={() => onChat(user)} />;
     return (
-        <div className="flex h-full flex-col overflow-hidden bg-white">
-            <div className="border-b border-slate-100 bg-slate-50/50 p-4">
+        <div className="flex h-full min-h-0 min-w-0 flex-col overflow-hidden bg-white">
+            <div className="shrink-0 border-b border-slate-100 bg-slate-50/50 p-4">
                 <SearchBar
                     variant="custom"
                     label="Encontrar pessoas"
@@ -22,12 +22,12 @@ export default function CommunitySidebar({ suggestedUsers, followedUsers, allUse
                     onChange={(event) => setSearch(event.target.value)}
                     className="relative"
                     iconClassName="fa-solid fa-magnifying-glass absolute top-1/2 left-3 -translate-y-1/2 text-xs text-slate-400"
-                    inputClassName="w-full rounded-xl border border-slate-200 bg-white py-2 pr-3 pl-9 text-xs outline-none focus:border-blue-500"
+                    inputClassName="min-w-0 w-full rounded-xl border border-slate-200 bg-white py-2 pr-3 pl-9 text-base outline-none focus:border-blue-500 sm:text-xs"
                 />
             </div>
-            <div className="flex-1 space-y-6 overflow-y-auto p-4">
+            <div className="min-h-0 min-w-0 flex-1 space-y-6 overflow-x-hidden overflow-y-auto overscroll-contain p-3 sm:p-4">
                 <section>
-                    <div className="mb-3 flex items-center justify-between gap-2">
+                    <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
                         <h3 className="text-xs font-bold text-slate-800 uppercase">{query ? 'Resultados da busca' : 'Sugestões para você'}</h3>
                         <span className="rounded-full border border-emerald-200 bg-emerald-50 px-2 py-0.5 text-caption-sm font-bold text-emerald-600">
                             {users.length} encontrados

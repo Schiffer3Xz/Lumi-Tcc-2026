@@ -4,8 +4,8 @@ import { Link } from '@inertiajs/react';
 export default function ReaderListItem({ user, variant = 'profile', isActive = false, onClick, onChat }) {
     if (variant === 'featured') {
         return (
-            <div className="flex w-full items-center gap-1 rounded-xl border border-transparent p-2 transition-all hover:border-slate-100 hover:bg-slate-50">
-                <Link href={route('people', user.id)} className="flex min-w-0 flex-1 items-center gap-3 text-left">
+            <div className="flex min-w-0 w-full flex-wrap items-center gap-1 rounded-xl border border-transparent p-2 transition-all hover:border-slate-100 hover:bg-slate-50">
+                <Link href={route('people', user.id)} className="flex min-w-0 flex-1 basis-28 items-center gap-2 text-left">
                     <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-blue-100 text-xs font-bold text-blue-700">
                         {user.name
                             .split(' ')
@@ -27,7 +27,7 @@ export default function ReaderListItem({ user, variant = 'profile', isActive = f
                         onClick={onChat}
                         aria-label={`Conversar com ${user.name}`}
                         title="Abrir conversa"
-                        className="relative flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-slate-400 hover:bg-blue-50 hover:text-blue-600"
+                        className="relative flex size-11 shrink-0 items-center justify-center rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-100 focus-visible:outline-2 focus-visible:outline-blue-600"
                     >
                         <i className="fa-regular fa-comment text-sm" aria-hidden="true" />
                         {user.unreadMessages > 0 && (

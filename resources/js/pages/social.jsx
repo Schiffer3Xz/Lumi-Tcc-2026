@@ -27,6 +27,7 @@ export default function Feed({
     const [createGroupOpen, setCreateGroupOpen] = useState(false);
     const activeGroup = chatUser?.is_group ? groupConversations.find((group) => group.id === chatUser.id) : null;
     const openChatTimerRef = useRef(null);
+    const pendingDialogRef = useRef(null);
 
     useEffect(() => {
         const target = filters.group
@@ -60,8 +61,7 @@ export default function Feed({
         }
 
         setPeopleOpen(false);
-        window.clearTimeout(openChatTimerRef.current);
-        openChatTimerRef.current = window.setTimeout(() => setChatUser(reader), 200);
+        pendingDialogRef.current = () => setChatUser(reader);
     };
 
     const sidebarProps = {
@@ -73,16 +73,19 @@ export default function Feed({
         trendingPosts,
         onChat: openChat,
         onCreateGroup: () => {
+            if (!peopleOpen) {
+                setCreateGroupOpen(true);
+                return;
+            }
+            pendingDialogRef.current = () => setCreateGroupOpen(true);
             setPeopleOpen(false);
-            window.clearTimeout(openChatTimerRef.current);
-            openChatTimerRef.current = window.setTimeout(() => setCreateGroupOpen(true), 200);
         },
     };
 
     return (
         <>
             <ReaderLayout title="Sala de Leitura - Feed da Comunidade" user={user} activeItem="usuarios" variant="social">
-                <div className="flex flex-1 overflow-hidden">
+                <div className="flex min-h-0 min-w-0 flex-1 overflow-hidden">
                     {/* FEED PRINCIPAL */}
                     <main id="reader-main-content" tabIndex={-1} className="min-w-0 flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8">
                         <div className="mx-auto flex max-w-[720px] flex-col gap-6">
@@ -120,12 +123,22 @@ export default function Feed({
                                         Pessoas e conversas
                                     </button>
                                 </DialogTrigger>
-                                <DialogContent className="max-h-[90dvh] w-[calc(100%-2rem)] max-w-md overflow-hidden rounded-2xl bg-white p-0">
-                                    <div className="px-5 pt-5">
+                                <DialogContent
+                                    className="top-0 left-0 flex h-dvh max-h-dvh w-full max-w-none translate-x-0 translate-y-0 flex-col gap-0 overflow-hidden rounded-none border-0 bg-white p-0 pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)] sm:top-1/2 sm:left-1/2 sm:h-[85dvh] sm:max-h-[90dvh] sm:w-[calc(100vw_-_2rem)] sm:max-w-md sm:-translate-x-1/2 sm:-translate-y-1/2 sm:rounded-2xl sm:border"
+                                    onCloseAutoFocus={(event) => {
+                                        const openPendingDialog = pendingDialogRef.current;
+                                        if (!openPendingDialog) return;
+                                        event.preventDefault();
+                                        pendingDialogRef.current = null;
+                                        // Wait for Radix to release the people dialog's focus trap.
+                                        openChatTimerRef.current = window.setTimeout(openPendingDialog, 0);
+                                    }}
+                                >
+                                    <div className="shrink-0 border-b border-slate-100 px-4 py-5 pr-14">
                                         <DialogTitle>Pessoas e conversas</DialogTitle>
                                         <DialogDescription>Encontre leitores, converse e acompanhe a comunidade.</DialogDescription>
                                     </div>
-                                    <div className="h-[65dvh]">
+                                    <div className="min-h-0 min-w-0 flex-1 overflow-hidden">
                                         <CommunitySidebar {...sidebarProps} />
                                     </div>
                                 </DialogContent>
