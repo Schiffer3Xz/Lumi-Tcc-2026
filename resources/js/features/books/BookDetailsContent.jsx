@@ -263,12 +263,19 @@ export default function BookDetailsContent({ book, similarBooks = [], comments =
                                 </label>
                                 <textarea
                                     id="book-comment"
+                                    aria-invalid={Boolean(error)}
+                                    aria-describedby={error ? 'book-comment-error' : undefined}
                                     value={comment}
                                     onChange={(event) => setComment(event.target.value)}
                                     maxLength={1000}
                                     placeholder="Conte o que achou desta leitura..."
                                     className="mt-3 min-h-24 w-full resize-y rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 transition outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
                                 />
+                                {error && (
+                                    <p id="book-comment-error" role="alert" className="mt-2 text-sm text-rose-600">
+                                        Não foi possível publicar o comentário. {error} Seu texto foi mantido para você corrigir e tentar novamente.
+                                    </p>
+                                )}
                                 <div className="mt-3 flex justify-end">
                                     <button
                                         type="button"

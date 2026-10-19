@@ -96,6 +96,7 @@ class AdminSettingsController extends Controller
 
         $user = auth()->user();
 
+        app(\App\Services\Moderation\PublicationModeration::class)->validateProfile($request->only('name', 'nickname', 'description'), $user);
         $user->name = $request->name;
         $user->nickname = $request->nickname;
         $user->email = $request->filled('email') ? $request->email : $user->email;
@@ -124,6 +125,7 @@ class AdminSettingsController extends Controller
 
         $user = auth()->user();
 
+        app(\App\Services\Moderation\PublicationModeration::class)->validateProfile($request->only('name', 'nickname', 'description'), $user);
         $user->name = $request->name;
         $user->nickname = $request->nickname;
         $user->description = $request->description;
@@ -201,6 +203,8 @@ class AdminSettingsController extends Controller
             'email' => 'required|email|max:255|unique:users,email,'.auth()->id(),
             'password' => 'required|string|min:8|',
         ]);
+
+        app(\App\Services\Moderation\PublicationModeration::class)->validateProfile($request->only('name', 'nickname'));
 
         User::create([
             'name' => $request->name,

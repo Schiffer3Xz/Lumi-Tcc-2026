@@ -1,0 +1,37 @@
+@media (max-width: 1023px) and (prefers-reduced-motion: no-preference) {
+    .reader-sidebar-mobile[data-state='open'] {
+        animation: reader-sidebar-in 280ms cubic-bezier(0.22, 1, 0.36, 1) both;
+    }
+
+    .reader-sidebar-mobile[data-state='closed'] {
+        animation: reader-sidebar-out 200ms ease-in both;
+    }
+
+    .reader-sidebar-backdrop[data-state='open'] {
+        animation: reader-sidebar-backdrop-in 280ms ease-out both;
+    }
+
+    .reader-sidebar-backdrop[data-state='closed'] {
+        animation: reader-sidebar-backdrop-out 200ms ease-in both;
+    }
+}
+
+@keyframes reader-sidebar-in {
+    from { transform: translateX(-100%); }
+    to { transform: translateX(0); }
+}
+
+@keyframes reader-sidebar-out {
+    from { transform: translateX(0); }
+    to { transform: translateX(-100%); }
+}
+
+@keyframes reader-sidebar-backdrop-in {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes reader-sidebar-backdrop-out {
+    from { opacity: 1; }
+    to { opacity: 0; }
+}

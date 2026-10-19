@@ -178,6 +178,7 @@ class BookController extends Controller
         ];
 
         if ($request->has('comment')) {
+            app(\App\Services\Moderation\PublicationModeration::class)->validate($validated['comment'] ?? null, 'comment', 'book_comment');
             $values['comment'] = blank($validated['comment'] ?? null) ? null : trim($validated['comment']);
         }
 

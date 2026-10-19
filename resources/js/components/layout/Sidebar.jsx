@@ -3,6 +3,7 @@ import { Link } from '@inertiajs/react';
 import * as Dialog from '@radix-ui/react-dialog';
 import clsx from 'clsx';
 import { useEffect, useRef } from 'react';
+import '../../../css/reader-sidebar.css';
 
 export default function Sidebar({ id, items, activeItem, isOpen, onClose, onNavigate, variant = 'library', className, children }) {
     const closeRef = useRef(onClose);
@@ -88,11 +89,11 @@ export default function Sidebar({ id, items, activeItem, isOpen, onClose, onNavi
                 }}
             >
                 <Dialog.Portal>
-                    <Dialog.Overlay className={clsx('fixed inset-0 z-40 lg:hidden', isSocial ? 'bg-slate-900/40 backdrop-blur-xs' : 'bg-black/50')} />
+                    <Dialog.Overlay className={clsx('reader-sidebar-backdrop fixed inset-0 z-40 lg:hidden', isSocial ? 'bg-slate-900/40 backdrop-blur-xs' : 'bg-black/50')} />
                     <Dialog.Content
                         id={id}
                         aria-describedby={undefined}
-                        className={clsx(sidebarClassName, 'fixed top-0 left-0 z-50 flex lg:hidden', className)}
+                        className={clsx(sidebarClassName, 'reader-sidebar-mobile fixed top-0 left-0 z-50 flex shadow-2xl lg:hidden', className)}
                         onOpenAutoFocus={() => {
                             triggerRef.current = document.activeElement;
                         }}

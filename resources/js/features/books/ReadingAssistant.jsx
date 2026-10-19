@@ -57,7 +57,7 @@ export default function ReadingAssistant({ isOpen, onClose }) {
         }
     }
     return (
-        <LibraryDrawer isOpen={isOpen} onClose={onClose} title="Sua próxima leitura" eyebrow="Converse com Lumi" className="max-w-md">
+        <LibraryDrawer isOpen={isOpen} onClose={onClose} title="Sua próxima leitura" eyebrow="Converse com Lumi" className="reading-assistant-panel max-w-none overflow-hidden md:max-w-md">
             <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
                 <header className="flex items-center gap-3 shrink-0 border-b border-slate-100 pb-4">
                     <span className="flex size-11 shrink-0 items-center justify-center rounded-2xl bg-lumi-navy text-yellow-300"><FireflyIcon className="size-7" /></span>
@@ -102,7 +102,7 @@ export default function ReadingAssistant({ isOpen, onClose }) {
                     <div className="shrink-0 border-t border-slate-100 pt-3 pb-1">
                         <form onSubmit={(event) => { event.preventDefault(); send(); }} className="flex items-end gap-2 rounded-2xl border border-slate-200 bg-slate-50 p-2 focus-within:border-blue-400 focus-within:ring-2 focus-within:ring-blue-100">
                             <label htmlFor="reading-message" className="sr-only">Sua mensagem para Lumi</label>
-                            <textarea ref={inputRef} id="reading-message" rows={2} maxLength={2000} value={draft} onChange={(event) => setDraft(event.target.value)} onKeyDown={(event) => { if (event.key === 'Enter' && !event.shiftKey && !event.nativeEvent.isComposing) { event.preventDefault(); send(); } }} placeholder="Me conta: o que você está com vontade de ler?" className="max-h-40 min-h-14 flex-1 resize-y border-0 bg-transparent px-2 py-2 text-sm text-slate-800 placeholder:text-slate-400 focus:ring-0 focus:outline-none" />
+                            <textarea ref={inputRef} id="reading-message" rows={2} maxLength={2000} value={draft} onChange={(event) => setDraft(event.target.value)} onKeyDown={(event) => { if (event.key === 'Enter' && !event.shiftKey && !event.nativeEvent.isComposing) { event.preventDefault(); send(); } }} placeholder="Me conta: o que você está com vontade de ler?" className="max-h-40 min-h-14 min-w-0 flex-1 resize-y border-0 bg-transparent px-2 py-2 text-base text-slate-800 placeholder:text-slate-400 focus:ring-0 focus:outline-none md:text-sm" />
                             <button type="submit" disabled={sending || !draft.trim()} aria-label="Enviar mensagem" className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-lumi-navy text-yellow-300 transition-colors hover:bg-blue-900 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600 disabled:cursor-not-allowed disabled:opacity-30"><ArrowUp size={19} /></button>
                         </form>
                         <p className="mt-3 text-center text-xs text-slate-400">Lumi usa IA e pode cometer erros. Confira a disponibilidade do livro na biblioteca.</p>
