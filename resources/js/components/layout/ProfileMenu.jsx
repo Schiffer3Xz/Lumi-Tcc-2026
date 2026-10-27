@@ -10,8 +10,8 @@ export default function ProfileMenu({ user, items, variant = 'social', showPhoto
     const id = useId();
     const isLibrary = variant === 'library';
     const isProfile = variant === 'profile';
-    const isStatic = variant === 'composer';
-    const displayName = user.nickname?.replace(/^@/, '') || user.name;
+    const isStatic = variant === 'composer' && Boolean(user);
+    const displayName = user?.nickname?.replace(/^@/, '') || user?.name || 'Visitante';
 
     useEffect(() => {
         function handleOutside(event) {
@@ -62,8 +62,8 @@ export default function ProfileMenu({ user, items, variant = 'social', showPhoto
                 )}
             >
                 <UserAvatar
-                    name={user.name}
-                    src={showPhoto ? user.profile_photo : undefined}
+                    name={displayName}
+                    src={showPhoto ? user?.profile_photo : undefined}
                     className={clsx(
                         isLibrary
                             ? 'bg-lumi-navy flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-sm font-bold text-yellow-300'
@@ -105,14 +105,16 @@ export default function ProfileMenu({ user, items, variant = 'social', showPhoto
                             : 'absolute right-0 z-50 mt-2 max-h-[calc(100dvh-5rem)] w-52 max-w-[calc(100vw-2rem)] overflow-y-auto rounded-2xl border border-slate-100 bg-white py-1.5 shadow-xl'
                     }
                 >
-                    <div className={isLibrary ? 'border-b border-gray-100 px-4 py-2' : 'border-b border-slate-100 px-4 py-2.5'}>
-                        <p className={isLibrary ? 'text-xs text-gray-400' : 'text-caption-sm font-bold tracking-wider text-slate-400 uppercase'}>
-                            {isLibrary ? 'Logado como' : 'Conta'}
-                        </p>
-                        <p className={isLibrary ? 'truncate text-sm font-semibold text-gray-800' : 'truncate text-xs font-bold text-slate-800'}>
-                            {displayName}
-                        </p>
-                    </div>
+                    {user && (
+                        <div className={isLibrary ? 'border-b border-gray-100 px-4 py-2' : 'border-b border-slate-100 px-4 py-2.5'}>
+                            <p className={isLibrary ? 'text-xs text-gray-400' : 'text-caption-sm font-bold tracking-wider text-slate-400 uppercase'}>
+                                {isLibrary ? 'Logado como' : 'Conta'}
+                            </p>
+                            <p className={isLibrary ? 'truncate text-sm font-semibold text-gray-800' : 'truncate text-xs font-bold text-slate-800'}>
+                                {displayName}
+                            </p>
+                        </div>
+                    )}
                     {items.map((item) => (
                         <Link
                             key={item.id}

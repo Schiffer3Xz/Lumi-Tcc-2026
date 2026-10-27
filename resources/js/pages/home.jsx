@@ -7,6 +7,7 @@ import BookGrid from '@/features/books/BookGrid';
 import GenreDrawer from '@/features/books/GenreDrawer';
 import ReadingProgressCard from '@/features/books/ReadingProgressCard';
 import ReadingProgressDrawer from '@/features/books/ReadingProgressDrawer';
+import ReadingProgressOverview from '@/features/books/ReadingProgressOverview';
 import PrivacySettings from '@/features/profile/PrivacySettings';
 import ReadingRules from '@/features/profile/ReadingRules';
 import { readingRules } from '@/features/profile/profile-data';
@@ -36,8 +37,10 @@ export default function Home({ books = [], auth, genres = [], readingProgress = 
     const [generoAtivo, setGeneroAtivo] = useState('Todos');
     const [searchQuery, setSearchQuery] = useState('');
     const [isGenresSidebarOpen, setIsGenresSidebarOpen] = useState(false);
+    const [isProgressOverviewOpen, setIsProgressOverviewOpen] = useState(false);
     const [isProgressSidebarOpen, setIsProgressSidebarOpen] = useState(false);
     const user = auth?.user ?? { name: 'Visitante', email: '' };
+    const openProgressOverview = () => (auth?.user ? setIsProgressOverviewOpen(true) : router.get(route('reading.history')));
     const openProgress = () => (auth?.user ? setIsProgressSidebarOpen(true) : router.get(route('reading.history')));
 
     const allGenres = useMemo(() => {
@@ -159,7 +162,7 @@ export default function Home({ books = [], auth, genres = [], readingProgress = 
                     <div className="sticky top-6">
                         <QuickAccessPanel
                             title="Acesso Rápido"
-                            items={[{ label: 'Qual vai ser sua próxima leitura?', icon: 'fa-solid fa-wand-magic-sparkles', onClick: () => { window.location.hash = 'assistente-leitura'; } }, ...QUICK_ACCESS.map((item) => ({
+                            items={[{ label: 'Ver livros em progresso', icon: 'fa-solid fa-book-open-reader', onClick: openProgressOverview }, { label: 'Qual vai ser sua próxima leitura?', icon: 'fa-solid fa-wand-magic-sparkles', onClick: () => { window.location.hash = 'assistente-leitura'; } }, ...QUICK_ACCESS.map((item) => ({
                                 ...item,
                                 ...(item.panel === 'privacy' && !auth?.user
                                     ? { href: route('privacy') }
@@ -183,6 +186,9 @@ export default function Home({ books = [], auth, genres = [], readingProgress = 
                 </div>
             </div>
 
+            {isProgressOverviewOpen && (
+                <ReadingProgressOverview readingProgress={readingProgress} onClose={() => setIsProgressOverviewOpen(false)} />
+            )}
             {isProgressSidebarOpen && (
                 <ReadingProgressDrawer books={books} readingProgress={readingProgress} onClose={() => setIsProgressSidebarOpen(false)} />
             )}

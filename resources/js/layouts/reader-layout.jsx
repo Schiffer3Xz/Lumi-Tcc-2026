@@ -3,20 +3,24 @@ import Topbar from '@/components/layout/Topbar';
 import { ACCOUNT_NAVIGATION, READER_NAVIGATION } from '@/constants/navigation';
 import GuestAccessPrompt from '@/features/auth/GuestAccessPrompt';
 import BookDetailsProvider from '@/features/books/BookDetailsProvider';
-import { Head } from '@inertiajs/react';
+import { Head, usePage } from '@inertiajs/react';
 import clsx from 'clsx';
 import { useId, useState } from 'react';
 
-export default function ReaderLayout({ title, user, activeItem, variant = 'social', topbar, className, children }) {
+export default function ReaderLayout({ title, activeItem, variant = 'social', topbar, className, children }) {
+    const { auth } = usePage().props;
+    const isVisitor = !auth?.user;
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const menuId = useId();
     const isLibrary = variant === 'library';
     const navigation = READER_NAVIGATION.map(({ routeName, ...item }) => ({ ...item, href: route(routeName) }));
-    const accountItems = ACCOUNT_NAVIGATION.map(({ routeName, ...item }) => ({ ...item, href: route(routeName) }));
+    const accountItems = isVisitor
+        ? [{ id: 'login', label: 'Entrar', icon: 'fa-solid fa-right-to-bracket', href: route('login') }]
+        : ACCOUNT_NAVIGATION.map(({ routeName, ...item }) => ({ ...item, href: route(routeName) }));
     const header = (
         <Topbar
             {...topbar}
-            user={user}
+            user={isVisitor ? null : auth.user}
             accountItems={accountItems}
             variant={variant}
             menuId={menuId}

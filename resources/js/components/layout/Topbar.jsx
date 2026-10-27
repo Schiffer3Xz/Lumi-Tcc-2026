@@ -63,17 +63,20 @@ export default function Topbar({
                             <h1 className="truncate text-sm leading-tight font-bold text-slate-800" title={title}>
                                 {title}
                             </h1>
-                            <p className={clsx('truncate text-caption font-medium text-slate-400', isComposer && 'hidden sm:block')}>{subtitle}</p>
+                            <p className={clsx('text-caption truncate font-medium text-slate-400', isComposer && 'hidden sm:block')}>{subtitle}</p>
                         </div>
                     </div>
                 )}
             </div>
             <div className={clsx('flex shrink-0 items-center gap-1.5', isLibrary ? 'sm:gap-4' : actions ? 'sm:gap-3' : 'sm:gap-4')}>
                 {actions}
-                <NotificationPopover
-                    className="relative rounded-full p-2.5 text-slate-600 transition-colors hover:bg-slate-100"
-                    iconClassName="fa-regular fa-bell text-lg"
-                />
+
+                {user && (
+                    <NotificationPopover
+                        className="relative rounded-full p-2.5 text-slate-600 transition-colors hover:bg-slate-100"
+                        iconClassName="fa-regular fa-bell text-lg"
+                    />
+                )}
                 <ProfileMenu user={user} items={accountItems} variant={variant} showPhoto={showPhoto} />
             </div>
         </header>

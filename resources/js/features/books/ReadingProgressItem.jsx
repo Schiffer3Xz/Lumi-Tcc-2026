@@ -35,6 +35,26 @@ export default function ReadingProgressItem({ progress, currentPage, onChange, o
                         </span>
                         <span>{percentage}%</span>
                     </div>
+                    <label className="mt-3 flex flex-wrap items-center gap-2 text-xs font-semibold text-slate-600">
+                        <span>Página atual</span>
+                        <input
+                            type="number"
+                            inputMode="numeric"
+                            min="0"
+                            max={pageCount || 0}
+                            step="1"
+                            value={currentPage}
+                            onChange={(event) => {
+                                const page = event.target.valueAsNumber;
+                                if (Number.isFinite(page)) onChange(Math.max(0, Math.min(pageCount, Math.trunc(page))));
+                                else if (event.target.value === '') onChange(0);
+                            }}
+                            disabled={disabled || !pageCount}
+                            aria-label={`Página atual de ${book.title}`}
+                            className="focus:border-lumi-progress focus:ring-lumi-progress/20 w-20 rounded-lg border border-slate-200 px-2 py-2 text-sm text-slate-800 outline-none focus:ring-2 disabled:cursor-not-allowed disabled:opacity-50"
+                        />
+                        <span>de {pageCount || '-'}</span>
+                    </label>
                     <input
                         type="range"
                         min="0"
