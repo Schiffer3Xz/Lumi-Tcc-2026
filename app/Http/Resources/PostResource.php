@@ -19,6 +19,7 @@ class PostResource extends JsonResource
             'author' => [
                 'id' => $this->user?->id,
                 'name' => $this->user?->name,
+                'profile_photo' => $this->user?->profile_photo,
                 'username' => ltrim($this->user?->nickname ?? '', '@'),
             ],
             'book' => $this->book ? [
@@ -33,7 +34,7 @@ class PostResource extends JsonResource
             'isSaved' => (bool) $this->is_saved,
             'comments' => $this->comments->map(fn ($comment) => [
                 'id' => $comment->id,
-                'user' => $comment->user?->name,
+                'user' => ['name' => $comment->user?->name, 'profile_photo' => $comment->user?->profile_photo],
                 'text' => $comment->content,
                 'time' => $comment->created_at?->locale('pt_BR')->diffForHumans(),
                 'canDelete' => $comment->user_id === $request->user()->id || $this->fk_user_id === $request->user()->id,

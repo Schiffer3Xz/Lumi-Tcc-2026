@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\User;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 
 class ReaderNotificationService
@@ -10,6 +11,10 @@ class ReaderNotificationService
     public static function send(int $recipient, int $actor, string $kind, ?int $postId = null, ?int $conversationId = null): void
     {
         if ($recipient === $actor || ! User::whereKey($recipient)->where('social_notifications', true)->exists()) {
+            return;
+        }
+
+        if ($kind === 'message' && $conversationId && Cache::has("chat-viewing:{$recipient}:{$conversationId}")) {
             return;
         }
 

@@ -33,8 +33,8 @@ export default function AdminTopbar({ isMenuOpen, onMenuToggle }) {
                         className="flex items-center gap-2 rounded-full border border-slate-200 p-1 pr-3 text-slate-700 hover:bg-slate-50"
                         aria-label="Menu da conta"
                     >
-                        <span className="bg-lumi-navy flex h-8 w-8 items-center justify-center rounded-full text-xs font-bold text-white">
-                            {auth.user.name.slice(0, 1).toLocaleUpperCase('pt-BR')}
+                        <span className="bg-lumi-navy flex h-8 w-8 items-center justify-center overflow-hidden rounded-full text-xs font-bold text-white">
+                            {auth.user.profile_photo ? <img src={auth.user.profile_photo} alt={`Foto de perfil de ${auth.user.name}`} className="h-full w-full object-cover" /> : auth.user.name.slice(0, 1).toLocaleUpperCase('pt-BR')}
                         </span>
                         <span className="hidden max-w-36 truncate text-xs font-semibold sm:block">{auth.user.name}</span>
                         <i className="fa-solid fa-chevron-down text-caption-sm" aria-hidden="true" />

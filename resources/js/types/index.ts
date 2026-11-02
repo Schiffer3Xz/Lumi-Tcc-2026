@@ -35,6 +35,7 @@ export interface User {
     nickname?: string | null;
     description?: string | null;
     avatar?: string;
+    profile_photo?: string | null;
     email_verified_at: string | null;
     created_at: string;
     updated_at: string;

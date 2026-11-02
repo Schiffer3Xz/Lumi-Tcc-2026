@@ -11,10 +11,33 @@ use App\Models\Message;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Validation\Rule;
 
 class DirectMessageController extends Controller
 {
+    public function setViewing(Request $request, Conversation $conversation)
+    {
+        abort_unless($conversation->participants()->where('users.id', $request->user()->id)->exists(), 403);
+
+        $active = $request->validate(['active' => ['required', 'boolean']])['active'];
+        $key = "chat-viewing:{$request->user()->id}:{$conversation->id}";
+
+        if ($active) {
+            Cache::put($key, true, now()->addSeconds(45));
+            DB::table('reader_notifications')
+                ->where('user_id', $request->user()->id)
+                ->where('conversation_id', $conversation->id)
+                ->where('kind', 'message')
+                ->whereNull('read_at')
+                ->update(['read_at' => now(), 'updated_at' => now()]);
+        } else {
+            Cache::forget($key);
+        }
+
+        return response()->noContent();
+    }
+
     public function typing(Request $request, Conversation $conversation)
     {
         abort_unless($conversation->participants()->where('users.id', $request->user()->id)->exists(), 403);

@@ -6,8 +6,8 @@ export default function ReaderListItem({ user, variant = 'profile', isActive = f
         return (
             <div className="flex min-w-0 w-full flex-wrap items-center gap-1 rounded-xl border border-transparent p-2 transition-all hover:border-slate-100 hover:bg-slate-50">
                 <Link href={route('people', user.id)} className="flex min-w-0 flex-1 basis-28 items-center gap-2 text-left">
-                    <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-blue-100 text-xs font-bold text-blue-700">
-                        {user.name
+                    <div className="flex h-8 w-8 shrink-0 items-center justify-center overflow-hidden rounded-full bg-blue-100 text-xs font-bold text-blue-700">
+                        {user.profile_photo ? <img src={user.profile_photo} alt={user.name} className="h-full w-full object-cover" /> : user.name
                             .split(' ')
                             .filter(Boolean)
                             .map((name) => name[0])

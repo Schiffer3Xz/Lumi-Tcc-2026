@@ -124,7 +124,7 @@ export default function Feed({
                                     </button>
                                 </DialogTrigger>
                                 <DialogContent
-                                    className="top-0 left-0 flex h-dvh max-h-dvh w-full max-w-none translate-x-0 translate-y-0 flex-col gap-0 overflow-hidden rounded-none border-0 bg-white p-0 pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)] sm:top-1/2 sm:left-1/2 sm:h-[85dvh] sm:max-h-[90dvh] sm:w-[calc(100vw_-_2rem)] sm:max-w-md sm:-translate-x-1/2 sm:-translate-y-1/2 sm:rounded-2xl sm:border"
+                                    className="flex h-[85dvh] max-h-[90dvh] w-[calc(100%-2rem)] max-w-md flex-col gap-0 overflow-hidden rounded-2xl border-slate-200 bg-white p-0 shadow-2xl"
                                     onCloseAutoFocus={(event) => {
                                         const openPendingDialog = pendingDialogRef.current;
                                         if (!openPendingDialog) return;

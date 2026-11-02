@@ -132,11 +132,11 @@ export default function PostCard({ post, user }) {
             <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
                     <div
-                        className={`flex h-10 w-10 items-center justify-center rounded-full text-xs font-bold text-white shadow-xs ${
+                        className={`flex h-10 w-10 items-center justify-center overflow-hidden rounded-full text-xs font-bold text-white shadow-xs ${
                             post.author?.bg ?? 'bg-slate-800'
                         }`}
                     >
-                        {post.author?.avatar ?? post.author?.name?.charAt(0).toUpperCase()}
+                        {post.author?.profile_photo ? <img src={post.author.profile_photo} alt={post.author.name} className="h-full w-full object-cover" /> : post.author?.avatar ?? post.author?.name?.charAt(0).toUpperCase()}
                     </div>
 
                     <div>

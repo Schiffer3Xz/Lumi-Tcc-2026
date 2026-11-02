@@ -19,9 +19,9 @@ export default function Admins({ admins, totalAdmins }) {
                     <li key={admin.id} className="flex min-w-0 items-center gap-4 rounded-2xl border border-slate-200 bg-white p-5">
                         <span
                             aria-hidden="true"
-                            className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-blue-50 font-bold text-blue-600"
+                            className="flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-blue-50 font-bold text-blue-600"
                         >
-                            {admin.name.slice(0, 1)}
+                            {admin.profile_photo ? <img src={admin.profile_photo} alt={admin.name} className="h-full w-full object-cover" /> : admin.name.slice(0, 1)}
                         </span>
                         <div className="min-w-0">
                             <h2 className="font-semibold break-words text-slate-900">{admin.name}</h2>

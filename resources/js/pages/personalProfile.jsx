@@ -1,4 +1,3 @@
-import PreferencesPanel from '@/features/profile/PreferencesPanel';
 import { defaultPersonalProfile, readingRules } from '@/features/profile/profile-data';
 import ProfilePosts from '@/features/profile/ProfilePosts';
 import ProfileStatCard from '@/features/profile/ProfileStatCard';
@@ -6,11 +5,8 @@ import ProfileSummary from '@/features/profile/ProfileSummary';
 import ReadingRules from '@/features/profile/ReadingRules';
 import ReaderLayout from '@/layouts/reader-layout';
 import { Link } from '@inertiajs/react';
-import { useState } from 'react';
 
 export default function ConfigPage({ auth, posts = [], profileUser }) {
-    const [drawerOpen, setDrawerOpen] = useState(false);
-
     const user = auth?.user ?? defaultPersonalProfile;
 
     return (
@@ -20,20 +16,6 @@ export default function ConfigPage({ auth, posts = [], profileUser }) {
                 user={user}
                 activeItem="config"
                 variant="profile"
-                topbar={{
-                    actions: (
-                        <button
-                            type="button"
-                            aria-label="Preferências"
-                            aria-haspopup="dialog"
-                            onClick={() => setDrawerOpen(true)}
-                            className="flex items-center gap-2 rounded-xl border border-slate-200 bg-slate-50 px-3 py-1.5 text-xs font-semibold text-slate-700 transition-colors hover:bg-slate-100"
-                        >
-                            <i className="fa-solid fa-sliders text-xs" />
-                            <span className="hidden sm:inline">Preferências</span>
-                        </button>
-                    ),
-                }}
             >
                 <div className="flex flex-1 overflow-hidden">
                     {/* CONTEÚDO PRINCIPAL */}
@@ -68,7 +50,6 @@ export default function ConfigPage({ auth, posts = [], profileUser }) {
                     </main>
 
                     {/* PAINEL DIREITO - PREFERÊNCIAS */}
-                    <PreferencesPanel isOpen={drawerOpen} onClose={() => setDrawerOpen(false)} />
                 </div>
             </ReaderLayout>
         </>

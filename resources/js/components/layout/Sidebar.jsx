@@ -65,7 +65,7 @@ export default function Sidebar({ id, items, activeItem, isOpen, onClose, onNavi
             </nav>
             {children ?? (
                 <Link
-                    href={route('profile.edit')}
+                    href={route('privacy')}
                     onClick={navigate}
                     aria-label="Configurações"
                     className={clsx('rounded-xl p-3 transition-colors', inactiveClassName)}

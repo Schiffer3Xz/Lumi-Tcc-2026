@@ -1,3 +1,5 @@
+import FollowPeoplePopover from './FollowPeoplePopover';
+
 export default function ProfileSummary({ user, variant = 'personal', action }) {
     if (variant === 'personal') {
         return (
@@ -7,8 +9,8 @@ export default function ProfileSummary({ user, variant = 'personal', action }) {
                         <div className="relative shrink-0">
                             <div className="h-20 w-20 rounded-full bg-gradient-to-tr from-amber-400 to-indigo-600 p-[2px]">
                                 <div className="h-full w-full rounded-full bg-white p-[2px]">
-                                    <div className="flex h-full w-full items-center justify-center rounded-full bg-slate-800 text-2xl font-bold text-white">
-                                        {user.name.charAt(0).toUpperCase()}
+                                    <div className="flex h-full w-full items-center justify-center overflow-hidden rounded-full bg-slate-800 text-2xl font-bold text-white">
+                                        {user.profile_photo ? <img src={user.profile_photo} alt={`Foto de perfil de ${user.name}`} className="h-full w-full object-cover" /> : user.name.charAt(0).toUpperCase()}
                                     </div>
                                 </div>
                             </div>
@@ -35,15 +37,8 @@ export default function ProfileSummary({ user, variant = 'personal', action }) {
 
                 {/* CONTADORES SOCIAIS */}
                 <div className="flex flex-wrap items-center gap-4 border-t border-slate-100 pt-3 text-xs sm:gap-8">
-                    {[
-                        { label: 'Seguindo', count: user.following_count ?? user.following ?? 0 },
-                        { label: 'Seguidores', count: user.followers_count ?? user.followers ?? 0 },
-                    ].map(({ label, count }) => (
-                        <div key={label} className="flex items-center gap-1.5">
-                            <span className="text-sm font-bold text-slate-900">{count}</span>
-                            <span className="text-slate-500">{label}</span>
-                        </div>
-                    ))}
+                    <FollowPeoplePopover label="Seguindo" count={user.following_count ?? user.following ?? user.follows?.length ?? 0} people={user.follows ?? []} />
+                    <FollowPeoplePopover label="Seguidores" count={user.followers_count ?? user.followersCount ?? user.followers?.length ?? 0} people={user.followers ?? []} />
                 </div>
             </div>
         );
@@ -70,15 +65,8 @@ export default function ProfileSummary({ user, variant = 'personal', action }) {
                     </div>
                     <p className="mt-0.5 text-xs break-words text-slate-500">{user.description || 'Nenhuma descrição informada.'}</p>
                     <div className="mt-3 flex flex-wrap items-center gap-3 text-xs sm:gap-5">
-                        {[
-                            { label: 'Seguindo', count: user.following_count ?? user.following ?? 0 },
-                            { label: 'Seguidores', count: user.followers_count ?? user.followers ?? 0 },
-                        ].map(({ label, count }) => (
-                            <div key={label} className="flex items-center gap-1.5">
-                                <span className="font-bold text-slate-900">{count}</span>
-                                <span className="text-slate-500">{label}</span>
-                            </div>
-                        ))}
+                        <FollowPeoplePopover label="Seguindo" count={user.following_count ?? user.following ?? user.follows?.length ?? 0} people={user.follows ?? []} />
+                        <FollowPeoplePopover label="Seguidores" count={user.followers_count ?? user.followersCount ?? user.followers?.length ?? 0} people={user.followers ?? []} />
                     </div>
                 </div>
             </div>

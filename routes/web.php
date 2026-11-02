@@ -137,6 +137,7 @@ Route::middleware(['RoleMiddleware'])->group(function () {
         Route::delete('books/{bookId}/comments/{ratingId}', [PublicBookController::class, 'deleteComment'])->name('book.comment.destroy');
 
         Route::post('/chat/send', [DirectMessageController::class, 'start'])->name('chat');
+        Route::post('/chat/{conversation}/viewing', [DirectMessageController::class, 'setViewing'])->name('chat.viewing');
         Route::post('/chat/{conversation}/typing', [DirectMessageController::class, 'typing'])->middleware('throttle:90,1')->name('chat.typing');
         Route::post('/chat/groups', [DirectMessageController::class, 'createGroup'])->name('chat.groups.store');
         Route::post('/chat/groups/{conversation}/messages', [DirectMessageController::class, 'sendToGroup'])->name('chat.groups.messages.store');
@@ -275,7 +276,7 @@ Route::middleware(['RoleMiddleware'])->group(function () {
                 ->name('admin.settings.password.update');
 
             // Profile
-            Route::put('admin/settings/profile', [AdminSettingsController::class, 'updateProfile'])
+            Route::post('admin/settings/profile', [AdminSettingsController::class, 'updateProfile'])
                 ->name('admin.settings.profile.update');
 
             Route::get('admin/settings/profile', [AdminSettingsController::class, 'create'])

@@ -9,6 +9,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -27,14 +28,22 @@ class ProfileController extends Controller
      */
     public function update(ProfileUpdateRequest $request): RedirectResponse
     {
-        app(\App\Services\Moderation\PublicationModeration::class)->validateProfile($request->validated(), $request->user());
-        $request->user()->fill($request->validated());
+        app(\App\Services\Moderation\PublicationModeration::class)->validateProfile($request->safe()->only(['name', 'nickname', 'description']), $request->user());
+        $user = $request->user();
+        $user->fill($request->safe()->only(['name', 'nickname', 'description', 'email']));
 
-        if ($request->user()->isDirty('email')) {
-            $request->user()->email_verified_at = null;
+        if ($request->hasFile('profile_photo')) {
+            if ($user->profile_photo) {
+                Storage::disk('public')->delete(str_replace('/storage/', '', parse_url($user->profile_photo, PHP_URL_PATH) ?: $user->profile_photo));
+            }
+            $user->profile_photo = '/storage/'.$request->file('profile_photo')->store('profile-photos', 'public');
         }
 
-        $request->user()->save();
+        if ($user->isDirty('email')) {
+            $user->email_verified_at = null;
+        }
+
+        $user->save();
 
         return to_route('profile.edit');
     }

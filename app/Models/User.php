@@ -27,6 +27,17 @@ class User extends Authenticatable
         'description',
     ];
 
+    public function getProfilePhotoAttribute(?string $value): ?string
+    {
+        if (! $value) {
+            return null;
+        }
+
+        $path = parse_url($value, PHP_URL_PATH);
+
+        return is_string($path) && str_starts_with($path, '/storage/') ? $path : $value;
+    }
+
     public function friend()
     {
         return $this->belongsToMany(

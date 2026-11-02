@@ -63,13 +63,13 @@ export default function ProfileMenu({ user, items, variant = 'social', showPhoto
             >
                 <UserAvatar
                     name={displayName}
-                    src={showPhoto ? user?.profile_photo : undefined}
+                    src={user?.profile_photo}
                     className={clsx(
                         isLibrary
                             ? 'bg-lumi-navy flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-sm font-bold text-yellow-300'
                             : 'flex h-8 w-8 items-center justify-center rounded-full bg-slate-800 text-xs font-bold text-white',
                         isProfile && 'shadow-xs',
-                        showPhoto && 'overflow-hidden',
+                        'overflow-hidden',
                     )}
                 >
                     {isLibrary ? <i aria-hidden="true" className="fa-solid fa-user text-xs" /> : undefined}

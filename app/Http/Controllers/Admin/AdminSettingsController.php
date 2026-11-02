@@ -9,6 +9,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\URL;
 use Inertia\Inertia;
 use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
@@ -118,17 +119,24 @@ class AdminSettingsController extends Controller
     public function updateProfile(Request $request)
     {
         $request->validate([
-            'name' => 'required|string|max:255',
-            'nickname' => 'required|string|max:255|unique:users,nickname,'.auth()->id(),
-            'description' => 'required|string|max:255',
+            'name' => 'sometimes|required|string|max:255',
+            'nickname' => 'sometimes|required|string|max:255|unique:users,nickname,'.auth()->id(),
+            'description' => 'sometimes|nullable|string|max:255',
+            'profile_photo' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:5120',
         ]);
 
         $user = auth()->user();
 
-        app(\App\Services\Moderation\PublicationModeration::class)->validateProfile($request->only('name', 'nickname', 'description'), $user);
-        $user->name = $request->name;
-        $user->nickname = $request->nickname;
-        $user->description = $request->description;
+        $profileFields = $request->safe()->only(['name', 'nickname', 'description']);
+        app(\App\Services\Moderation\PublicationModeration::class)->validateProfile($profileFields, $user);
+        $user->fill($profileFields);
+
+        if ($request->hasFile('profile_photo')) {
+            if ($user->profile_photo) {
+                Storage::disk('public')->delete(str_replace('/storage/', '', parse_url($user->profile_photo, PHP_URL_PATH) ?: $user->profile_photo));
+            }
+            $user->profile_photo = '/storage/'.$request->file('profile_photo')->store('profile-photos', 'public');
+        }
 
         $user->save();
 

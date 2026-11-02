@@ -71,6 +71,7 @@ class SocialController extends Controller
         $userSummary = fn ($user) => [
             'id' => $user->id,
             'name' => $user->name,
+            'profile_photo' => $user->profile_photo,
             'nickname' => $user->nickname,
             'isFollowing' => $followingIds->contains($user->id),
         ];
@@ -125,7 +126,9 @@ class SocialController extends Controller
 
     public function profile()
     {
-        $profileUser = User::withCount(['followers', 'follows as following_count'])->findOrFail(auth()->id());
+        $profileUser = User::with(['followers:id,name,nickname,profile_photo', 'follows:id,name,nickname,profile_photo'])
+            ->withCount(['followers', 'follows as following_count'])
+            ->findOrFail(auth()->id());
         $profileUser->setAttribute('reading_books_count', DB::table('reading_progresses')->where('user_id', $profileUser->id)->count());
         $profileUser->setAttribute('shelf_books_count', DB::table('book_favorites')->where('user_id', $profileUser->id)->count());
         $profileUser->setAttribute('rated_books_count', DB::table('book_ratings')->where('user_id', $profileUser->id)->count());
@@ -161,7 +164,9 @@ class SocialController extends Controller
 
     public function people($id)
     {
-        $targetUser = User::withCount(['followers', 'follows as following_count'])->findOrFail($id);
+        $targetUser = User::with(['followers:id,name,nickname,profile_photo', 'follows:id,name,nickname,profile_photo'])
+            ->withCount(['followers', 'follows as following_count'])
+            ->findOrFail($id);
         $targetUser->setAttribute('reading_books_count', DB::table('reading_progresses')->where('user_id', $targetUser->id)->count());
         $targetUser->setAttribute('shelf_books_count', DB::table('book_favorites')->where('user_id', $targetUser->id)->count());
         $targetUser->setAttribute('rated_books_count', DB::table('book_ratings')->where('user_id', $targetUser->id)->count());
@@ -186,11 +191,14 @@ class SocialController extends Controller
                 ];
             }),
 
-            'targetUser' => $targetUser->only([
+            'targetUser' => array_merge($targetUser->only([
                 'id', 'name', 'nickname', 'description', 'profile_photo',
                 'read_books', 'reading_books', 'shelf_books', 'rated_books',
                 'followers_count', 'following_count', 'reading_books_count',
                 'shelf_books_count', 'rated_books_count', 'posts_count',
+            ]), [
+                'followers' => $targetUser->followers->map(fn (User $person) => $person->only(['id', 'name', 'nickname', 'profile_photo']))->values(),
+                'follows' => $targetUser->follows->map(fn (User $person) => $person->only(['id', 'name', 'nickname', 'profile_photo']))->values(),
             ]),
             'isFollowing' => Follow::where('fk_follower_id', auth()->id())
                 ->where('fk_followed_id', $id)

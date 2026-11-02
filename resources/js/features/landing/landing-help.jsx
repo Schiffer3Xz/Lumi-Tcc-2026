@@ -15,7 +15,7 @@ export default function LandingHelp() {
                 </button>
             </DialogTrigger>
             <DialogContent className="bg-lumi-landing rounded-2xl border-slate-700 text-white">
-                <DialogTitle className="pr-6">Como começar no Lumi</DialogTitle>
+                <DialogTitle className="pr-6 text-white">Como começar no Lumi</DialogTitle>
                 <DialogDescription className="text-slate-300">Encontre seu próximo livro e organize suas leituras.</DialogDescription>
                 <div className="space-y-5 text-sm leading-relaxed text-slate-300">
                     <p>

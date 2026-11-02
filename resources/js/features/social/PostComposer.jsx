@@ -60,8 +60,8 @@ export default function PostComposer({ user, onSubmit, processing = false, error
         >
             {/* AUTOR */}
             <div className="flex items-center gap-3">
-                <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full bg-slate-800 text-xs font-bold text-white sm:h-10 sm:w-10">
-                    {user.name.charAt(0).toUpperCase()}
+                <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center overflow-hidden rounded-full bg-slate-800 text-xs font-bold text-white sm:h-10 sm:w-10">
+                    {user.profile_photo ? <img src={user.profile_photo} alt={user.name} className="h-full w-full object-cover" /> : user.name.charAt(0).toUpperCase()}
                 </div>
 
                 <div className="min-w-0">

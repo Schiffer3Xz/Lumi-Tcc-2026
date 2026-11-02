@@ -14,20 +14,30 @@ export default function ProfileEdit() {
     const { auth } = usePage().props;
     const user = auth?.user ?? {};
     const [savedMessage, setSavedMessage] = useState(false);
-    const { data, setData, patch, errors, processing } = useForm({
+    const [photoPreview, setPhotoPreview] = useState(user.profile_photo ?? null);
+    const { data, setData, post, errors, processing } = useForm({
         name: user.name ?? '',
         nickname: user.nickname ?? '',
         description: user.description ?? '',
         email: user.email ?? '',
+        profile_photo: null,
     });
 
     const submit = (event) => {
         event.preventDefault();
         setSavedMessage(false);
-        patch(route('profile.update'), {
+        post(route('profile.update'), {
             preserveScroll: true,
             onSuccess: () => setSavedMessage(true),
         });
+    };
+
+    const choosePhoto = (event) => {
+        const file = event.target.files?.[0];
+        if (!file) return;
+        setData('profile_photo', file);
+        setPhotoPreview(URL.createObjectURL(file));
+        setSavedMessage(false);
     };
 
     return (
@@ -63,8 +73,13 @@ export default function ProfileEdit() {
                         <aside className="h-fit rounded-2xl border border-slate-200/80 bg-white p-5 shadow-xs">
                             <div className="flex flex-col items-center text-center">
                                 <div className="flex h-24 w-24 items-center justify-center overflow-hidden rounded-full border-4 border-amber-100 bg-slate-800 text-3xl font-bold text-white shadow-sm">
-                                    {user.name ? user.name.charAt(0).toUpperCase() : 'U'}
+                                    {photoPreview ? <img src={photoPreview} alt={`Foto de perfil de ${user.name}`} className="h-full w-full object-cover" /> : (user.name ? user.name.charAt(0).toUpperCase() : 'U')}
                                 </div>
+                                <label className="mt-3 inline-flex cursor-pointer items-center gap-2 rounded-lg border border-slate-200 px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50">
+                                    <i className="fa-solid fa-camera" /> {photoPreview ? 'Alterar foto' : 'Adicionar foto'}
+                                    <input type="file" accept="image/jpeg,image/png,image/webp" className="sr-only" onChange={choosePhoto} disabled={processing} />
+                                </label>
+                                {errors.profile_photo && <FieldError id="profile-photo-error" message={errors.profile_photo} />}
                                 <h2 className="mt-4 text-base font-bold text-slate-900">{user.name || 'Leitor'}</h2>
                                 <p className="mt-1 text-xs text-slate-500">
                                     {user.nickname ? `@${user.nickname.replace('@', '')}` : 'Adicione um nickname'}

@@ -44,7 +44,7 @@ function PostHeader({ post, user }) {
                     className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-slate-800 text-caption font-bold text-white"
                     aria-hidden="true"
                 >
-                    {user.name.charAt(0).toUpperCase()}
+                    {user.profile_photo ? <img src={user.profile_photo} alt={user.name} className="h-full w-full rounded-full object-cover" /> : user.name.charAt(0).toUpperCase()}
                 </span>
                 <div className="min-w-0">
                     <h3 className="truncate text-xs font-semibold text-slate-900">{user.name}</h3>

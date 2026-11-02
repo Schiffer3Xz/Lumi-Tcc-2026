@@ -24,8 +24,8 @@ export default function PostComments({ postId, comments = [], user, inputRef, bu
     return (
         <div className="flex flex-col gap-3 pt-1">
             <form onSubmit={submit} className="flex items-center gap-2">
-                <div className="text-caption-sm flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full bg-slate-800 font-bold text-white">
-                    {user.name?.charAt(0).toUpperCase()}
+                <div className="text-caption-sm flex h-7 w-7 flex-shrink-0 items-center justify-center overflow-hidden rounded-full bg-slate-800 font-bold text-white">
+                    {user.profile_photo ? <img src={user.profile_photo} alt={user.name} className="h-full w-full object-cover" /> : user.name?.charAt(0).toUpperCase()}
                 </div>
                 <div className="relative flex-1">
                     <input

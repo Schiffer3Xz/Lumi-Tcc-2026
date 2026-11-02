@@ -34,6 +34,40 @@ export default function ChatDialog({ recipient, viewerId, messages = [], convers
         if (conversationId) setActiveConversationId(conversationId);
     }, [conversationId]);
 
+    useEffect(() => {
+        if (!activeConversationId) return;
+
+        let stopped = false;
+        let lastActive = null;
+        const updateViewing = (active) => {
+            const shouldRefreshNotifications = active && lastActive !== true;
+            lastActive = active;
+            chatRequest(route('chat.viewing', activeConversationId, false), {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ active }),
+            })
+                .then(() => {
+                    if (shouldRefreshNotifications && !stopped) router.reload({ only: ['unreadNotifications'], async: true });
+                })
+                .catch(() => {});
+        };
+        const syncVisibility = () => updateViewing(!document.hidden);
+
+        syncVisibility();
+        const heartbeat = window.setInterval(() => {
+            if (!document.hidden) updateViewing(true);
+        }, 15000);
+        document.addEventListener('visibilitychange', syncVisibility);
+
+        return () => {
+            stopped = true;
+            window.clearInterval(heartbeat);
+            document.removeEventListener('visibilitychange', syncVisibility);
+            updateViewing(false);
+        };
+    }, [activeConversationId]);
+
     const sortMessages = (messageList) =>
         [...messageList].sort((first, second) => new Date(first.created_at).getTime() - new Date(second.created_at).getTime());
 
