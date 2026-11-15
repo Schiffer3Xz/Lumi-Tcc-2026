@@ -42,10 +42,11 @@ Route::middleware(['auth', 'RoleMiddleware'])->group(function () {
         ->name('admin.email-verification');
 
     Route::post('admin/verification/resend', [AdminSettingsController::class, 'resendVerification'])
+        ->middleware('throttle:6,1')
         ->name('admin.email.resend');
 
     Route::get('admin/verification/{id}/{hash}', [AdminSettingsController::class, 'verifyEmail'])
-        ->middleware('signed')
+        ->middleware(['signed', 'throttle:6,1'])
         ->name('admin.email.verify');
 
     Route::post('admin/credentials', [AdminSettingsController::class, 'update'])
@@ -64,6 +65,7 @@ Route::middleware(['RoleMiddleware'])->group(function () {
             ? DB::table('book_favorites')->where('user_id', auth()->id())->pluck('book_id')->flip()
             : collect();
         $books = Book::with(['author', 'genre', 'availability'])
+            ->withReaderCount()
             ->withAvg('ratings', 'rating')
             ->get()
             ->map(function ($book) use ($favoriteIds) {

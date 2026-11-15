@@ -14,9 +14,9 @@ export default function Dashboard(props) {
         ['Cadastrados no mês', props.totalBooksPerMonth, 'fa-calendar'],
     ];
     return (
-        <AdminLayout title="Painel administrativo">
+        <AdminLayout title="Painel administrativo" fitViewport>
             <AdminPageHeader title="Seu acervo em um só lugar." description="Acompanhe os livros, autores e atividades da Sala de Leitura." />
-            <div className="mb-6 grid grid-cols-2 gap-3 sm:grid-cols-4 xl:grid-cols-7">
+            <div className="admin-dashboard-stats mb-6 grid grid-cols-2 gap-3 sm:grid-cols-4 xl:grid-cols-7">
                 {stats.map(([label, value, icon]) => (
                     <AdminStatCard key={label} label={label} value={value} icon={icon} />
                 ))}

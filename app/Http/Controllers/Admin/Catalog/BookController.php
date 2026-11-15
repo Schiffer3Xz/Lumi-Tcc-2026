@@ -27,7 +27,7 @@ class BookController extends Controller
 
     public function updateView()
     {
-        $books = Book::with(['author', 'genre', 'availability'])->latest()->get();
+        $books = Book::with(['author', 'genre', 'availability'])->withReaderCount()->latest()->get();
 
         return Inertia::render('admin/books/availability', compact('books'));
     }
@@ -37,6 +37,7 @@ class BookController extends Controller
         $request->validate([
             'title' => 'required|string|max:150',
             'page_count' => 'required|integer|min:1',
+            'publication_year' => 'nullable|integer|min:1|max:9999',
 
             'fk_author_id' => 'required|exists:authors,id',
             'fk_genre_id' => 'required|exists:genres,id',
@@ -54,6 +55,7 @@ class BookController extends Controller
         Book::create([
             'title' => $request->title,
             'page_count' => $request->page_count,
+            'publication_year' => $request->input('publication_year'),
             'fk_author_id' => $request->fk_author_id,
             'fk_genre_id' => $request->fk_genre_id,
             'fk_availability_id' => $request->fk_availability_id,
@@ -66,14 +68,14 @@ class BookController extends Controller
 
     public function list()
     {
-        $books = Book::with(['author', 'genre', 'availability'])->latest()->get();
+        $books = Book::with(['author', 'genre', 'availability'])->withReaderCount()->latest()->get();
 
         return Inertia::render('admin/books/index', compact('books'));
     }
 
     public function edit($id)
     {
-        $book = Book::findOrFail($id);
+        $book = Book::withReaderCount()->findOrFail($id);
         $authors = Author::orderBy('name')->get();
         $genres = Genre::orderBy('name')->get();
         $availabilities = Availability::all();
@@ -97,6 +99,7 @@ class BookController extends Controller
         $request->validate([
             'title' => 'required|string|max:150',
             'page_count' => 'required|integer|min:1',
+            'publication_year' => 'nullable|integer|min:1|max:9999',
             'fk_author_id' => 'required|exists:authors,id',
             'fk_genre_id' => 'required|exists:genres,id',
             'fk_availability_id' => 'required|exists:availabilities,id',
@@ -112,6 +115,7 @@ class BookController extends Controller
         $book->update([
             'title' => $request->title,
             'page_count' => $request->page_count,
+            'publication_year' => $request->input('publication_year'),
             'fk_author_id' => $request->fk_author_id,
             'fk_genre_id' => $request->fk_genre_id,
             'fk_availability_id' => $request->fk_availability_id,

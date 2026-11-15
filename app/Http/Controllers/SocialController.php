@@ -103,6 +103,10 @@ class SocialController extends Controller
                 ])
                 ->when($request->filled('post'), fn ($query) => $query->whereKey($request->integer('post')))
                 ->when($request->boolean('saved'), fn ($query) => $query->whereHas('saves', fn ($saved) => $saved->where('users.id', $user->id)))
+                ->when(! $request->boolean('saved') && ! $request->filled('post'), fn ($query) => $query->orderByRaw(
+                    'CASE WHEN EXISTS (SELECT 1 FROM follows WHERE follows.fk_follower_id = ? AND follows.fk_followed_id = posts.fk_user_id) THEN 0 ELSE 1 END',
+                    [$user->id],
+                ))
                 ->latest()
                 ->orderByDesc('id')
                 ->get()
@@ -135,7 +139,7 @@ class SocialController extends Controller
         $profileUser->setAttribute('posts_count', DB::table('posts')->where('fk_user_id', $profileUser->id)->count());
 
         $posts = Post::where('fk_user_id', auth()->id())
-            ->with(['book.author', 'book' => fn ($query) => $query->withAvg('ratings', 'rating')])
+            ->with(['book.author', 'book' => fn ($query) => $query->withReaderCount()->withAvg('ratings', 'rating')])
             ->withCount(['likes', 'comments'])
             ->latest()
             ->get()
@@ -147,6 +151,11 @@ class SocialController extends Controller
                 'comments' => $post->comments_count,
                 'time' => $post->created_at?->locale('pt_BR')->diffForHumans(),
                 'book' => $post->book ? [
+                    'id' => $post->book->id,
+                    'author' => $post->book->author?->name,
+                    'cover_url' => $post->book->cover_url
+                        ? (str_starts_with($post->book->cover_url, 'http') ? $post->book->cover_url : asset('storage/'.$post->book->cover_url))
+                        : null,
                     'title' => $post->book->title,
                     'publisher' => $post->book->publisher,
                     'page_count' => $post->book->page_count,

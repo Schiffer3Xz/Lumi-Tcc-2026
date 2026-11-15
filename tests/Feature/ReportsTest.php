@@ -84,11 +84,11 @@ class ReportsTest extends TestCase
         $admin = $this->admin();
         $this->actingAs($admin)->get(route('admin.reports.index'))->assertInertia(fn (Assert $page) => $page
             ->component('admin/reports/index')->has('reports.data', 15)->where('reports.total', 17)
-            ->where('counts.pending', 17)->where('reports.data.0.reporter', 'Leitora da comunidade')
-            ->missing('reports.data.0.reporter.email'));
+            ->where('counts.pending', 17)->missing('reports.data.0.reporter')
+            ->missing('reports.data.0.fk_user_id'));
         $this->get(route('admin.reports.index', ['page' => 2]))->assertInertia(fn (Assert $page) => $page->has('reports.data', 2));
         $this->get(route('admin.reports.index', ['q' => 'Relato 17']))->assertInertia(fn (Assert $page) => $page->where('reports.total', 1));
-        $this->get(route('admin.reports.index', ['q' => 'Leitora']))->assertInertia(fn (Assert $page) => $page->where('reports.total', 17));
+        $this->get(route('admin.reports.index', ['q' => 'Leitora']))->assertInertia(fn (Assert $page) => $page->where('reports.total', 0));
 
         $this->from(route('admin.reports.index'))->patch(route('admin.reports.update', $report), [
             'status' => 'reviewed', 'review_note' => 'Analisado pela equipe.', 'reviewed_by' => $reader->id,
@@ -134,6 +134,6 @@ class ReportsTest extends TestCase
         $this->assertNull($report->fresh()->fk_user_id);
         $this->actingAs($this->admin())->get(route('admin.reports.index'))->assertInertia(fn (Assert $page) => $page
             ->where('reports.data.0.target.content', 'Texto original')->where('reports.data.0.target.deleted', true)
-            ->where('reports.data.0.reporter', 'Conta removida'));
+            ->missing('reports.data.0.reporter'));
     }
 }

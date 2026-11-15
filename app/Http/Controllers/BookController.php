@@ -13,6 +13,7 @@ class BookController extends Controller
     public function favorites(Request $request)
     {
         $books = Book::with(['author', 'genre', 'availability'])
+            ->withReaderCount()
             ->withAvg('ratings', 'rating')
             ->whereIn('id', DB::table('book_favorites')
                 ->where('user_id', $request->user()->id)
@@ -54,6 +55,7 @@ class BookController extends Controller
     public function show(Request $request, int $id)
     {
         $book = Book::with(['author', 'genre', 'availability'])
+            ->withReaderCount()
             ->withAvg('ratings', 'rating')
             ->findOrFail($id);
         $similarBooks = Book::with(['author', 'genre', 'availability'])

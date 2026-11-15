@@ -33,6 +33,7 @@ class ProfileController extends Controller
         $user->fill($request->safe()->only(['name', 'nickname', 'description', 'email']));
 
         if ($request->hasFile('profile_photo')) {
+            app(\App\Services\Moderation\PublicationModeration::class)->validateImage($request->file('profile_photo'), 'profile_photo');
             if ($user->profile_photo) {
                 Storage::disk('public')->delete(str_replace('/storage/', '', parse_url($user->profile_photo, PHP_URL_PATH) ?: $user->profile_photo));
             }

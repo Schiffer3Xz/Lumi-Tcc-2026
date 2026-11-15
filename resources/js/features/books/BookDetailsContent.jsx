@@ -96,7 +96,7 @@ export default function BookDetailsContent({ book, similarBooks = [], comments =
             <article className="overflow-hidden rounded-3xl border border-slate-200/80 bg-white shadow-sm">
                 <div className="grid lg:grid-cols-[320px_minmax(0,1fr)]">
                     {/* Left Column: Cover & Quick Actions */}
-                    <div className="relative flex flex-col items-center justify-between bg-gradient-to-b from-slate-100 to-slate-200/60 p-8">
+                    <div className="relative flex flex-col items-center justify-center bg-gradient-to-b from-slate-100 to-slate-200/60 p-8">
                         <div className="absolute top-4 left-4">
                             <span
                                 className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-bold shadow-sm ${
@@ -124,13 +124,6 @@ export default function BookDetailsContent({ book, similarBooks = [], comments =
                             )}
                         </div>
 
-                        <div className="w-full rounded-2xl border border-slate-200/60 bg-white/80 p-4 text-center shadow-sm backdrop-blur-md">
-                            <span className="text-caption font-semibold tracking-wider text-slate-400 uppercase">Formato do Acervo</span>
-                            <p className="mt-1 flex items-center justify-center gap-2 text-sm font-medium text-slate-800">
-                                <i className="fa-solid fa-barcode text-blue-600" />
-                                ISBN / Código: {book.isbn || 'Não informado'}
-                            </p>
-                        </div>
                     </div>
 
                     {/* Right Column: Complete Book Information */}

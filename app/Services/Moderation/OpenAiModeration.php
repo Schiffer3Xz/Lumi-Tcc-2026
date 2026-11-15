@@ -13,7 +13,7 @@ class OpenAiModeration
         return (bool) config('services.openai.moderation_enabled') && filled(config('services.openai.key'));
     }
 
-    public function analyze(string $text): array
+    public function analyze(string|array $text): array
     {
         if (! $this->available()) {
             throw new ModerationUnavailable('Moderação indisponível.');

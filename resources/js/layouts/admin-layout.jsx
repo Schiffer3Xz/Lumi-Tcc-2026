@@ -6,7 +6,7 @@ import { Head, Link, usePage } from '@inertiajs/react';
 import { useState } from 'react';
 import '../../css/admin.css';
 
-export default function AdminLayout({ title, section = 'dashboard', firstAccess = false, step = 1, children }) {
+export default function AdminLayout({ title, section = 'dashboard', firstAccess = false, step = 1, fitViewport = false, children }) {
     const [menuOpen, setMenuOpen] = useState(false);
     const { flash } = usePage().props;
     const { url } = usePage();
@@ -57,7 +57,7 @@ export default function AdminLayout({ title, section = 'dashboard', firstAccess 
                     </div>
                 </main>
             ) : (
-                <div className="flex min-h-dvh">
+                <div className={`flex min-h-dvh ${fitViewport ? 'admin-dashboard-viewport' : ''}`}>
                     <Sidebar
                         id="admin-sidebar"
                         items={adminNavigation.map((item) => ({ ...item, href: route(item.route) }))}
@@ -75,7 +75,7 @@ export default function AdminLayout({ title, section = 'dashboard', firstAccess 
                             <i className="fa-solid fa-right-from-bracket" aria-hidden="true" />
                         </Link>
                     </Sidebar>
-                    <div className="flex min-w-0 flex-1 flex-col">
+                    <div className="admin-shell flex min-w-0 flex-1 flex-col">
                         <AdminTopbar isMenuOpen={menuOpen} onMenuToggle={() => setMenuOpen(!menuOpen)} />
                         <main id="admin-content" tabIndex={-1} className="admin-content max-w-lumi-page mx-auto w-full flex-1 p-4 sm:p-6 lg:p-8">
                             {adminSections[section] && (
@@ -99,7 +99,7 @@ export default function AdminLayout({ title, section = 'dashboard', firstAccess 
                             {messages}
                             {children}
                         </main>
-                        <footer className="px-6 py-5 text-center text-caption text-slate-500">Sala de Leitura · Painel administrativo</footer>
+                        <footer className="text-caption px-6 py-5 text-center text-slate-500">Sala de Leitura · Painel administrativo</footer>
                     </div>
                 </div>
             )}

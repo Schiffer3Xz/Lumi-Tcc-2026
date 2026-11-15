@@ -14,8 +14,8 @@ export default function Books({ books }) {
         `${book.title} ${book.author?.name ?? ''}`.toLocaleLowerCase('pt-BR').includes(query.toLocaleLowerCase('pt-BR')),
     );
     return (
-        <AdminLayout title="Livros do acervo" section="catalog">
-            <AdminPageHeader title="Livros do acervo" description="Consulte, edite e organize as obras cadastradas.">
+        <AdminLayout title="Editar livros" section="catalog">
+            <AdminPageHeader title="Editar livros" description="Consulte e atualize as informações dos livros cadastrados.">
                 <Link href={route('admin.books.index')} className="admin-button-primary">
                     Cadastrar livro
                 </Link>

@@ -3,6 +3,8 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
@@ -25,6 +27,19 @@ class Book extends Model
     public function author(): BelongsTo
     {
         return $this->belongsTo(Author::class, 'fk_author_id');
+    }
+
+    public function scopeWithReaderCount(Builder $query): Builder
+    {
+        if ($query->getQuery()->columns === null) {
+            $query->select('books.*');
+        }
+
+        return $query->selectSub(
+            DB::table('reading_progresses')->selectRaw('COUNT(DISTINCT user_id)')
+                ->whereColumn('reading_progresses.book_id', 'books.id'),
+            'readers_count',
+        );
     }
 
     public function genre(): BelongsTo

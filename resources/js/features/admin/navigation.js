@@ -1,9 +1,7 @@
 export const adminSections = {
     catalog: [
-        ['admin.catalog.index', 'Acervo'],
-        ['admin.books.list', 'Livros'],
+        ['admin.books.list', 'Editar livros'],
         ['admin.books.index', 'Cadastrar livro'],
-        ['admin.books.create', 'Disponibilidade'],
     ],
     categories: [
         ['admin.categories.index', 'Categorias'],
@@ -22,8 +20,9 @@ export const adminSections = {
 
 export const adminNavigation = [
     { id: 'dashboard', route: 'admin.dashboard', label: 'Início', icon: 'fa-solid fa-house' },
-    { id: 'catalog', route: 'admin.catalog.index', label: 'Acervo', icon: 'fa-solid fa-book-open' },
-    { id: 'categories', route: 'admin.categories.index', label: 'Categorias', icon: 'fa-solid fa-layer-group' },
+    { id: 'catalog', route: 'admin.books.list', label: 'Acervo', icon: 'fa-solid fa-book-open' },
+    { id: 'availability', route: 'admin.books.create', label: 'Status', icon: 'fa-solid fa-rotate' },
+    { id: 'categories', route: 'admin.categories.index', label: 'Cadastros', icon: 'fa-solid fa-layer-group' },
     { id: 'reports', route: 'admin.reports.index', label: 'Denúncias', icon: 'fa-solid fa-flag' },
     { id: 'settings', route: 'admin.settings.index', label: 'Config', icon: 'fa-solid fa-gear' },
 ];

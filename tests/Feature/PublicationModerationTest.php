@@ -120,11 +120,95 @@ class PublicationModerationTest extends TestCase
         Http::assertSentCount(1);
     }
 
-    public function test_image_only_posts_keep_existing_flow_without_sending_image(): void
+    public function test_safe_image_is_analyzed_before_being_saved(): void
     {
         Storage::fake('public');
+        $response = $this->response(false);
+        $response['results'][0]['categories']['sexual'] = false;
+        $response['results'][0]['category_scores']['sexual'] = 0.01;
+        Http::fake(['api.openai.com/v1/moderations' => Http::response($response)]);
         $this->post(route('posts.store'), ['image' => $this->image()])->assertSessionHasNoErrors();
         $this->assertDatabaseCount('posts', 1);
+        $this->assertCount(1, Storage::disk('public')->allFiles());
+        Http::assertSent(fn ($request) => $request['input'][0]['type'] === 'image_url'
+            && str_starts_with($request['input'][0]['image_url']['url'], 'data:image/png;base64,'));
+    }
+
+    public function test_explicit_image_is_not_saved_even_with_safe_caption_or_spoofed_result(): void
+    {
+        Storage::fake('public');
+        $response = $this->response(true);
+        $response['results'][0]['categories']['sexual'] = true;
+        $response['results'][0]['category_scores']['sexual'] = 0.99;
+        Http::fakeSequence()->push($this->response(false))->push($response);
+        $this->post(route('posts.store'), [
+            'content' => 'Uma boa leitura.', 'image' => $this->image(),
+            'skip_moderation' => true, 'moderation_result' => ['flagged' => false],
+        ])->assertSessionHasErrors(['image', 'moderation']);
+        $this->assertDatabaseCount('posts', 0);
+        $this->assertSame([], Storage::disk('public')->allFiles());
+    }
+
+    public function test_image_score_blocks_content_below_provider_default_flag(): void
+    {
+        Storage::fake('public');
+        config(['services.openai.image_sexual_threshold' => 0.05]);
+        foreach ([0.05, 0.15, 0.49] as $score) {
+            $response = $this->response(false);
+            $response['results'][0]['categories']['sexual'] = false;
+            $response['results'][0]['category_scores']['sexual'] = $score;
+            Http::fake(['api.openai.com/v1/moderations' => Http::response($response)]);
+            $this->post(route('posts.store'), ['image' => $this->image()])
+                ->assertSessionHasErrors(['image', 'moderation']);
+        }
+        $this->assertDatabaseCount('posts', 0);
+        $this->assertSame([], Storage::disk('public')->allFiles());
+    }
+
+    public function test_unavailable_or_partial_image_analysis_never_publishes(): void
+    {
+        Storage::fake('public');
+        foreach ([Http::response([], 503), Http::response($this->response(false)), Http::response(['results' => []])] as $response) {
+            Http::fake(['api.openai.com/v1/moderations' => $response]);
+            $this->post(route('posts.store'), ['image' => $this->image()])->assertSessionHasErrors('image');
+        }
+        $this->assertDatabaseCount('posts', 0);
+        $this->assertSame([], Storage::disk('public')->allFiles());
+    }
+
+    public function test_disabled_image_moderation_blocks_uploads(): void
+    {
+        Storage::fake('public');
+        config(['services.openai.moderation_enabled' => false]);
+        $this->post(route('posts.store'), ['image' => $this->image()])->assertSessionHasErrors('image');
+        $this->assertDatabaseCount('posts', 0);
+        $this->assertSame([], Storage::disk('public')->allFiles());
+        Http::assertNothingSent();
+    }
+
+    public function test_rejected_profile_image_preserves_previous_photo(): void
+    {
+        Storage::fake('public');
+        Storage::disk('public')->put('profile-photos/previous.png', 'previous');
+        auth()->user()->forceFill(['profile_photo' => '/storage/profile-photos/previous.png'])->save();
+        $response = $this->response(true);
+        $response['results'][0]['categories']['sexual'] = true;
+        $response['results'][0]['category_scores']['sexual'] = 0.99;
+        Http::fake(['api.openai.com/v1/moderations' => Http::response($response)]);
+        $this->post(route('profile.update'), ['profile_photo' => $this->image()])
+            ->assertSessionHasErrors('profile_photo');
+        $this->assertSame('/storage/profile-photos/previous.png', auth()->user()->fresh()->profile_photo);
+        Storage::disk('public')->assertExists('profile-photos/previous.png');
+        $this->assertCount(1, Storage::disk('public')->allFiles());
+    }
+
+    public function test_missing_key_blocks_image_upload(): void
+    {
+        Storage::fake('public');
+        config(['services.openai.key' => '']);
+        $this->post(route('posts.store'), ['image' => $this->image()])->assertSessionHasErrors('image');
+        $this->assertDatabaseCount('posts', 0);
+        $this->assertSame([], Storage::disk('public')->allFiles());
         Http::assertNothingSent();
     }
 

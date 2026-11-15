@@ -1,4 +1,5 @@
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import PostBookCard from '@/features/social/PostBookCard';
 import { Link, useForm } from '@inertiajs/react';
 
 function PostOptions({ postId }) {
@@ -41,10 +42,14 @@ function PostHeader({ post, user }) {
         <div className="flex items-center justify-between gap-2 p-3">
             <div className="flex min-w-0 items-center gap-2.5">
                 <span
-                    className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-slate-800 text-caption font-bold text-white"
+                    className="text-caption flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-slate-800 font-bold text-white"
                     aria-hidden="true"
                 >
-                    {user.profile_photo ? <img src={user.profile_photo} alt={user.name} className="h-full w-full rounded-full object-cover" /> : user.name.charAt(0).toUpperCase()}
+                    {user.profile_photo ? (
+                        <img src={user.profile_photo} alt={user.name} className="h-full w-full rounded-full object-cover" />
+                    ) : (
+                        user.name.charAt(0).toUpperCase()
+                    )}
                 </span>
                 <div className="min-w-0">
                     <h3 className="truncate text-xs font-semibold text-slate-900">{user.name}</h3>
@@ -94,8 +99,9 @@ export default function ProfilePostCard({ post, user, variant = 'grid' }) {
             )}
             <div className="space-y-3 p-3">
                 <p className="text-xs leading-relaxed break-words whitespace-pre-wrap text-slate-600">{post.caption || post.book?.title}</p>
+                {post.book && <PostBookCard book={post.book} />}
                 {post.book && (
-                    <div className="grid grid-cols-2 gap-2 text-caption-sm text-slate-500">
+                    <div className="text-caption-sm grid grid-cols-2 gap-2 text-slate-500">
                         <span>
                             <i className="fa-solid fa-star mr-1 text-yellow-400" aria-hidden="true" />
                             {Number(post.book.rating || 0).toFixed(1)}

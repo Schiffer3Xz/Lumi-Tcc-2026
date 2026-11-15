@@ -11,6 +11,7 @@ return [
         'key' => env('OPENAI_API_KEY'),
         'moderation_enabled' => env('OPENAI_MODERATION_ENABLED', false),
         'moderation_model' => 'omni-moderation-latest',
+        'image_sexual_threshold' => (float) env('OPENAI_IMAGE_SEXUAL_THRESHOLD', 0.05),
     ],
 
     /*

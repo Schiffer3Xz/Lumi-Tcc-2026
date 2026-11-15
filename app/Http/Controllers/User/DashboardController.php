@@ -29,7 +29,7 @@ class DashboardController extends Controller
                 'author',
                 'genre',
                 'availability',
-            ])->withAvg('ratings', 'rating')->get()->map(function ($book) {
+            ])->withReaderCount()->withAvg('ratings', 'rating')->get()->map(function ($book) {
                 return [
                     'id' => $book->id,
                     'title' => $book->title,
@@ -90,8 +90,8 @@ class DashboardController extends Controller
             return back();
         }
 
-        if (DB::table('reading_progresses')->where('user_id', $userId)->count() >= 3) {
-            throw ValidationException::withMessages(['book_id' => 'Você já possui o limite de 3 livros em progresso.']);
+        if (DB::table('reading_progresses')->where('user_id', $userId)->count() >= 5) {
+            throw ValidationException::withMessages(['book_id' => 'Você já possui o limite de 5 livros em progresso.']);
         }
 
         DB::table('reading_progresses')->insert([
@@ -123,7 +123,7 @@ class DashboardController extends Controller
     public function syncReadingProgress(Request $request)
     {
         $validated = $request->validate([
-            'progresses' => ['required', 'array', 'max:3'],
+            'progresses' => ['required', 'array', 'max:5'],
             'progresses.*.id' => ['required', 'integer'],
             'progresses.*.current_page' => ['required', 'integer', 'min:0'],
         ]);

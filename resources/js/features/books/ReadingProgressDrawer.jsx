@@ -56,7 +56,7 @@ export default function ReadingProgressDrawer({ books, readingProgress, onClose 
             description={
                 isPicking
                     ? 'Escolha um livro para acompanhar sua leitura.'
-                    : `${readingProgress.length}/3 livros em andamento · Alterações salvas ao fechar.`
+                    : `${readingProgress.length}/5 livros em andamento · Alterações salvas ao fechar.`
             }
         >
             {error && (
@@ -94,7 +94,7 @@ export default function ReadingProgressDrawer({ books, readingProgress, onClose 
                             <button
                                 key={book.id}
                                 type="button"
-                                disabled={busy || readingProgress.length >= 3}
+                                disabled={busy || readingProgress.length >= 5}
                                 onClick={() => mutate('post', route('reading-progress.store'), { book_id: book.id }, () => setIsPicking(false))}
                                 className="hover:border-lumi-progress flex w-full items-center gap-3 rounded-xl border border-slate-200 p-3 text-left transition-colors hover:bg-blue-50/40 disabled:opacity-50"
                                 aria-label={`Adicionar ${book.title} ao progresso`}
@@ -140,12 +140,12 @@ export default function ReadingProgressDrawer({ books, readingProgress, onClose 
                     </div>
                     <button
                         type="button"
-                        disabled={busy || readingProgress.length >= 3}
+                        disabled={busy || readingProgress.length >= 5}
                         onClick={() => setIsPicking(true)}
                         className="bg-lumi-navy hover:bg-lumi-navy-hover mt-5 flex w-full items-center justify-center gap-2 rounded-xl px-4 py-3 text-sm font-bold text-white transition-colors disabled:cursor-not-allowed disabled:bg-slate-300"
                     >
                         <i className="fa-solid fa-plus text-xs" aria-hidden="true" />
-                        {busy ? 'Salvando...' : readingProgress.length >= 3 ? 'Limite de 3 livros atingido' : 'Adicionar livro'}
+                        {busy ? 'Salvando...' : readingProgress.length >= 5 ? 'Limite de 5 livros atingido' : 'Adicionar livro'}
                     </button>
                 </>
             )}

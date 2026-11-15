@@ -11,7 +11,7 @@ export default function Catalog() {
                     description="Selecione uma operação para o gerenciamento de livros."
                     backHref={route('admin.dashboard')}
                 />
-                <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
+                <div className="grid gap-6 sm:grid-cols-2">
                     <AdminActionCard
                         title="Cadastrar livro"
                         description="Adicionar nova obra ao catálogo."
@@ -23,12 +23,6 @@ export default function Catalog() {
                         description="Modificar informações do catálogo."
                         href={route('admin.books.list')}
                         icon="fa-pen-to-square"
-                    />
-                    <AdminActionCard
-                        title="Atualizar disponibilidade"
-                        description="Controlar o status dos exemplares."
-                        href={route('admin.books.create')}
-                        icon="fa-rotate"
                     />
                 </div>
             </div>

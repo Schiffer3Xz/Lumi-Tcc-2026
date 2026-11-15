@@ -66,7 +66,7 @@ class PostInteractionsTest extends TestCase
         $this->assertDatabaseHas('post_comments', ['post_id' => $post->id, 'user_id' => $viewer->id, 'content' => 'Também gostei!']);
         $this->withoutVite()->get('/social')->assertInertia(fn (Assert $page) => $page
             ->where('posts.0.commentsCount', 1)
-            ->where('posts.0.comments.0.user', 'Leitora')
+            ->where('posts.0.comments.0.user.name', 'Leitora')
             ->where('posts.0.comments.0.text', 'Também gostei!')
             ->where('posts.0.comments.0.canDelete', true));
         $this->get('/profile')->assertInertia(fn (Assert $page) => $page->has('posts', 0));

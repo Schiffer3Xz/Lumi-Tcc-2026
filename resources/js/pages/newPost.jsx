@@ -4,14 +4,14 @@ import ReaderLayout from '@/layouts/reader-layout';
 import { Link, useForm } from '@inertiajs/react';
 import { useState } from 'react';
 
-export default function CreatePost({ auth }) {
+export default function CreatePost({ auth, books = [] }) {
     const user = auth?.user ?? { name: 'Estudante', email: '' };
-    const form = useForm({ content: '', image: null });
+    const form = useForm({ content: '', image: null, book_id: null });
     const [moderationMessage, setModerationMessage] = useState('');
 
-    const handleSubmit = ({ content, image }) => {
+    const handleSubmit = ({ content, image, book_id }) => {
         if (form.processing) return;
-        form.transform(() => ({ content, image }));
+        form.transform(() => ({ content, image, book_id }));
         form.post(route('posts.store'), {
             forceFormData: true,
             onError: (errors) => {
@@ -49,7 +49,7 @@ export default function CreatePost({ auth }) {
                         </div>
 
                         {/* CARD */}
-                        <PostComposer user={user} onSubmit={handleSubmit} processing={form.processing} errors={form.errors} />
+                        <PostComposer user={user} books={books} onSubmit={handleSubmit} processing={form.processing} errors={form.errors} />
 
                         {/* DICA */}
                         <div className="mt-4 flex items-start gap-3 rounded-xl border border-amber-100 bg-amber-50/60 p-3 sm:p-4">

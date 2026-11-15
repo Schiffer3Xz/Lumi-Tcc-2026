@@ -74,7 +74,7 @@ class ContentPolicyTest extends TestCase
     public function test_profile_refusal_preserves_all_database_fields(): void
     {
         $user = User::factory()->create();
-        $this->actingAs($user)->patch(route('profile.update'), [
+        $this->actingAs($user)->post(route('profile.update'), [
             'name' => $user->name, 'email' => $user->email,
             'nickname' => 'nazistaGames', 'description' => 'Nova descrição',
         ])->assertSessionHasErrors('nickname');

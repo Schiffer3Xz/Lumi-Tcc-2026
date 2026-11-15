@@ -12,7 +12,7 @@ export default function Availability({ books }) {
         edit_url: route('admin.books.edit', book.id),
     }));
     return (
-        <AdminLayout title="Disponibilidade do acervo" section="catalog">
+        <AdminLayout title="Disponibilidade do acervo" section="availability">
             <BookAvailabilityManager books={items} dashboardUrl={route('admin.catalog.index')} />
         </AdminLayout>
     );

@@ -23,9 +23,13 @@ class PostResource extends JsonResource
                 'username' => ltrim($this->user?->nickname ?? '', '@'),
             ],
             'book' => $this->book ? [
+                'id' => $this->book->id,
+                'cover_url' => $this->book->cover_url
+                    ? (str_starts_with($this->book->cover_url, 'http') ? $this->book->cover_url : asset('storage/'.$this->book->cover_url))
+                    : null,
                 'title' => $this->book->title,
                 'author' => $this->book->author?->name,
-                'badge' => 'Livro',
+                'badge' => 'Livro mencionado',
                 'coverBg' => 'bg-slate-800',
             ] : null,
             'likesCount' => $this->likes_count,

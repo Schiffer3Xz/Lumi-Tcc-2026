@@ -86,7 +86,7 @@ export default function ReportPostDialog({ postId, commentId, open, onClose, onS
                         )}
                         <div className="flex items-start gap-2.5 rounded-xl bg-blue-50 px-3 py-3 text-xs leading-relaxed text-blue-700">
                             <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0" aria-hidden="true" />
-                            <p>A equipe administrativa receberá sua denúncia para análise. Obrigado por ajudar a manter um espaço respeitoso.</p>
+                            <p>Sua identidade não será exibida à equipe administrativa. Sua denúncia será recebida de forma anônima para análise.</p>
                         </div>
                     </div>
 

@@ -35,8 +35,8 @@ export default function ReportFilters({ filters, counts }) {
                 }}
             >
                 <SearchBar
-                    label="Buscar por motivo ou denunciante"
-                    placeholder="Motivo ou denunciante..."
+                    label="Buscar por motivo"
+                    placeholder="Motivo da denúncia..."
                     type="search"
                     maxLength={120}
                     value={query}

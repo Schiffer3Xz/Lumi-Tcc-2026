@@ -45,7 +45,7 @@ export default function ReportReviewDialog({ report, onClose }) {
                         <ReportStatusBadge status={report.status} />
                         <ReportModerationPanel report={report} />
                         <section>
-                            <h3 className="text-xs font-bold tracking-wide text-slate-500 uppercase">Motivo informado por {report.reporter}</h3>
+                            <h3 className="text-xs font-bold tracking-wide text-slate-500 uppercase">Motivo da denúncia anônima</h3>
                             <p className="mt-2 text-sm break-words whitespace-pre-wrap">{report.content}</p>
                         </section>
                         <section className="rounded-xl border border-slate-200 bg-slate-50 p-4">

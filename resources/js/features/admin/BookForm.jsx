@@ -7,6 +7,7 @@ export default function BookForm({ book, authors, genres, availabilities }) {
     const form = useForm({
         title: book?.title ?? '',
         page_count: book?.page_count ?? '',
+        publication_year: book?.publication_year ?? '',
         fk_author_id: book?.fk_author_id ?? '',
         fk_genre_id: book?.fk_genre_id ?? '',
         fk_availability_id: book?.fk_availability_id ?? '',
@@ -30,6 +31,16 @@ export default function BookForm({ book, authors, genres, availabilities }) {
                 <div className="space-y-5">
                     <AdminField form={form} name="title" label="Título da obra" required maxLength={150} />
                     <AdminField form={form} name="page_count" label="Número de páginas" type="number" required min={1} step={1} />
+                    <AdminField
+                        form={form}
+                        name="publication_year"
+                        label="Ano de lançamento"
+                        type="number"
+                        min={1}
+                        max={9999}
+                        step={1}
+                        placeholder="Ex.: 2026"
+                    />
                     {[
                         ['fk_author_id', 'Autor', authors, 'name'],
                         ['fk_genre_id', 'Gênero', genres, 'name'],

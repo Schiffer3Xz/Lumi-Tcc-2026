@@ -45,7 +45,8 @@ class AdminSettingsController extends Controller
         abort_unless(hash_equals(sha1($user->email), (string) $request->route('hash')), 403);
 
         if (is_null($user->email_verified_at)) {
-            $user->forceFill(['email_verified_at' => now()])->save();
+            $user->markEmailAsVerified();
+            event(new \Illuminate\Auth\Events\Verified($user));
         }
 
         return redirect()->route('admin.dashboard')->with('success', 'E-mail verificado com sucesso.');
@@ -53,6 +54,9 @@ class AdminSettingsController extends Controller
 
     public function resendVerification(Request $request): RedirectResponse
     {
+        if ($request->user()->hasVerifiedEmail()) {
+            return redirect()->route('admin.dashboard');
+        }
         $sent = $this->sendVerificationEmail($request->user());
 
         return $sent
@@ -127,11 +131,12 @@ class AdminSettingsController extends Controller
 
         $user = auth()->user();
 
-        $profileFields = $request->safe()->only(['name', 'nickname', 'description']);
+        $profileFields = $request->only(['name', 'nickname', 'description']);
         app(\App\Services\Moderation\PublicationModeration::class)->validateProfile($profileFields, $user);
         $user->fill($profileFields);
 
         if ($request->hasFile('profile_photo')) {
+            app(\App\Services\Moderation\PublicationModeration::class)->validateImage($request->file('profile_photo'), 'profile_photo');
             if ($user->profile_photo) {
                 Storage::disk('public')->delete(str_replace('/storage/', '', parse_url($user->profile_photo, PHP_URL_PATH) ?: $user->profile_photo));
             }

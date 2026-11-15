@@ -1,6 +1,7 @@
 import { useEffect, useId, useRef, useState } from 'react';
+import PostBookCard from './PostBookCard';
 
-export default function PostComposer({ user, onSubmit, processing = false, errors = {} }) {
+export default function PostComposer({ user, books = [], onSubmit, processing = false, errors = {} }) {
     const fileInputRef = useRef(null);
     const cameraInputRef = useRef(null);
 
@@ -9,6 +10,15 @@ export default function PostComposer({ user, onSubmit, processing = false, error
     const [imagePreview, setImagePreview] = useState(null);
     const [imageError, setImageError] = useState('');
     const errorId = useId();
+    const [selectedBook, setSelectedBook] = useState(null);
+    const [bookPickerOpen, setBookPickerOpen] = useState(false);
+    const [bookQuery, setBookQuery] = useState('');
+    const normalize = (value) =>
+        (value || '')
+            .normalize('NFD')
+            .replace(/[\u0300-\u036f]/g, '')
+            .toLocaleLowerCase('pt-BR');
+    const visibleBooks = books.filter((book) => normalize(`${book.title} ${book.author || ''}`).includes(normalize(bookQuery.trim())));
 
     useEffect(() => {
         return () => {
@@ -48,8 +58,8 @@ export default function PostComposer({ user, onSubmit, processing = false, error
 
     const handleSubmit = (event) => {
         event.preventDefault();
-        if (processing || (!content.trim() && !image)) return;
-        onSubmit({ content, image });
+        if (processing || (!content.trim() && !image && !selectedBook)) return;
+        onSubmit({ content, image, book_id: selectedBook?.id ?? null });
     };
 
     return (
@@ -61,7 +71,11 @@ export default function PostComposer({ user, onSubmit, processing = false, error
             {/* AUTOR */}
             <div className="flex items-center gap-3">
                 <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center overflow-hidden rounded-full bg-slate-800 text-xs font-bold text-white sm:h-10 sm:w-10">
-                    {user.profile_photo ? <img src={user.profile_photo} alt={user.name} className="h-full w-full object-cover" /> : user.name.charAt(0).toUpperCase()}
+                    {user.profile_photo ? (
+                        <img src={user.profile_photo} alt={user.name} className="h-full w-full object-cover" />
+                    ) : (
+                        user.name.charAt(0).toUpperCase()
+                    )}
                 </div>
 
                 <div className="min-w-0">
@@ -92,6 +106,79 @@ export default function PostComposer({ user, onSubmit, processing = false, error
             {(imageError || errors.image) && (
                 <p role="alert" className="text-xs text-red-600">
                     {imageError || errors.image}
+                </p>
+            )}
+
+            {bookPickerOpen && (
+                <section
+                    id={`${errorId}-books`}
+                    aria-label="Selecionar livro de referência"
+                    className="space-y-3 rounded-xl border border-blue-100 bg-blue-50/40 p-3"
+                >
+                    <label htmlFor={`${errorId}-book-search`} className="block text-xs font-semibold text-slate-700">
+                        Sobre qual livro você quer falar?
+                    </label>
+                    <input
+                        id={`${errorId}-book-search`}
+                        type="search"
+                        autoFocus
+                        value={bookQuery}
+                        onChange={(event) => setBookQuery(event.target.value)}
+                        placeholder="Buscar por título ou autor..."
+                        disabled={processing}
+                        className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+                    />
+                    <ul className="max-h-64 space-y-1 overflow-y-auto" aria-label="Livros do acervo">
+                        {visibleBooks.map((book) => (
+                            <li key={book.id}>
+                                <button
+                                    type="button"
+                                    disabled={processing}
+                                    onClick={() => {
+                                        setSelectedBook(book);
+                                        setBookPickerOpen(false);
+                                        setBookQuery('');
+                                    }}
+                                    className="flex w-full items-center gap-3 rounded-lg p-2 text-left hover:bg-white focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none"
+                                >
+                                    <span className="flex h-12 w-9 shrink-0 items-center justify-center overflow-hidden rounded bg-slate-800 text-white">
+                                        {book.cover_url ? (
+                                            <img src={book.cover_url} alt="" className="h-full w-full object-cover" />
+                                        ) : (
+                                            <i className="fa-solid fa-book" aria-hidden="true" />
+                                        )}
+                                    </span>
+                                    <span className="min-w-0">
+                                        <span className="block truncate text-xs font-semibold text-slate-800">{book.title}</span>
+                                        <span className="block text-xs text-slate-500">{book.author || 'Autor não informado'}</span>
+                                    </span>
+                                </button>
+                            </li>
+                        ))}
+                    </ul>
+                    {visibleBooks.length === 0 && (
+                        <p role="status" className="text-xs text-slate-500">
+                            Nenhum livro encontrado.
+                        </p>
+                    )}
+                </section>
+            )}
+            {selectedBook && (
+                <div className="space-y-2">
+                    <PostBookCard book={selectedBook} preview />
+                    <button
+                        type="button"
+                        disabled={processing}
+                        onClick={() => setSelectedBook(null)}
+                        className="text-xs font-semibold text-slate-500 hover:text-red-600"
+                    >
+                        Remover referência
+                    </button>
+                </div>
+            )}
+            {errors.book_id && (
+                <p role="alert" className="text-xs text-red-600">
+                    {errors.book_id}
                 </p>
             )}
 
@@ -133,8 +220,19 @@ export default function PostComposer({ user, onSubmit, processing = false, error
             {/* AÇÕES */}
             <div className="flex flex-col gap-3 border-t border-slate-100 pt-4 sm:flex-row sm:items-center sm:justify-between">
                 {/* ESQUERDA */}
-                <div className="flex w-full items-center gap-2 sm:w-auto">
+                <div className="flex w-full flex-wrap items-center gap-2 sm:w-auto">
                     {/* FOTO */}
+                    <button
+                        type="button"
+                        disabled={processing}
+                        aria-expanded={bookPickerOpen}
+                        aria-controls={`${errorId}-books`}
+                        onClick={() => setBookPickerOpen((open) => !open)}
+                        className="flex flex-1 items-center justify-center gap-2 rounded-xl border border-blue-200 bg-blue-50 px-3 py-2 text-xs font-medium text-blue-700 transition-colors hover:bg-blue-100 sm:flex-none"
+                    >
+                        <i className="fa-solid fa-book" aria-hidden="true" />
+                        <span>{selectedBook ? 'Trocar livro' : 'Referenciar livro'}</span>
+                    </button>
                     <button
                         type="button"
                         onClick={() => fileInputRef.current?.click()}
@@ -162,7 +260,7 @@ export default function PostComposer({ user, onSubmit, processing = false, error
                 {/* PUBLICAR */}
                 <button
                     type="submit"
-                    disabled={processing || (!content.trim() && !image)}
+                    disabled={processing || (!content.trim() && !image && !selectedBook)}
                     className="flex w-full items-center justify-center gap-2 rounded-xl bg-blue-600 px-4 py-2.5 text-xs font-bold text-white shadow-xs transition-all hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-40 sm:w-auto"
                 >
                     <i className="fa-solid fa-paper-plane" />

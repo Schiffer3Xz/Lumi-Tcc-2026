@@ -31,7 +31,7 @@ class AdminReactCrudTest extends TestCase
         $genre = Genre::create(['name' => 'Romance']);
         $availability = Availability::create(['availability' => 'Disponível']);
         $data = [
-            'title' => 'Livro React', 'page_count' => 200,
+            'title' => 'Livro React', 'page_count' => 200, 'publication_year' => 2001,
             'fk_author_id' => $author->id, 'fk_genre_id' => $genre->id,
             'fk_availability_id' => $availability->id, 'description' => 'Descrição da obra',
         ];
@@ -39,14 +39,16 @@ class AdminReactCrudTest extends TestCase
         $this->post(route('admin.books.store'), [...$data, 'cover_image' => $cover])
             ->assertRedirect(route('admin.books.create'))->assertSessionHasNoErrors();
         $book = Book::where('title', 'Livro React')->firstOrFail();
+        $this->assertSame(2001, (int) $book->publication_year);
         Storage::disk('public')->assertExists($book->cover_url);
 
         $this->get(route('admin.books.edit', $book->id))->assertInertia(fn (Assert $page) => $page
             ->component('admin/books/edit')->where('book.title', 'Livro React')->has('authors', 1)
             ->has('genres', 1)->has('availabilities', 1));
-        $this->post(route('admin.books.update', $book->id), [...$data, '_method' => 'put', 'title' => 'Título atualizado'])
+        $this->post(route('admin.books.update', $book->id), [...$data, '_method' => 'put', 'title' => 'Título atualizado', 'publication_year' => 2026])
             ->assertRedirect(route('admin.books.list'))->assertSessionHasNoErrors();
         $this->assertSame('Título atualizado', $book->fresh()->title);
+        $this->assertSame(2026, (int) $book->fresh()->publication_year);
         $this->assertSame($book->cover_url, $book->fresh()->cover_url);
 
         $this->delete(route('admin.books.destroy', $book->id))->assertRedirect(route('admin.books.list'));
@@ -81,7 +83,7 @@ class AdminReactCrudTest extends TestCase
     public function test_profile_and_password_still_use_admin_endpoints(): void
     {
         $user = auth()->user();
-        $this->put(route('admin.settings.profile.update'), [
+        $this->post(route('admin.settings.profile.update'), [
             'name' => 'Perfil atualizado', 'nickname' => 'admin-atualizado', 'description' => 'Administração da biblioteca',
         ])->assertRedirect(route('admin.dashboard'))->assertSessionHasNoErrors();
         $this->assertSame('Perfil atualizado', $user->fresh()->name);

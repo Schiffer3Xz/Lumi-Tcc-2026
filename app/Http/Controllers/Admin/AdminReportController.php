@@ -23,11 +23,10 @@ class AdminReportController extends Controller
         ]);
         $status = $request->input('status', 'pending');
         $search = trim((string) $request->input('q', ''));
-        $query = Report::with(['reporter:id,name', 'reviewer:id,name', 'post.user:id,name', 'comment.user:id,name'])
+        $query = Report::with(['reviewer:id,name', 'post.user:id,name', 'comment.user:id,name'])
             ->when($status !== 'all', fn ($query) => $query->where('status', $status))
             ->when($search !== '', fn ($query) => $query->where(function ($query) use ($search) {
-                $query->where('content', 'like', '%'.$search.'%')
-                    ->orWhereHas('reporter', fn ($user) => $user->where('name', 'like', '%'.$search.'%'));
+                $query->where('content', 'like', '%'.$search.'%');
             }));
         $reports = $query->latest('id')->paginate(15)->withQueryString()->through(function (Report $report) {
             $snapshot = $report->target_snapshot;
@@ -38,7 +37,6 @@ class AdminReportController extends Controller
             return [
                 'id' => $report->id, 'content' => $report->content, 'status' => $report->status,
                 'created_at' => $report->created_at?->toIso8601String(),
-                'reporter' => $report->reporter?->name ?? 'Conta removida',
                 'reviewer' => $report->reviewer?->name,
                 'review_note' => $report->review_note,
                 'reviewed_at' => $report->reviewed_at?->toIso8601String(),
