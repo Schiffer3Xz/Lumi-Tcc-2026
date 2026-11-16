@@ -51,13 +51,10 @@ export default function ReadingProgressDrawer({ books, readingProgress, onClose 
         <LibraryDrawer
             onClose={saveAndClose}
             busy={busy}
+            className="reading-progress-drawer"
             title={isPicking ? 'Adicionar livro' : 'Progresso de leitura'}
             eyebrow={isPicking ? 'Progresso de leitura' : 'Minhas leituras'}
-            description={
-                isPicking
-                    ? 'Escolha um livro para acompanhar sua leitura.'
-                    : `${readingProgress.length}/5 livros em andamento · Alterações salvas ao fechar.`
-            }
+            description={isPicking ? 'Escolha um livro para acompanhar sua leitura.' : 'Um capítulo de cada vez. Acompanhe sua jornada.'}
         >
             {error && (
                 <p role="alert" className="mb-4 rounded-xl bg-red-50 p-3 text-sm text-red-700">
@@ -109,7 +106,7 @@ export default function ReadingProgressDrawer({ books, readingProgress, onClose 
                                 <div className="min-w-0 flex-1">
                                     <h3 className="text-sm font-bold text-slate-800">{book.title}</h3>
                                     <p className="truncate text-xs text-slate-500">{textValue(book.author) || 'Autor não informado'}</p>
-                                    <p className="mt-1 text-caption text-slate-500">{book.page_count || '-'} páginas</p>
+                                    <p className="text-caption mt-1 text-slate-500">{book.page_count || '-'} páginas</p>
                                 </div>
                                 <i className="fa-solid fa-plus text-lumi-progress-strong text-xs" aria-hidden="true" />
                             </button>
@@ -123,7 +120,26 @@ export default function ReadingProgressDrawer({ books, readingProgress, onClose 
                 </>
             ) : (
                 <>
-                    <div className="min-h-0 flex-1 space-y-4 overflow-y-auto" aria-busy={busy}>
+                    <div className="reading-summary shrink-0">
+                        <div className="flex items-center justify-between gap-3">
+                            <div>
+                                <p className="text-caption-sm font-semibold tracking-widest text-slate-300 uppercase">Na sua companhia</p>
+                                <p className="mt-1 text-sm font-semibold">
+                                    <span className="text-2xl font-bold">{readingProgress.length}</span>
+                                    <span className="ml-2 text-slate-200">
+                                        {readingProgress.length === 1 ? 'livro em andamento' : 'livros em andamento'}
+                                    </span>
+                                </p>
+                            </div>
+                            <i className="fa-solid fa-book-open text-2xl text-amber-200/80" aria-hidden="true" />
+                        </div>
+                        <div className="reading-summary-slots" aria-label={`${readingProgress.length} de 5 espaços de leitura ocupados`}>
+                            {Array.from({ length: 5 }, (_, index) => (
+                                <span key={index} className={index < readingProgress.length ? 'is-filled' : ''} />
+                            ))}
+                        </div>
+                    </div>
+                    <div className="min-h-0 flex-1 space-y-3 overflow-y-auto pb-1" aria-busy={busy}>
                         {readingProgress.map((progress) => (
                             <ReadingProgressItem
                                 key={progress.id}
@@ -135,7 +151,13 @@ export default function ReadingProgressDrawer({ books, readingProgress, onClose 
                             />
                         ))}
                         {!readingProgress.length && (
-                            <p className="py-8 text-center text-sm text-slate-500">Adicione um livro para acompanhar cada página da sua leitura.</p>
+                            <div className="rounded-2xl border border-dashed border-slate-300 px-6 py-10 text-center">
+                                <i className="fa-solid fa-bookmark text-lumi-progress-strong mb-4 text-2xl" aria-hidden="true" />
+                                <p className="text-lumi-navy text-sm font-bold">Sua próxima história começa aqui</p>
+                                <p className="mt-2 text-xs leading-relaxed text-slate-500">
+                                    Adicione um livro e veja cada página se transformar em uma conquista.
+                                </p>
+                            </div>
                         )}
                     </div>
                     <button
@@ -147,6 +169,10 @@ export default function ReadingProgressDrawer({ books, readingProgress, onClose 
                         <i className="fa-solid fa-plus text-xs" aria-hidden="true" />
                         {busy ? 'Salvando...' : readingProgress.length >= 5 ? 'Limite de 5 livros atingido' : 'Adicionar livro'}
                     </button>
+                    <p className="text-caption-sm mt-3 flex shrink-0 items-center justify-center gap-2 text-slate-500">
+                        <i className="fa-solid fa-check text-lumi-progress-strong" aria-hidden="true" />
+                        Seu progresso é salvo ao fechar
+                    </p>
                 </>
             )}
         </LibraryDrawer>
