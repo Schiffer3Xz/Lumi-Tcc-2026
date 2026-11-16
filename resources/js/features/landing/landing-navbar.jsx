@@ -11,7 +11,7 @@ export default function LandingNavbar({ homeHref, links, action, brand = 'Lumi',
             )}
         >
             <Link href={homeHref} className="group flex items-center gap-2 text-2xl font-black tracking-wide">
-                <FireflyIcon className="h-7 w-7 text-amber-300 transition-transform duration-300 motion-safe:group-hover:rotate-12" />
+                <FireflyIcon className="size-12 shrink-0 text-amber-300 transition-transform duration-300 motion-safe:group-hover:rotate-12" />
                 <span>{brand}</span>
             </Link>
             <nav

@@ -32,7 +32,7 @@ export default function Sidebar({ id, items, activeItem, isOpen, onClose, onNavi
     const content = (
         <>
             <div className="text-yellow-300" role="img" aria-label="Lumi, mascote vagalume">
-                <FireflyIcon className="size-8" />
+                <FireflyIcon className="size-12" />
             </div>
             <nav aria-label="Navegação principal" className="flex flex-1 flex-col gap-3">
                 {items.map((item) => {
