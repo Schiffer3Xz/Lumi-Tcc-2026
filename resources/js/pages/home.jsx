@@ -132,6 +132,7 @@ export default function Home({ books = [], auth, genres = [], readingProgress = 
                         actionLabel={auth?.user ? 'Adicionar progresso' : 'Entrar para acompanhar leitura'}
                         onAction={openProgress}
                         progressLabel={`${progressPercentage}%`}
+                        books={readingProgress.map((progress) => progress.book).filter(Boolean)}
                     />
                     {/* ==================== 3 LIVROS MELHORES AVALIADOS ==================== */}
                     <SectionHeader title="Melhores Avaliados">

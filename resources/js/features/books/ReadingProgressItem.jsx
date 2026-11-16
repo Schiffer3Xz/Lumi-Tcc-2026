@@ -1,42 +1,43 @@
+import '../../../css/reading-progress.css';
+
 export default function ReadingProgressItem({ progress, currentPage, onChange, onRemove, disabled }) {
     const { book } = progress;
     const pageCount = Number(book.page_count || 0);
     const percentage = pageCount ? Math.min(100, Math.round((currentPage / pageCount) * 100)) : 0;
+    const complete = pageCount > 0 && currentPage >= pageCount;
 
     return (
-        <article className="rounded-xl border border-slate-200 p-3">
-            <div className="flex gap-3">
-                <div className="flex h-20 w-14 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-slate-100 text-slate-400">
+        <article className="reading-card">
+            <div className="flex items-start gap-4">
+                <div className="reading-card-cover">
                     {book.cover_url ? (
                         <img src={book.cover_url} alt="" className="h-full w-full object-cover" />
                     ) : (
-                        <i className="fa-solid fa-book" aria-hidden="true" />
+                        <i className="fa-solid fa-book-open" aria-hidden="true" />
                     )}
                 </div>
-                <div className="min-w-0 flex-1">
-                    <div className="flex gap-2">
-                        <div className="min-w-0 flex-1">
-                            <h3 className="text-sm font-bold text-slate-800">{book.title}</h3>
-                            <p className="truncate text-xs text-slate-500">{book.author || 'Autor não informado'}</p>
-                        </div>
-                        <button
-                            type="button"
-                            disabled={disabled}
-                            onClick={onRemove}
-                            aria-label={`Remover ${book.title} do progresso`}
-                            className="h-9 w-9 shrink-0 rounded-md text-slate-500 hover:bg-red-50 hover:text-red-600 disabled:opacity-50"
-                        >
-                            <i className="fa-solid fa-trash-can text-xs" aria-hidden="true" />
-                        </button>
-                    </div>
-                    <div className="mt-3 flex flex-wrap items-center justify-between gap-1 text-xs font-semibold text-slate-600">
-                        <span>
-                            Página {currentPage} de {pageCount || '-'}
-                        </span>
-                        <span>{percentage}%</span>
-                    </div>
-                    <label className="mt-3 flex flex-wrap items-center gap-2 text-xs font-semibold text-slate-600">
-                        <span>Página atual</span>
+                <div className="min-w-0 flex-1 pt-1">
+                    <p className={`reading-card-status ${complete ? 'is-complete' : ''}`}>
+                        <span aria-hidden="true" />
+                        {complete ? 'Leitura concluída' : currentPage > 0 ? 'Em leitura' : 'Próxima leitura'}
+                    </p>
+                    <h3 className="text-lumi-navy mt-2 text-sm leading-snug font-bold">{book.title}</h3>
+                    <p className="mt-1 truncate text-xs text-slate-500">{book.author || 'Autor não informado'}</p>
+                </div>
+                <button
+                    type="button"
+                    disabled={disabled}
+                    onClick={onRemove}
+                    aria-label={`Remover ${book.title} do progresso`}
+                    className="reading-card-remove"
+                >
+                    <i className="fa-solid fa-trash-can text-xs" aria-hidden="true" />
+                </button>
+            </div>
+            <div className="reading-card-controls">
+                <div className="flex items-center justify-between gap-3">
+                    <label className="flex min-w-0 flex-wrap items-center gap-2 text-xs text-slate-500">
+                        <span>Página</span>
                         <input
                             type="number"
                             inputMode="numeric"
@@ -51,21 +52,53 @@ export default function ReadingProgressItem({ progress, currentPage, onChange, o
                             }}
                             disabled={disabled || !pageCount}
                             aria-label={`Página atual de ${book.title}`}
-                            className="focus:border-lumi-progress focus:ring-lumi-progress/20 w-20 rounded-lg border border-slate-200 px-2 py-2 text-sm text-slate-800 outline-none focus:ring-2 disabled:cursor-not-allowed disabled:opacity-50"
+                            className="reading-page-input"
                         />
-                        <span>de {pageCount || '-'}</span>
+                        <span>de {pageCount || '—'}</span>
                     </label>
-                    <input
-                        type="range"
-                        min="0"
-                        max={pageCount || 0}
-                        value={Math.min(currentPage, pageCount || 0)}
-                        onChange={(event) => onChange(Number(event.target.value))}
-                        disabled={disabled || !pageCount}
-                        aria-label={`Página atual de ${book.title}`}
-                        aria-valuetext={`${currentPage} de ${pageCount} páginas`}
-                        className="accent-lumi-progress-strong mt-1 h-6 w-full cursor-pointer disabled:cursor-not-allowed"
-                    />
+                </div>
+                <input
+                    type="range"
+                    min="0"
+                    max={pageCount || 0}
+                    value={Math.min(currentPage, pageCount || 0)}
+                    onChange={(event) => onChange(Number(event.target.value))}
+                    disabled={disabled || !pageCount}
+                    aria-label={`Ajustar progresso de ${book.title}`}
+                    aria-valuetext={`${currentPage} de ${pageCount} páginas`}
+                    style={{ '--reading-percentage': `${percentage}%` }}
+                    className="reading-progress-slider"
+                />
+                <div className="reading-card-footer">
+                    <p className="text-caption-sm text-slate-500">
+                        {complete
+                            ? 'Mais uma história na sua estante.'
+                            : currentPage > 0
+                              ? `${Math.max(0, pageCount - currentPage)} páginas para a próxima conquista`
+                              : 'Toda história começa na primeira página.'}
+                    </p>
+                    <div
+                        className={`reading-progress-ring ${complete ? 'is-complete' : ''}`}
+                        role="meter"
+                        aria-label={`Progresso de ${book.title}`}
+                        aria-valuemin={0}
+                        aria-valuemax={100}
+                        aria-valuenow={percentage}
+                    >
+                        <svg viewBox="0 0 48 48" aria-hidden="true">
+                            <circle className="reading-ring-track" cx="24" cy="24" r="20" />
+                            <circle
+                                className="reading-ring-value"
+                                cx="24"
+                                cy="24"
+                                r="20"
+                                pathLength="100"
+                                strokeDasharray="100"
+                                strokeDashoffset={100 - percentage}
+                            />
+                        </svg>
+                        <span aria-hidden="true">{percentage}%</span>
+                    </div>
                 </div>
             </div>
         </article>
