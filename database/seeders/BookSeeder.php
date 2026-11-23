@@ -8,7 +8,6 @@ use App\Models\Book;
 use App\Models\Genre;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Str;
 
 class BookSeeder extends Seeder
 {
@@ -16,57 +15,38 @@ class BookSeeder extends Seeder
 
     public function run(): void
     {
-        $catalog = new \SplFileObject(__DIR__.'/assets/books/acervo-etec-joao-belarmino.jsonl');
+        $catalog = new \SplFileObject(__DIR__.'/assets/books/acervo-lumi.jsonl');
         $catalog->setFlags(\SplFileObject::DROP_NEW_LINE | \SplFileObject::SKIP_EMPTY | \SplFileObject::READ_AHEAD);
-        $covers = json_decode(file_get_contents(__DIR__.'/assets/books/acervo-capas.json'), true, 512, JSON_THROW_ON_ERROR);
-        $selected = array_fill_keys(json_decode(
-            file_get_contents(__DIR__.'/assets/books/acervo-selecionado.json'),
-            true,
-            512,
-            JSON_THROW_ON_ERROR,
-        ), true);
 
-        DB::transaction(function () use ($catalog, $covers, $selected) {
-            $author = Author::firstOrCreate(['name' => 'Autor não informado']);
+        DB::transaction(function () use ($catalog) {
             $unclassifiedId = Genre::where('name', 'Não classificado')->value('id');
-            $availability = Availability::firstOrCreate(['availability' => 'A confirmar']);
             $now = now();
             $books = [];
-            $titles = [];
+            $authorIds = [];
             $genreIds = [];
+            $availabilityIds = [];
 
             foreach ($catalog as $line) {
                 $item = json_decode($line, true, 512, JSON_THROW_ON_ERROR);
-                $title = isset($item['subtitle']) ? $item['title'].' — '.$item['subtitle'] : $item['title'];
-                $titleKey = Str::lower(Str::squish($title));
-                if (isset($titles[$titleKey])) {
-                    continue;
-                }
-                $titles[$titleKey] = true;
-
-                if (! isset($selected[$item['number']])) {
-                    continue;
-                }
-
-                [$genre, $pages] = AcervoBookMetadata::estimate($title, $item['cdd'] ?? '');
+                $author = $item['author'];
+                $genre = $item['genre'];
+                $availability = $item['availability'];
+                $authorIds[$author] ??= Author::firstOrCreate(['name' => $author])->id;
                 $genreIds[$genre] ??= Genre::firstOrCreate(['name' => $genre])->id;
-                $details = ['Número no acervo: '.$item['number']];
-                foreach (['cdd' => 'CDD', 'cutter' => 'Cutter', 'acquired' => 'Aquisição', 'volume' => 'Volume'] as $field => $label) {
-                    if (isset($item[$field])) {
-                        $details[] = $label.': '.$item[$field];
-                    }
-                }
+                $availabilityIds[$availability] ??= Availability::firstOrCreate(['availability' => $availability])->id;
 
                 $books[] = [
-                    'accession_number' => $item['number'],
-                    'title' => $title,
-                    'page_count' => $pages,
-                    'page_count_estimated' => true,
-                    'fk_author_id' => $author->id,
+                    'accession_number' => $item['accession_number'],
+                    'title' => $item['title'],
+                    'page_count' => $item['page_count'],
+                    'page_count_estimated' => $item['page_count_estimated'],
+                    'publication_year' => $item['publication_year'],
+                    'publisher' => $item['publisher'],
+                    'fk_author_id' => $authorIds[$author],
                     'fk_genre_id' => $genreIds[$genre],
-                    'fk_availability_id' => $availability->id,
-                    'description' => implode("\n", $details),
-                    'cover_url' => $covers[$item['number']],
+                    'fk_availability_id' => $availabilityIds[$availability],
+                    'description' => $item['description'],
+                    'cover_url' => $item['cover_url'],
                     'created_at' => $now,
                     'updated_at' => $now,
                 ];
@@ -86,7 +66,7 @@ class BookSeeder extends Seeder
                     }
                     if ((int) $book->page_count === 0) {
                         $book->page_count = $item['page_count'];
-                        $book->page_count_estimated = true;
+                        $book->page_count_estimated = $item['page_count_estimated'];
                     }
                     if ($book->cover_url === self::GENERIC_ABNT_COVER || (blank($book->cover_url) && filled($item['cover_url']))) {
                         $book->cover_url = $item['cover_url'];
