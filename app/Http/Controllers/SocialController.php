@@ -8,8 +8,10 @@ use App\Models\Conversation;
 use App\Models\ConversationUser;
 use App\Models\Message;
 use App\Models\Post;
+use App\Models\ReadingRule;
 use App\Models\User;
 use App\Services\ReaderNotificationService;
+use App\Services\LibraryNotices;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -19,11 +21,17 @@ class SocialController extends Controller
 {
     public function index(Request $request)
     {
-        $request->validate(['post' => ['nullable', 'integer'], 'saved' => ['nullable', 'boolean'], 'group' => ['nullable', 'integer']]);
+        $request->validate(['post' => ['nullable', 'integer'], 'saved' => ['nullable', 'boolean'], 'group' => ['nullable', 'integer'], 'notice' => ['nullable', 'integer']]);
         if ($request->filled('post')) {
-            Post::findOrFail($request->integer('post'));
+            Post::social()->findOrFail($request->integer('post'));
         }
         $user = User::find(auth()->id());
+        $notices = LibraryNotices::listing()->activeLibraryNotices();
+        $selectedNotice = $request->filled('notice') ? (clone $notices)->findOrFail($request->integer('notice')) : null;
+        if ($selectedNotice) {
+            LibraryNotices::markRead($selectedNotice, $user);
+            $selectedNotice->has_read = true;
+        }
         $followingIds = $user->follows->pluck('id');
         $conversationIds = ConversationUser::where('fk_user_id', $user->id)->pluck('fk_conversation_id');
         $conversations = Conversation::with('participants:id,name')->whereIn('id', $conversationIds)->get()->keyBy('id');
@@ -78,10 +86,15 @@ class SocialController extends Controller
 
         return Inertia::render('social', [
             'filters' => ['saved' => $request->boolean('saved'), 'post' => $request->input('post'), 'group' => $request->integer('group'), 'chat' => $request->integer('chat')],
+            'selectedNotice' => $selectedNotice ? LibraryNotices::data($selectedNotice, $user) : null,
+            'libraryNotices' => fn () => $notices
+                ->withExists(['noticeReaders as has_read' => fn ($query) => $query->where('users.id', $user->id)])
+                ->paginate(5, pageName: 'notices_page')->withQueryString()
+                ->through(fn (Post $notice) => LibraryNotices::data($notice, $user)),
             'directMessages' => $directMessages,
             'groupConversations' => $groupConversations,
             'conversationUsers' => User::whereIn('id', array_keys($directMessages))->where('is_admin', false)->get()->map($userSummary),
-            'trendingPosts' => Post::with('user:id,name')
+            'trendingPosts' => Post::social()->with('user:id,name')
                 ->withCount([
                     'likes' => fn ($query) => $query->where('post_likes.created_at', '>=', now()->subDays(7)),
                     'comments' => fn ($query) => $query->where('post_comments.created_at', '>=', now()->subDays(7)),
@@ -95,7 +108,7 @@ class SocialController extends Controller
                     'content' => Str::limit($post->content ?: 'Publicação com imagem', 90),
                     'interactions' => $post->likes_count + $post->comments_count,
                 ]),
-            'posts' => Post::with(['user', 'book.author', 'comments.user'])
+            'posts' => Post::social()->with(['user', 'book.author', 'comments.user'])
                 ->withCount(['likes', 'comments'])
                 ->withExists([
                     'likes as is_liked' => fn ($query) => $query->where('users.id', $user->id),
@@ -138,7 +151,7 @@ class SocialController extends Controller
         $profileUser->setAttribute('rated_books_count', DB::table('book_ratings')->where('user_id', $profileUser->id)->count());
         $profileUser->setAttribute('posts_count', DB::table('posts')->where('fk_user_id', $profileUser->id)->count());
 
-        $posts = Post::where('fk_user_id', auth()->id())
+        $posts = Post::social()->where('fk_user_id', auth()->id())
             ->with(['book.author', 'book' => fn ($query) => $query->withReaderCount()->withAvg('ratings', 'rating')])
             ->withCount(['likes', 'comments'])
             ->latest()
@@ -166,6 +179,7 @@ class SocialController extends Controller
             ]);
 
         return Inertia::render('personalProfile', [
+            'readingRules' => ReadingRule::displayList()->get(),
             'posts' => $posts,
             'profileUser' => $profileUser,
         ]);
@@ -242,7 +256,7 @@ class SocialController extends Controller
 
     public function destroyPost($id)
     {
-        $post = Post::findOrFail($id);
+        $post = Post::social()->findOrFail($id);
         abort_unless($post->fk_user_id === auth()->id(), 403);
         $post->delete();
 

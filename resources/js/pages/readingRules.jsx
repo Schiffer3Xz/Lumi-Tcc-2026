@@ -1,9 +1,8 @@
 import ReadingRules from '@/features/profile/ReadingRules';
-import { readingRules } from '@/features/profile/profile-data';
 import ReaderLayout from '@/layouts/reader-layout';
 import { Link } from '@inertiajs/react';
 
-export default function Rules({ auth }) {
+export default function Rules({ auth, readingRules }) {
     return (
         <ReaderLayout
             title="Regras da Sala de Leitura"

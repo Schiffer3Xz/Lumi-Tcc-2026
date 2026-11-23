@@ -25,12 +25,3 @@ export const defaultPersonalProfile = {
     following: '480',
     friends: '150',
 };
-
-export const readingRules = [
-    'Prazo máximo de empréstimo: 7 dias úteis por exemplar.',
-    'Máximo de 2 livros emprestados simultaneamente por aluno.',
-    'Renovações devem ser solicitadas pelo sistema até o dia do vencimento.',
-    'Danos ou extravios resultam em reposição do exemplar pelo responsável.',
-    'Respeite o silêncio e o espaço coletivo da sala de leitura.',
-    'A devolução fora do prazo implica suspensão do serviço por 7 dias.',
-];

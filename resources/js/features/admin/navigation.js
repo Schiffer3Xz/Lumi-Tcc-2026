@@ -1,4 +1,8 @@
 export const adminSections = {
+    'library-notices': [
+        ['admin.library-notices.create', 'Criar notificação'],
+        ['admin.library-notices.index', 'Histórico de comunicados'],
+    ],
     catalog: [
         ['admin.books.list', 'Editar livros'],
         ['admin.books.index', 'Cadastrar livro'],
@@ -24,5 +28,7 @@ export const adminNavigation = [
     { id: 'availability', route: 'admin.books.create', label: 'Status', icon: 'fa-solid fa-rotate' },
     { id: 'categories', route: 'admin.categories.index', label: 'Cadastros', icon: 'fa-solid fa-layer-group' },
     { id: 'reports', route: 'admin.reports.index', label: 'Denúncias', icon: 'fa-solid fa-flag' },
+    { id: 'library-notices', route: 'admin.library-notices.index', label: 'Notificações', icon: 'fa-solid fa-bullhorn' },
+    { id: 'reading-rules', route: 'admin.reading-rules.index', label: 'Regras', icon: 'fa-solid fa-gavel' },
     { id: 'settings', route: 'admin.settings.index', label: 'Config', icon: 'fa-solid fa-gear' },
 ];

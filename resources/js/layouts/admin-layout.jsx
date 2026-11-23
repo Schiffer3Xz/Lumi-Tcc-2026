@@ -57,9 +57,10 @@ export default function AdminLayout({ title, section = 'dashboard', firstAccess 
                     </div>
                 </main>
             ) : (
-                <div className={`flex min-h-dvh ${fitViewport ? 'admin-dashboard-viewport' : ''}`}>
+                <div className={`flex min-h-dvh ${fitViewport === 'notice' ? 'admin-notice-viewport' : fitViewport ? 'admin-dashboard-viewport' : ''}`}>
                     <Sidebar
                         id="admin-sidebar"
+                        className="admin-sidebar"
                         items={adminNavigation.map((item) => ({ ...item, href: route(item.route) }))}
                         activeItem={section}
                         isOpen={menuOpen}

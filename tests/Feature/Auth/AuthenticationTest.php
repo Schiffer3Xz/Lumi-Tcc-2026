@@ -19,7 +19,7 @@ class AuthenticationTest extends TestCase
 
     public function test_users_can_authenticate_using_the_login_screen()
     {
-        $user = User::factory()->create();
+        $user = User::factory()->create(['email' => 'leitor@aluno.cps.sp.gov.br']);
 
         $response = $this->post('/login', [
             'email' => $user->email,
@@ -32,7 +32,7 @@ class AuthenticationTest extends TestCase
 
     public function test_users_can_not_authenticate_with_invalid_password()
     {
-        $user = User::factory()->create();
+        $user = User::factory()->create(['email' => 'leitor@aluno.cps.sp.gov.br']);
 
         $this->post('/login', [
             'email' => $user->email,
@@ -44,7 +44,7 @@ class AuthenticationTest extends TestCase
 
     public function test_admin_login_redirects_to_the_inertia_dashboard(): void
     {
-        $admin = User::factory()->create(['is_admin' => true, 'first_login' => false]);
+        $admin = User::factory()->create(['email' => 'admin@aluno.cps.sp.gov.br', 'is_admin' => true, 'first_login' => false]);
 
         $this->withHeader('X-Inertia', 'true')->post('/login', [
             'email' => $admin->email,
@@ -54,9 +54,9 @@ class AuthenticationTest extends TestCase
         $this->assertAuthenticatedAs($admin);
     }
 
-    public function test_admin_login_without_inertia_redirects_to_the_dashboard(): void
+    public function test_admin_can_login_with_a_non_institutional_email(): void
     {
-        $admin = User::factory()->create(['is_admin' => true, 'first_login' => false]);
+        $admin = User::factory()->create(['email' => 'admin@gmail.com', 'is_admin' => true, 'first_login' => false]);
 
         $this->post('/login', [
             'email' => $admin->email,
@@ -74,5 +74,15 @@ class AuthenticationTest extends TestCase
 
         $this->assertGuest();
         $response->assertRedirect('/');
+    }
+
+    public function test_existing_accounts_outside_the_institutional_domain_cannot_login(): void
+    {
+        $user = User::factory()->create(['email' => 'leitor@gmail.com']);
+
+        $this->from('/login')->post('/login', ['email' => $user->email, 'password' => 'password', 'is_admin' => true])
+            ->assertRedirect('/login')->assertSessionHasErrors('email');
+
+        $this->assertGuest();
     }
 }

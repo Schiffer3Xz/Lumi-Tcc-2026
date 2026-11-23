@@ -2,9 +2,9 @@
 
 namespace App\Http\Middleware;
 
+use App\Services\ReaderNotificationService;
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 use Inertia\Middleware;
 
 class HandleInertiaRequests extends Middleware
@@ -46,7 +46,7 @@ class HandleInertiaRequests extends Middleware
                 'success' => fn () => $request->session()->get('success'),
             ],
             'unreadNotifications' => fn () => $request->user()
-                ? DB::table('reader_notifications')->where('user_id', $request->user()->id)->whereNull('read_at')->count()
+                ? ReaderNotificationService::visibleFor($request->user()->id)->whereNull('notifications.read_at')->count()
                 : 0,
             'quote' => ['message' => trim($message), 'author' => trim($author)],
             'auth' => [

@@ -1,3 +1,4 @@
+import BookCover from '@/features/books/BookCover';
 import LibraryDrawer from './LibraryDrawer';
 
 export default function ReadingProgressOverview({ readingProgress, onClose }) {
@@ -14,14 +15,7 @@ export default function ReadingProgressOverview({ readingProgress, onClose }) {
                             return (
                                 <figure key={id} className="min-w-0">
                                     <div className="aspect-[2/3] overflow-hidden rounded-xl bg-slate-100 shadow-md">
-                                        {book.cover_url ? (
-                                            <img src={book.cover_url} alt={book.title} className="h-full w-full object-cover" />
-                                        ) : (
-                                            <div className="flex h-full flex-col items-center justify-center gap-3 p-4 text-center text-slate-500">
-                                                <i className="fa-solid fa-book-open text-3xl" aria-hidden="true" />
-                                                <span className="text-sm font-semibold">{book.title}</span>
-                                            </div>
-                                        )}
+                                        <BookCover book={book} />
                                     </div>
                                     <figcaption className="mt-3 text-center text-lg font-bold text-slate-800">
                                         <span className="sr-only">{book.title}: </span>

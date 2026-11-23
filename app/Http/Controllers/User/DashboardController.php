@@ -4,7 +4,8 @@ namespace App\Http\Controllers\User;
 
 use App\Http\Controllers\Controller;
 use App\Models\Book;
-use App\Models\Genre;
+use App\Models\ReadingRule;
+use App\Services\BookListing;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
@@ -12,9 +13,11 @@ use Inertia\Inertia;
 
 class DashboardController extends Controller
 {
-    public function index()
+    public function index(Request $request, BookListing $listing)
     {
-        $userId = request()->user()?->id;
+        $userId = $request->user()?->id;
+        $filters = $listing->filters($request);
+        $matching = $listing->query($filters, home: true);
         $progressRecords = $userId ? DB::table('reading_progresses')
             ->where('user_id', $userId)
             ->orderBy('created_at')
@@ -25,35 +28,17 @@ class DashboardController extends Controller
             ->keyBy('id');
 
         return Inertia::render('home', [
-            'books' => Book::with([
-                'author',
-                'genre',
-                'availability',
-            ])->withReaderCount()->withAvg('ratings', 'rating')->get()->map(function ($book) {
-                return [
-                    'id' => $book->id,
-                    'title' => $book->title,
-                    'description' => $book->description,
-                    'page_count' => $book->page_count,
-                    'publication_year' => $book->publication_year,
-                    'publisher' => $book->publisher,
-                    'rating' => (float) ($book->ratings_avg_rating ?? 0),
-                    'readers_count' => $book->readers_count ?? 0,
-                    'cover_url' => $book->cover_url
-                        ? asset('storage/'.$book->cover_url)
-                        : null,
-                    'author' => $book->author,
-                    'genre' => $book->genre,
-                    'availability' => $book->availability,
-                ];
-            }),
-            'genres' => Genre::query()
-                ->orderBy('name')
-                ->get()
-                ->map(fn ($genre) => [
-                    'label' => $genre->name,
-                    'icon' => 'fa-solid fa-bookmark',
-                ]),
+            'readingRules' => fn () => ReadingRule::displayList()->get(),
+            'books' => fn () => $listing->cards(clone $matching)
+                ->leftJoinSub(
+                    DB::table('book_ratings')->selectRaw('book_id, avg(rating) as average')->groupBy('book_id'),
+                    'ranking', 'ranking.book_id', '=', 'books.id'
+                )
+                ->orderByRaw('coalesce(ranking.average, 0) desc')
+                ->orderBy('books.id')->limit(3)->get()->map($listing->card(...)),
+            'bookCount' => fn () => $matching->count(),
+            'filters' => $filters,
+            'genres' => fn () => $listing->genres(),
             'readingProgress' => $progressRecords
                 ->map(function ($progress) use ($progressBooks) {
                     $book = $progressBooks->get($progress->book_id);
@@ -78,6 +63,27 @@ class DashboardController extends Controller
                 })
                 ->filter()
                 ->values(),
+        ]);
+    }
+
+    public function readingProgressBooks(Request $request, BookListing $listing)
+    {
+        $books = $listing->query($listing->filters($request))
+            ->whereNotIn('books.id', DB::table('reading_progresses')
+                ->where('user_id', $request->user()->id)->select('book_id'))
+            ->with('author:id,name')->orderBy('id')->simplePaginate(20, [
+                'id', 'title', 'page_count', 'cover_url', 'fk_author_id',
+            ]);
+
+        return response()->json([
+            'books' => $books->getCollection()->map(fn (Book $book) => [
+                'id' => $book->id,
+                'title' => $book->title,
+                'page_count' => $book->page_count,
+                'cover_url' => $listing->coverUrl($book),
+                'author' => $book->author?->name,
+            ]),
+            'hasMore' => $books->hasMorePages(),
         ]);
     }
 

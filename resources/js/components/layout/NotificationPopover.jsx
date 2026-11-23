@@ -1,11 +1,9 @@
 import { Popover, PopoverButton, PopoverPanel } from '@headlessui/react';
 import { Link, router, useForm, usePage } from '@inertiajs/react';
 import { useEffect, useState } from 'react';
+import NotificationMessage from './NotificationMessage';
 
-const messages = { like: 'curtiu sua publicação', comment: 'comentou na sua publicação', follow: 'começou a seguir você' };
-
-function NotificationList({ close }) {
-    messages.message = 'enviou uma mensagem no chat';
+function NotificationList({ close, routePrefix }) {
     const [page, setPage] = useState(1);
     const [refresh, setRefresh] = useState(0);
     const [notifications, setNotifications] = useState(null);
@@ -18,7 +16,7 @@ function NotificationList({ close }) {
         const controller = new AbortController();
         setLoading(true);
         setError('');
-        fetch(route('notifications', { page }), {
+        fetch(route(`${routePrefix}notifications`, { page }), {
             headers: { Accept: 'application/json' },
             credentials: 'same-origin',
             signal: controller.signal,
@@ -35,7 +33,7 @@ function NotificationList({ close }) {
                 if (!controller.signal.aborted) setLoading(false);
             });
         return () => controller.abort();
-    }, [page, refresh, unreadNotifications]);
+    }, [page, refresh, routePrefix, unreadNotifications]);
 
     return (
         <>
@@ -56,7 +54,7 @@ function NotificationList({ close }) {
                     type="button"
                     disabled={processing || !unreadNotifications || loading}
                     onClick={() =>
-                        post(route('notifications.read'), {
+                        post(route(`${routePrefix}notifications.read`), {
                             preserveScroll: true,
                             preserveState: true,
                             onSuccess: () => setRefresh((value) => value + 1),
@@ -88,11 +86,11 @@ function NotificationList({ close }) {
                             key={notification.id}
                             type="button"
                             disabled={processing}
-                            onClick={() => post(route('notifications.open', notification.id), { onSuccess: () => close() })}
+                            onClick={() => post(route(`${routePrefix}notifications.open`, notification.id), { onSuccess: () => close() })}
                             className={`block w-full border-b border-slate-100 p-4 text-left transition-colors hover:bg-slate-100 disabled:opacity-50 ${notification.read_at ? 'bg-white' : 'bg-blue-50'}`}
                         >
                             <p className="text-sm text-slate-700">
-                                <strong>{notification.actor}</strong> {messages[notification.kind]}.
+                                <NotificationMessage notification={notification} />
                             </p>
                             <p className="mt-1.5 text-caption text-slate-500">
                                 {new Date(notification.created_at.replace(' ', 'T') + 'Z').toLocaleString('pt-BR')} ·{' '}
@@ -104,7 +102,7 @@ function NotificationList({ close }) {
                     <div className="space-y-2 px-5 py-8 text-center text-slate-500">
                         <i className="fa-regular fa-bell text-2xl" aria-hidden="true" />
                         <p className="text-sm font-semibold">Nenhuma notificação</p>
-                        <p className="text-xs">Novas curtidas, comentários e seguidores aparecerão aqui.</p>
+                        <p className="text-xs">Novos avisos aparecerão aqui.</p>
                     </div>
                 )}
             </div>
@@ -131,23 +129,23 @@ function NotificationList({ close }) {
                     </button>
                 </nav>
             )}
-            <Link
+            {!routePrefix && <Link
                 href={route('privacy')}
                 onClick={() => close()}
                 className="block border-t border-slate-100 p-3 text-center text-xs font-semibold text-blue-600 hover:bg-slate-50"
             >
                 Configurar avisos
-            </Link>
+            </Link>}
         </>
     );
 }
 
-export default function NotificationPopover({ className, iconClassName }) {
+export default function NotificationPopover({ className, iconClassName, routePrefix = '' }) {
     const { auth, unreadNotifications = 0 } = usePage().props;
     useEffect(() => {
         if (!auth?.user?.id || !window.Echo) return;
         const channelName = `notifications.user.${auth.user.id}`;
-        const refresh = () => router.reload({ only: ['unreadNotifications'], async: true });
+        const refresh = () => router.reload({ only: ['unreadNotifications', 'libraryNotices'], async: true });
         window.Echo.private(channelName).listen('ReaderNotificationCreated', refresh).subscribed(refresh);
         return () => window.Echo.leave(channelName);
     }, [auth?.user?.id]);
@@ -171,7 +169,7 @@ export default function NotificationPopover({ className, iconClassName }) {
                 aria-label="Notificações"
                 className="z-[70] max-h-[calc(100dvh-24px)] w-[380px] max-w-[calc(100vw-24px)] overflow-y-auto overscroll-contain rounded-2xl border border-slate-200 bg-white shadow-xl outline-none"
             >
-                {({ close }) => <NotificationList close={close} />}
+                {({ close }) => <NotificationList close={close} routePrefix={routePrefix} />}
             </PopoverPanel>
         </Popover>
     );

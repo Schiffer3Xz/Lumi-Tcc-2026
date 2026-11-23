@@ -3,26 +3,19 @@ import SectionHeader from '@/components/shared/SectionHeader';
 import { BOOK_GENRES } from '@/constants/genres';
 import BookFilters from '@/features/books/BookFilters';
 import BookGrid from '@/features/books/BookGrid';
+import BookPagination from '@/features/books/BookPagination';
 import GenreDrawer from '@/features/books/GenreDrawer';
+import useBookFilters from '@/features/books/useBookFilters';
 import ReaderLayout from '@/layouts/reader-layout';
 
 import { useMemo, useRef, useState } from 'react';
 
-const BOOKS_PER_PAGE = 20;
-
-const getRelationName = (value) => {
-    if (!value) return '';
-    return typeof value === 'object' ? value.name || '' : value;
-};
-
-export default function Catalogo({ books = [], auth, genres = [] }) {
-    const [generoAtivo, setGeneroAtivo] = useState('Todos');
-    const [searchQuery, setSearchQuery] = useState('');
+export default function Catalogo({ books = [], auth, genres = [], filters, pagination, catalogTotal }) {
+    const { query: searchQuery, genre: generoAtivo, changeQuery, changeGenre, changePage } = useBookFilters('catalogo', filters, [
+        'books', 'filters', 'pagination', 'catalogTotal',
+    ]);
     const [isGenresSidebarOpen, setIsGenresSidebarOpen] = useState(false);
-    const [page, setPage] = useState(1);
     const catalogRef = useRef(null);
-    const changeQuery = (value) => { setSearchQuery(value); setPage(1); };
-    const changeGenre = (value) => { setGeneroAtivo(value); setPage(1); };
 
     const user = auth?.user ?? { name: 'Usuário', email: '' };
 
@@ -40,29 +33,12 @@ export default function Catalogo({ books = [], auth, genres = [] }) {
         return Array.from(genresByLabel.values()).sort((first, second) => first.label.localeCompare(second.label, 'pt-BR'));
     }, [genres]);
 
-    // Filtra os livros recebidos da Controller do Laravel
-    const filteredBooks = books.filter((book) => {
-        const genreName = getRelationName(book.genre);
-        const authorName = getRelationName(book.author);
-
-        const matchesGenre = generoAtivo === 'Todos' || genreName.toLowerCase().includes(generoAtivo.toLowerCase());
-
-        const matchesSearch =
-            book.title.toLowerCase().includes(searchQuery.toLowerCase()) || authorName.toLowerCase().includes(searchQuery.toLowerCase());
-
-        return matchesGenre && matchesSearch;
-    });
-
-    const totalPages = Math.max(1, Math.ceil(filteredBooks.length / BOOKS_PER_PAGE));
-    const currentPage = Math.min(page, totalPages);
-    const start = (currentPage - 1) * BOOKS_PER_PAGE;
-    const visibleBooks = filteredBooks.slice(start, start + BOOKS_PER_PAGE);
-    const pageNumbers = Array.from({ length: totalPages }, (_, index) => index + 1)
-        .filter((value) => value === 1 || value === totalPages || Math.abs(value - currentPage) <= 1);
-    const changePage = (value) => {
-        setPage(value);
-        catalogRef.current?.scrollIntoView({ block: 'start' });
-        catalogRef.current?.focus({ preventScroll: true });
+    const { first, last, total } = pagination;
+    const selectPage = (value) => {
+        changePage(value, () => {
+            catalogRef.current?.scrollIntoView({ block: 'start' });
+            catalogRef.current?.focus({ preventScroll: true });
+        });
     };
 
     return (
@@ -76,8 +52,8 @@ export default function Catalogo({ books = [], auth, genres = [] }) {
             <div className="w-full">
                 {/* Contagem de livros */}
                 <p className="mb-3 text-sm text-gray-500">
-                    Olá, <span className="font-semibold text-gray-700">{user.name}</span>! — {books.length}{' '}
-                    {books.length === 1 ? 'livro cadastrado' : 'livros cadastrados'} no catálogo
+                    Olá, <span className="font-semibold text-gray-700">{user.name}</span>! — {catalogTotal}{' '}
+                    {catalogTotal === 1 ? 'livro cadastrado' : 'livros cadastrados'} no catálogo
                 </p>
 
                 {/* Barra de busca */}
@@ -95,13 +71,13 @@ export default function Catalogo({ books = [], auth, genres = [] }) {
                 <div ref={catalogRef} tabIndex={-1} className="scroll-mt-6 outline-none">
                 <SectionHeader title="Catálogo Completo">
                     <span className="text-xs font-semibold text-gray-400">
-                        <span role="status">Exibindo {filteredBooks.length ? start + 1 : 0}–{start + visibleBooks.length} de {filteredBooks.length} livros</span>
+                        <span role="status">Exibindo {first}–{last} de {total} livros</span>
                     </span>
                 </SectionHeader>
 
                 {/* GRID DE TODOS OS LIVROS */}
                 <BookGrid
-                    books={visibleBooks}
+                    books={books}
                     className="lg:grid-cols-2 2xl:grid-cols-3"
                     cardProps={{ showActions: Boolean(auth?.user) }}
                     emptyState={
@@ -113,21 +89,7 @@ export default function Catalogo({ books = [], auth, genres = [] }) {
                         />
                     }
                 />
-                {totalPages > 1 && (
-                    <nav aria-label="Páginas do catálogo" className="mt-6 flex flex-wrap items-center justify-between gap-4 border-t border-slate-200 pt-5">
-                        <p className="text-sm text-slate-500">Página {currentPage} de {totalPages}</p>
-                        <div className="flex flex-wrap items-center gap-2">
-                            <button type="button" disabled={currentPage === 1} onClick={() => changePage(currentPage - 1)} className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-600 hover:bg-slate-50 focus-visible:outline-2 focus-visible:outline-blue-600 disabled:cursor-not-allowed disabled:opacity-40">Anterior</button>
-                            {pageNumbers.map((value, index) => (
-                                <span key={value} className="flex items-center gap-2">
-                                    {index > 0 && value - pageNumbers[index - 1] > 1 && <span className="text-slate-400" aria-hidden="true">…</span>}
-                                    <button type="button" aria-label={`Página ${value}`} aria-current={value === currentPage ? 'page' : undefined} onClick={() => changePage(value)} className={`min-w-10 rounded-xl border px-3 py-2 text-sm font-semibold focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600 ${value === currentPage ? 'border-lumi-navy bg-lumi-navy text-yellow-300' : 'border-slate-200 bg-white text-slate-600 hover:bg-slate-50'}`}>{value}</button>
-                                </span>
-                            ))}
-                            <button type="button" disabled={currentPage === totalPages} onClick={() => changePage(currentPage + 1)} className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-600 hover:bg-slate-50 focus-visible:outline-2 focus-visible:outline-blue-600 disabled:cursor-not-allowed disabled:opacity-40">Próxima</button>
-                        </div>
-                    </nav>
-                )}
+                <BookPagination pagination={pagination} onPageChange={selectPage} />
                 </div>
             </div>
 

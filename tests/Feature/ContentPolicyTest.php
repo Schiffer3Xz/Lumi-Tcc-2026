@@ -49,10 +49,10 @@ class ContentPolicyTest extends TestCase
     public function test_registration_cannot_save_an_offensive_name(): void
     {
         $this->post(route('register'), [
-            'name' => 'RoludoGames', 'email' => 'reader@example.test',
+            'name' => 'RoludoGames', 'email' => 'reader@aluno.cps.sp.gov.br',
             'password' => 'Password123!', 'password_confirmation' => 'Password123!',
         ])->assertSessionHasErrors('name');
-        $this->assertDatabaseMissing('users', ['email' => 'reader@example.test']);
+        $this->assertDatabaseMissing('users', ['email' => 'reader@aluno.cps.sp.gov.br']);
     }
 
     public function test_local_rules_detect_disguises_and_embedded_names_without_external_calls(): void

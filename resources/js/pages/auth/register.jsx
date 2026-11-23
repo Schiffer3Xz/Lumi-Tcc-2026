@@ -45,7 +45,7 @@ export default function Register() {
                     autoComplete="email"
                     value={data.email}
                     onChange={(e) => setData('email', e.target.value)}
-                    placeholder="seu.email@escola.edu.br"
+                    placeholder="seu.email@aluno.cps.sp.gov.br"
                     error={errors.email}
                 />
                 <PasswordField

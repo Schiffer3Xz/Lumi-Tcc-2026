@@ -1,3 +1,4 @@
+import BookCover from '@/features/books/BookCover';
 import { Link, router } from '@inertiajs/react';
 import { useRef, useState } from 'react';
 import BookDetailsLink from './BookDetailsLink';
@@ -109,19 +110,9 @@ export default function BookDetailsContent({ book, similarBooks = [], comments =
                         </div>
 
                         <div className="my-8 flex w-full justify-center">
-                            {book.cover_url ? (
-                                <img
-                                    src={book.cover_url}
-                                    alt={book.title}
-                                    className="max-h-[440px] w-full max-w-[280px] rounded-2xl object-cover shadow-2xl ring-1 ring-slate-900/10 transition duration-300 hover:scale-[1.02]"
-                                />
-                            ) : (
-                                <div className="flex h-[420px] w-full max-w-[280px] flex-col items-center justify-center rounded-2xl bg-slate-900 p-6 text-center text-white shadow-xl">
-                                    <i className="fa-solid fa-book mb-4 text-5xl text-yellow-400/80" aria-hidden="true" />
-                                    <span className="text-lg leading-snug font-bold">{book.title}</span>
-                                    <span className="mt-2 text-xs text-slate-400">{relationName(book.author)}</span>
-                                </div>
-                            )}
+                            <div className="aspect-[2/3] w-full max-w-[280px] overflow-hidden rounded-2xl shadow-2xl ring-1 ring-slate-900/10">
+                                <BookCover book={book} eager />
+                            </div>
                         </div>
 
                     </div>
@@ -155,7 +146,10 @@ export default function BookDetailsContent({ book, similarBooks = [], comments =
                                 </div>
                                 <div className="rounded-2xl border border-slate-100 bg-slate-50 p-4">
                                     <span className="block text-caption font-bold tracking-wider text-slate-400 uppercase">Páginas</span>
-                                    <strong className="mt-1.5 block text-base text-slate-900">{book.page_count ?? '-'}</strong>
+                                    <strong className="mt-1.5 block text-base text-slate-900">
+                                        {book.page_count_estimated && '≈ '}
+                                        {book.page_count ?? '-'}
+                                    </strong>
                                 </div>
                                 <div className="rounded-2xl border border-slate-100 bg-slate-50 p-4">
                                     <span className="block text-caption font-bold tracking-wider text-slate-400 uppercase">Publicação</span>
@@ -303,11 +297,7 @@ export default function BookDetailsContent({ book, similarBooks = [], comments =
                             className="flex items-center gap-4 rounded-2xl border border-slate-200/80 bg-white p-4 shadow-sm transition hover:shadow-md"
                         >
                             <div className="flex h-20 w-14 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-slate-800 text-center text-white shadow-inner">
-                                {item.cover_url ? (
-                                    <img src={item.cover_url} alt={item.title} className="h-full w-full object-cover" />
-                                ) : (
-                                    <i className="fa-solid fa-book text-sm text-yellow-300/80" />
-                                )}
+                                <BookCover book={item} />
                             </div>
                             <div className="min-w-0 flex-1">
                                 <h4 className="truncate text-sm font-bold text-slate-900">{item.title}</h4>

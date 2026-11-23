@@ -2,6 +2,7 @@ import { Dialog, DialogContent, DialogDescription, DialogTitle, DialogTrigger } 
 import ChatDialog from '@/features/social/ChatDialog';
 import CommunitySidebar from '@/features/social/CommunitySidebar';
 import CreateGroupDialog from '@/features/social/CreateGroupDialog';
+import LibraryNoticeBoard from '@/features/social/LibraryNoticeBoard';
 import PostFeed from '@/features/social/PostFeed';
 import subscribeToChat from '@/features/social/subscribeToChat';
 
@@ -17,6 +18,8 @@ export default function Feed({
     conversationUsers = [],
     trendingPosts = [],
     posts = [],
+    libraryNotices = { data: [] },
+    selectedNotice,
     filters = {},
     directMessages = {},
     groupConversations = [],
@@ -143,6 +146,7 @@ export default function Feed({
                                     </div>
                                 </DialogContent>
                             </Dialog>
+                            <LibraryNoticeBoard notices={libraryNotices} selectedNotice={selectedNotice} />
                             {/* LISTA DE POSTS */}
                             <nav aria-label="Filtrar publicações" className="flex flex-wrap gap-4 text-xs font-semibold">
                                 <Link

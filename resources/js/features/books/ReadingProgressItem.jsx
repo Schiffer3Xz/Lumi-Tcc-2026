@@ -1,3 +1,4 @@
+import BookCover from '@/features/books/BookCover';
 import '../../../css/reading-progress.css';
 
 export default function ReadingProgressItem({ progress, currentPage, onChange, onRemove, disabled }) {
@@ -10,11 +11,7 @@ export default function ReadingProgressItem({ progress, currentPage, onChange, o
         <article className="reading-card">
             <div className="flex items-start gap-4">
                 <div className="reading-card-cover">
-                    {book.cover_url ? (
-                        <img src={book.cover_url} alt="" className="h-full w-full object-cover" />
-                    ) : (
-                        <i className="fa-solid fa-book-open" aria-hidden="true" />
-                    )}
+                    <BookCover book={book} />
                 </div>
                 <div className="min-w-0 flex-1 pt-1">
                     <p className={`reading-card-status ${complete ? 'is-complete' : ''}`}>

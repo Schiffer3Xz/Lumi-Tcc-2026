@@ -30,7 +30,7 @@ export default function Login({ status, canResetPassword }) {
             <form className="flex flex-col gap-5" onSubmit={submit}>
                 <AuthField
                     id="email"
-                    label="E-mail Escolar"
+                    label="E-mail"
                     icon={Mail}
                     type="email"
                     required
@@ -38,7 +38,7 @@ export default function Login({ status, canResetPassword }) {
                     autoComplete="email"
                     value={data.email}
                     onChange={(e) => setData('email', e.target.value)}
-                    placeholder="seu.email@escola.edu.br"
+                    placeholder="seu.email@aluno.cps.sp.gov.br"
                     error={errors.email}
                 />
                 <PasswordField

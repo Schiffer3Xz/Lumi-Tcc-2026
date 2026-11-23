@@ -1,3 +1,4 @@
+import BookCover from '@/features/books/BookCover';
 import { cn } from '@/lib/utils';
 import { router } from '@inertiajs/react';
 import { useRef, useState } from 'react';
@@ -71,13 +72,7 @@ export default function BookCard({
             {variant === 'catalog' ? (
                 <>
                     <div className={cn('aspect-[2/3] h-56 shrink-0 overflow-hidden bg-slate-100 sm:h-60', 'w-28 sm:w-32', imageClassName)}>
-                        {book.cover_url ? (
-                            <img src={book.cover_url} alt={book.title} className="h-full w-full object-cover" />
-                        ) : (
-                            <div className="flex h-full w-full items-center justify-center text-slate-400">
-                                <i className="fa-solid fa-book text-2xl" aria-hidden="true" />
-                            </div>
-                        )}
+                        <BookCover book={book} />
                     </div>
                     <div className="flex min-w-0 flex-1 flex-col p-3 sm:p-4">
                         <h3 className={cn('line-clamp-2 text-sm leading-tight font-bold text-slate-900', showActions && 'pr-9')}>{book.title}</h3>
@@ -92,6 +87,7 @@ export default function BookCard({
                             </span>
                             <span className="flex items-center gap-1">
                                 <i className="fa-solid fa-file-lines text-caption-xs text-slate-400" />
+                                {book.page_count_estimated && '≈ '}
                                 {book.page_count ?? '-'} págs.
                             </span>
                             <span className="flex items-center gap-1">
@@ -110,13 +106,8 @@ export default function BookCard({
                         )}
                     </div>
                 </>
-            ) : book.cover_url ? (
-                <img src={book.cover_url} alt={book.title} className="h-full w-full object-cover" />
             ) : (
-                <div className="from-lumi-navy to-lumi-navy-soft flex h-full w-full flex-col items-center justify-center bg-gradient-to-b p-4 text-center">
-                    <i className="fa-solid fa-book mb-2 text-3xl text-yellow-300/40" aria-hidden="true" />
-                    <span className="line-clamp-3 px-2 text-xs font-semibold text-white/80">{book.title}</span>
-                </div>
+                <BookCover book={book} eager />
             )}
             {showRating && variant !== 'catalog' && (
                 <div className="bg-lumi-navy/85 absolute top-3 right-3 flex items-center gap-1 rounded-lg px-2.5 py-1 backdrop-blur-sm">

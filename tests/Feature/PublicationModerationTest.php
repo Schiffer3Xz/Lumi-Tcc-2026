@@ -19,7 +19,7 @@ class PublicationModerationTest extends TestCase
         parent::setUp();
         $this->withoutVite();
         config(['inertia.ssr.enabled' => false]);
-        config(['services.openai.key' => 'test-key', 'services.openai.moderation_enabled' => true]);
+        config(['services.openai.key' => 'test-key', 'moderation.enabled' => true]);
         Http::preventStrayRequests();
         $this->actingAs(User::factory()->create());
     }
@@ -176,13 +176,14 @@ class PublicationModerationTest extends TestCase
         $this->assertSame([], Storage::disk('public')->allFiles());
     }
 
-    public function test_disabled_image_moderation_blocks_uploads(): void
+    public function test_disabled_moderation_allows_uploads_but_keeps_file_validation(): void
     {
         Storage::fake('public');
-        config(['services.openai.moderation_enabled' => false]);
-        $this->post(route('posts.store'), ['image' => $this->image()])->assertSessionHasErrors('image');
-        $this->assertDatabaseCount('posts', 0);
-        $this->assertSame([], Storage::disk('public')->allFiles());
+        config(['moderation.enabled' => false]);
+        $this->post(route('posts.store'), ['image' => UploadedFile::fake()->create('file.pdf')])->assertSessionHasErrors('image');
+        $this->post(route('posts.store'), ['image' => $this->image()])->assertSessionHasNoErrors()->assertRedirect(route('list'));
+        $this->assertDatabaseCount('posts', 1);
+        Storage::disk('public')->assertExists(Post::sole()->media_url);
         Http::assertNothingSent();
     }
 
@@ -214,9 +215,29 @@ class PublicationModerationTest extends TestCase
 
     public function test_disabled_integration_preserves_existing_publication_flow(): void
     {
-        config(['services.openai.moderation_enabled' => false]);
-        $this->post(route('posts.store'), ['content' => 'Texto'])->assertSessionHasNoErrors();
-        $this->assertDatabaseCount('posts', 1);
+        config(['moderation.enabled' => false]);
+        $this->post(route('posts.store'), [])->assertSessionHasErrors('content');
+        $this->post(route('posts.store'), ['content' => 'nazismoemuitolegal'])->assertSessionHasNoErrors();
+        $this->assertDatabaseHas('posts', ['content' => 'nazismoemuitolegal']);
         Http::assertNothingSent();
+    }
+
+    public function test_enabled_switch_keeps_local_text_and_both_image_checks(): void
+    {
+        Storage::fake('public');
+        Http::fake([
+            'api.openai.com/v1/moderations' => Http::response($this->response(false)),
+            'api.openai.com/v1/chat/completions' => Http::response(['choices' => [[
+                'message' => ['content' => json_encode([
+                    'contains_nazi_symbols' => true, 'promotes_nazism' => true, 'confidence' => 0.9,
+                ])],
+            ]]]),
+        ]);
+        $this->post(route('posts.store'), ['content' => 'nazismoemuitolegal'])->assertSessionHasErrors('content');
+        Http::assertNothingSent();
+        $this->post(route('posts.store'), ['image' => $this->image()])->assertSessionHasErrors('image');
+        Http::assertSentCount(2);
+        $this->assertDatabaseCount('posts', 0);
+        $this->assertSame([], Storage::disk('public')->allFiles());
     }
 }

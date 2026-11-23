@@ -2,11 +2,9 @@
 
 namespace Tests\Feature;
 
-use App\Jobs\ModerateReport;
 use App\Models\Post;
 use App\Models\Report;
 use App\Models\User;
-use App\Services\Moderation\OpenAiModeration;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Queue;
@@ -17,16 +15,11 @@ class ReportRemovalTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_reported_comment_can_be_removed_by_admin_even_when_the_api_does_not_flag_it(): void
+    public function test_reported_comment_can_be_removed_by_admin(): void
     {
         Queue::fake();
-        Http::preventStrayRequests();
         config(['services.openai.key' => 'test-key', 'services.openai.moderation_enabled' => true]);
-        Http::fake(['api.openai.com/v1/moderations' => Http::response([
-            'model' => 'omni-moderation-latest', 'results' => [[
-                'flagged' => false, 'categories' => ['harassment' => false], 'category_scores' => ['harassment' => 0.01],
-            ]],
-        ])]);
+        Http::fake();
         [$author, $reader, $admin] = User::factory()->count(3)->create()->all();
         $admin->update(['is_admin' => true, 'first_login' => false]);
         $post = Post::create(['fk_user_id' => $author->id, 'content' => 'Keep post']);
@@ -38,9 +31,10 @@ class ReportRemovalTest extends TestCase
         $report = Report::sole();
         $this->assertSame($reader->id, $report->fk_user_id);
         $this->assertSame($comment->id, $report->fk_comment_id);
-        Queue::assertPushed(ModerateReport::class);
-        (new ModerateReport($report->id, $report->moderation_token))->handle(app(OpenAiModeration::class));
-        $this->assertFalse($report->fresh()->moderation_result['flagged']);
+        Queue::assertNothingPushed();
+        Http::assertNothingSent();
+        $this->assertSame('Review requested', $report->content);
+        $this->assertSame('pending', $report->status);
         $this->withoutVite()->actingAs($admin)->get(route('admin.reports.index'))->assertInertia(fn (Assert $page) => $page
             ->where('reports.data.0.target.type', 'comment')->where('reports.data.0.target.deleted', false));
         $this->from(route('admin.reports.index'))->delete(route('admin.reports.target.destroy', $report), [
@@ -54,7 +48,6 @@ class ReportRemovalTest extends TestCase
         $this->assertSame($admin->id, $report->reviewed_by);
         $this->assertSame('Removed after manual review.', $report->review_note);
         $this->assertSame('Reported comment', $report->target_snapshot['content']);
-        $this->assertFalse($report->moderation_result['flagged']);
         $this->get(route('admin.reports.index', ['status' => 'all']))->assertInertia(fn (Assert $page) => $page
             ->where('reports.data.0.target.type', 'comment')->where('reports.data.0.target.deleted', true));
         // A repeated request must never fall back to deleting the parent post.
@@ -89,18 +82,17 @@ class ReportRemovalTest extends TestCase
         $this->assertSame('pending', $report->fresh()->status);
     }
 
-    public function test_admin_can_remove_a_publication_without_waiting_for_automatic_analysis(): void
+    public function test_admin_can_remove_a_publication_and_preserve_report_evidence(): void
     {
         $admin = User::factory()->create(['is_admin' => true, 'first_login' => false]);
-        foreach (['pending', 'unavailable', 'completed'] as $status) {
-            $post = Post::create(['fk_user_id' => $admin->id, 'content' => 'Reported post']);
-            $report = Report::create(['fk_user_id' => $admin->id, 'fk_post_id' => $post->id, 'content' => 'Reason']);
-            $report->forceFill(['moderation_status' => $status])->save();
-            $this->actingAs($admin)->delete(route('admin.reports.target.destroy', $report))->assertSessionHasNoErrors();
-            $this->assertDatabaseMissing('posts', ['id' => $post->id]);
-            $this->assertSame('Reported post', $report->fresh()->target_snapshot['content']);
-            $this->assertSame($status, $report->fresh()->moderation_status);
-        }
+        $post = Post::create(['fk_user_id' => $admin->id, 'content' => 'Reported post']);
+        $report = Report::create(['fk_user_id' => $admin->id, 'fk_post_id' => $post->id, 'content' => 'Reason']);
+        $this->actingAs($admin)->delete(route('admin.reports.target.destroy', $report))->assertSessionHasNoErrors();
+        $this->assertDatabaseMissing('posts', ['id' => $post->id]);
+        $report->refresh();
+        $this->assertSame('Reported post', $report->target_snapshot['content']);
+        $this->assertSame('Reason', $report->content);
+        $this->assertSame('reviewed', $report->status);
     }
 
     public function test_invalid_review_note_does_not_remove_content(): void

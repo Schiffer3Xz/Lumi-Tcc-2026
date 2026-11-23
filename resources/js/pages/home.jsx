@@ -8,9 +8,9 @@ import GenreDrawer from '@/features/books/GenreDrawer';
 import ReadingProgressCard from '@/features/books/ReadingProgressCard';
 import ReadingProgressDrawer from '@/features/books/ReadingProgressDrawer';
 import ReadingProgressOverview from '@/features/books/ReadingProgressOverview';
+import useBookFilters from '@/features/books/useBookFilters';
 import PrivacySettings from '@/features/profile/PrivacySettings';
 import ReadingRules from '@/features/profile/ReadingRules';
-import { readingRules } from '@/features/profile/profile-data';
 import ReaderLayout from '@/layouts/reader-layout';
 import ReadingAssistant from '@/features/books/ReadingAssistant';
 import { Link, router } from '@inertiajs/react';
@@ -22,20 +22,16 @@ const QUICK_ACCESS = [
     { label: 'Configurações de Privacidade', icon: 'fa-solid fa-shield-halved', panel: 'privacy' },
 ];
 
-const getTextValue = (value) => {
-    if (!value) return '';
-    return typeof value === 'object' ? value.name || '' : String(value);
-};
-
-export default function Home({ books = [], auth, genres = [], readingProgress = [] }) {
+export default function Home({ books = [], bookCount, filters, auth, genres = [], readingProgress = [], readingRules }) {
     const [isAssistantOpen, setIsAssistantOpen] = useState(() => window.location.hash === '#assistente-leitura');
     useEffect(() => {
         const syncHash = () => setIsAssistantOpen(window.location.hash === '#assistente-leitura');
         window.addEventListener('hashchange', syncHash);
         return () => window.removeEventListener('hashchange', syncHash);
     }, []);
-    const [generoAtivo, setGeneroAtivo] = useState('Todos');
-    const [searchQuery, setSearchQuery] = useState('');
+    const { query: searchQuery, genre: generoAtivo, changeQuery, changeGenre } = useBookFilters('dashboard', filters, [
+        'books', 'bookCount', 'filters',
+    ]);
     const [isGenresSidebarOpen, setIsGenresSidebarOpen] = useState(false);
     const [isProgressOverviewOpen, setIsProgressOverviewOpen] = useState(false);
     const [isProgressSidebarOpen, setIsProgressSidebarOpen] = useState(false);
@@ -56,31 +52,6 @@ export default function Home({ books = [], auth, genres = [], readingProgress = 
 
         return Array.from(genresByLabel.values()).sort((first, second) => first.label.localeCompare(second.label, 'pt-BR'));
     }, [genres]);
-
-    // Lógica de filtragem combinada por busca textual e gênero ativo
-    const filteredBooks = useMemo(() => {
-        return books.filter((book) => {
-            const title = getTextValue(book.title).toLowerCase();
-            const author = getTextValue(book.author).toLowerCase();
-            const genre = getTextValue(book.genre).toLowerCase();
-            const query = searchQuery.toLowerCase();
-
-            const titleMatch = title.includes(query);
-            const authorMatch = author.includes(query);
-            const genreTextMatch = genre.includes(query);
-
-            const matchesSearch = titleMatch || authorMatch || genreTextMatch;
-
-            const matchesGenre = generoAtivo === 'Todos' || genre === generoAtivo.toLowerCase();
-
-            return matchesSearch && matchesGenre;
-        });
-    }, [books, searchQuery, generoAtivo]);
-
-    // 3 livros melhores avaliados dentro dos livros filtrados
-    const topRatedBooks = useMemo(() => {
-        return [...filteredBooks].sort((a, b) => Number(b.rating || 0) - Number(a.rating || 0)).slice(0, 3);
-    }, [filteredBooks]);
 
     const progressPercentage = useMemo(() => {
         if (!readingProgress.length) return 0;
@@ -108,16 +79,16 @@ export default function Home({ books = [], auth, genres = [], readingProgress = 
                 <div className="min-w-0">
                     {/* Saudação */}
                     <p className="mb-3 text-sm text-gray-500">
-                        Olá, <span className="font-semibold text-gray-700">{user.name}</span>! — {filteredBooks.length}{' '}
-                        {filteredBooks.length === 1 ? 'livro encontrado' : 'livros encontrados'}
+                        Olá, <span className="font-semibold text-gray-700">{user.name}</span>! — {bookCount}{' '}
+                        {bookCount === 1 ? 'livro encontrado' : 'livros encontrados'}
                     </p>
                     {/* Barra de busca */}
                     <BookFilters
                         query={searchQuery}
-                        onQueryChange={setSearchQuery}
+                        onQueryChange={changeQuery}
                         genres={BOOK_GENRES}
                         selectedGenre={generoAtivo}
-                        onGenreChange={setGeneroAtivo}
+                        onGenreChange={changeGenre}
                         onMoreGenres={() => setIsGenresSidebarOpen(true)}
                         showSearchButton={false}
                     />
@@ -144,7 +115,7 @@ export default function Home({ books = [], auth, genres = [], readingProgress = 
                         </Link>
                     </SectionHeader>
                     <BookGrid
-                        books={topRatedBooks}
+                        books={books}
                         variant="catalog"
                         className="grid-cols-[repeat(auto-fit,minmax(min(100%,18rem),1fr))] lg:grid-cols-[repeat(auto-fit,minmax(min(100%,18rem),1fr))]"
                         cardProps={{ className: 'min-h-72', imageClassName: 'h-72 sm:h-80' }}
@@ -191,14 +162,14 @@ export default function Home({ books = [], auth, genres = [], readingProgress = 
                 <ReadingProgressOverview readingProgress={readingProgress} onClose={() => setIsProgressOverviewOpen(false)} />
             )}
             {isProgressSidebarOpen && (
-                <ReadingProgressDrawer books={books} readingProgress={readingProgress} onClose={() => setIsProgressSidebarOpen(false)} />
+                <ReadingProgressDrawer readingProgress={readingProgress} onClose={() => setIsProgressSidebarOpen(false)} />
             )}
             <GenreDrawer
                 isOpen={isGenresSidebarOpen}
                 onClose={() => setIsGenresSidebarOpen(false)}
                 genres={allGenres}
                 value={generoAtivo}
-                onChange={setGeneroAtivo}
+                onChange={changeGenre}
             />
             <ReadingAssistant isOpen={isAssistantOpen} onClose={() => { window.location.hash = ''; }} />
         </ReaderLayout>

@@ -10,6 +10,11 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Book extends Model
 {
+    protected function casts(): array
+    {
+        return ['page_count_estimated' => 'boolean'];
+    }
+
     protected $fillable = [
         'title',
         'page_count',

@@ -2,7 +2,6 @@ import Modal from '@/components/shared/Modal';
 import { useForm } from '@inertiajs/react';
 import AdminField from '../AdminField';
 import AdminForm from '../AdminForm';
-import ReportModerationPanel from './ReportModerationPanel';
 import ReportStatusBadge from './ReportStatusBadge';
 import { reportDate, reportStatuses } from './report-utils';
 
@@ -43,7 +42,6 @@ export default function ReportReviewDialog({ report, onClose }) {
                     </header>
                     <div className="mb-6 space-y-5">
                         <ReportStatusBadge status={report.status} />
-                        <ReportModerationPanel report={report} />
                         <section>
                             <h3 className="text-xs font-bold tracking-wide text-slate-500 uppercase">Motivo da denúncia anônima</h3>
                             <p className="mt-2 text-sm break-words whitespace-pre-wrap">{report.content}</p>
@@ -100,9 +98,6 @@ export default function ReportReviewDialog({ report, onClose }) {
                     </AdminForm>
                     {!report.target.deleted && (
                         <section className="mt-6 rounded-xl border border-red-200 bg-red-50 p-4">
-                            <p className="mb-3 text-xs leading-relaxed text-red-800">
-                                A equipe pode remover o conteúdo mesmo que a análise automática não tenha sinalizado uma infração.
-                            </p>
                             <button
                                 type="button"
                                 disabled={form.processing}

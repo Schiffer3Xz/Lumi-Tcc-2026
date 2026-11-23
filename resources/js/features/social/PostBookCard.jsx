@@ -1,14 +1,11 @@
+import BookCover from '@/features/books/BookCover';
 import BookDetailsLink from '@/features/books/BookDetailsLink';
 
 export default function PostBookCard({ book, preview = false }) {
     const content = (
         <>
             <div className="flex h-16 w-11 shrink-0 items-center justify-center overflow-hidden rounded-md bg-slate-800 text-white shadow-xs">
-                {book.cover_url ? (
-                    <img src={book.cover_url} alt="" className="h-full w-full object-cover" />
-                ) : (
-                    <i className="fa-solid fa-book text-lg" aria-hidden="true" />
-                )}
+                <BookCover book={book} />
             </div>
 
             <div className="min-w-0">

@@ -1,23 +1,46 @@
+import BookCover from '@/features/books/BookCover';
 import { router } from '@inertiajs/react';
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import LibraryDrawer from './LibraryDrawer';
 import ReadingProgressItem from './ReadingProgressItem';
 
 const textValue = (value) => (typeof value === 'object' ? value?.name || '' : String(value || ''));
 
-export default function ReadingProgressDrawer({ books, readingProgress, onClose }) {
+export default function ReadingProgressDrawer({ readingProgress, onClose }) {
     const [draftPages, setDraftPages] = useState({});
     const [isPicking, setIsPicking] = useState(false);
     const [query, setQuery] = useState('');
+    const [page, setPage] = useState(1);
+    const [results, setResults] = useState(null);
     const [busy, setBusy] = useState(false);
     const [error, setError] = useState('');
     const pending = useRef(false);
-    const selectedIds = new Set(readingProgress.map((progress) => progress.book.id));
-    const availableBooks = books.filter(
-        (book) =>
-            !selectedIds.has(book.id) &&
-            `${textValue(book.title)} ${textValue(book.author)}`.toLocaleLowerCase('pt-BR').includes(query.trim().toLocaleLowerCase('pt-BR')),
-    );
+    const search = query.trim();
+
+    useEffect(() => {
+        if (!isPicking) return;
+        const controller = new AbortController();
+        setResults(null);
+        const timeout = setTimeout(async () => {
+            try {
+                const response = await fetch(route('reading-progress.books', { q: search, page }), {
+                    headers: { Accept: 'application/json' },
+                    signal: controller.signal,
+                });
+                if (!response.ok) throw new Error();
+                setResults(await response.json());
+            } catch {
+                if (!controller.signal.aborted) setResults({ error: true });
+            }
+        }, search ? 250 : 0);
+
+        return () => {
+            clearTimeout(timeout);
+            controller.abort();
+        };
+    }, [isPicking, search, page]);
+
+    const availableBooks = results?.books ?? [];
 
     const mutate = (method, url, data, onSuccess) => {
         if (pending.current) return;
@@ -81,12 +104,15 @@ export default function ReadingProgressDrawer({ books, readingProgress, onClose 
                         <input
                             type="search"
                             value={query}
-                            onChange={(event) => setQuery(event.target.value)}
+                            onChange={(event) => {
+                                setQuery(event.target.value);
+                                setPage(1);
+                            }}
                             placeholder="Pesquisar por título ou autor..."
                             className="focus:border-lumi-progress focus:ring-lumi-progress/20 w-full rounded-xl border border-slate-200 py-3 pr-4 pl-9 text-sm outline-none focus:ring-2"
                         />
                     </label>
-                    <div className="min-h-0 flex-1 space-y-2 overflow-y-auto" aria-busy={busy}>
+                    <div className="min-h-0 flex-1 space-y-2 overflow-y-auto" aria-busy={busy || !results}>
                         {availableBooks.map((book) => (
                             <button
                                 key={book.id}
@@ -97,11 +123,7 @@ export default function ReadingProgressDrawer({ books, readingProgress, onClose 
                                 aria-label={`Adicionar ${book.title} ao progresso`}
                             >
                                 <div className="flex h-16 w-11 shrink-0 items-center justify-center overflow-hidden rounded-md bg-slate-100 text-slate-400">
-                                    {book.cover_url ? (
-                                        <img src={book.cover_url} alt="" className="h-full w-full object-cover" />
-                                    ) : (
-                                        <i className="fa-solid fa-book text-xs" aria-hidden="true" />
-                                    )}
+                                    <BookCover book={book} />
                                 </div>
                                 <div className="min-w-0 flex-1">
                                     <h3 className="text-sm font-bold text-slate-800">{book.title}</h3>
@@ -111,12 +133,24 @@ export default function ReadingProgressDrawer({ books, readingProgress, onClose 
                                 <i className="fa-solid fa-plus text-lumi-progress-strong text-xs" aria-hidden="true" />
                             </button>
                         ))}
-                        {!availableBooks.length && (
+                        {!results && <p role="status" className="py-8 text-center text-sm text-slate-500">Buscando livros…</p>}
+                        {results?.error && <p role="alert" className="py-8 text-center text-sm text-red-700">Não foi possível buscar os livros.</p>}
+                        {results?.books && !availableBooks.length && (
                             <p role="status" className="py-8 text-center text-sm text-slate-500">
                                 {query ? 'Nenhum livro encontrado para essa busca.' : 'Não há outros livros disponíveis para adicionar.'}
                             </p>
                         )}
                     </div>
+                    {(page > 1 || results?.hasMore) && (
+                        <nav aria-label="Páginas de livros" className="mt-3 flex shrink-0 justify-between gap-2 text-sm">
+                            <button type="button" disabled={page === 1 || busy} onClick={() => setPage(page - 1)} className="p-2 font-semibold disabled:opacity-40">
+                                Anterior
+                            </button>
+                            <button type="button" disabled={!results?.hasMore || busy} onClick={() => setPage(page + 1)} className="p-2 font-semibold disabled:opacity-40">
+                                Próxima
+                            </button>
+                        </nav>
+                    )}
                 </>
             ) : (
                 <>

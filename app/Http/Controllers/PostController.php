@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Post;
 use App\Models\Book;
 use App\Services\Moderation\PublicationModeration;
+use App\Services\PostImages;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -28,7 +29,7 @@ class PostController extends Controller
     {
         $validated = $request->validate([
             'content' => ['nullable', 'string', 'max:5000'],
-            'image' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:5120'],
+            'image' => ['nullable', ...PostImages::RULES],
             'book_id' => ['nullable', 'integer', 'exists:books,id'],
         ]);
 
@@ -39,7 +40,7 @@ class PostController extends Controller
         $moderation->validate($validated['content'] ?? null);
 
         if ($request->hasFile('image')) {
-            $moderation->validateImage($request->file('image'));
+            $moderation->moderateImage($request->file('image'));
         }
 
         $post = new Post([
@@ -49,7 +50,7 @@ class PostController extends Controller
         ]);
 
         if ($request->hasFile('image')) {
-            $post->media_url = $request->file('image')->store('posts', 'public');
+            $post->media_url = PostImages::store($request->file('image'));
         }
 
         $post->save();

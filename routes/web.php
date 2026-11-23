@@ -3,6 +3,8 @@
 use App\Http\Controllers\Admin\AdminCatalogController;
 use App\Http\Controllers\Admin\AdminCategoriesController;
 use App\Http\Controllers\Admin\AdminDashboardController;
+use App\Http\Controllers\Admin\AdminLibraryNoticeController;
+use App\Http\Controllers\Admin\AdminReadingRuleController;
 use App\Http\Controllers\Admin\AdminReportController;
 use App\Http\Controllers\Admin\AdminSettingsController;
 use App\Http\Controllers\Admin\Catalog\BookController;
@@ -17,9 +19,7 @@ use App\Http\Controllers\ReaderAccountController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\SocialController;
 use App\Http\Controllers\User\DashboardController;
-use App\Models\Book;
-use App\Models\Genre;
-use Illuminate\Support\Facades\DB;
+use App\Models\ReadingRule;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -55,50 +55,13 @@ Route::middleware(['auth', 'RoleMiddleware'])->group(function () {
 
 Route::middleware(['RoleMiddleware'])->group(function () {
     Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    Route::get('reading-progress/books', [DashboardController::class, 'readingProgressBooks'])->middleware('auth')->name('reading-progress.books');
     Route::post('reading-progress', [DashboardController::class, 'addReadingProgress'])->middleware('auth')->name('reading-progress.store');
     Route::patch('reading-progress/sync', [DashboardController::class, 'syncReadingProgress'])->middleware('auth')->name('reading-progress.sync');
     Route::patch('reading-progress/{progressId}', [DashboardController::class, 'updateReadingProgress'])->middleware('auth')->name('reading-progress.update');
     Route::delete('reading-progress/{progressId}', [DashboardController::class, 'removeReadingProgress'])->middleware('auth')->name('reading-progress.destroy');
 
-    Route::get('catalogo', function () {
-        $favoriteIds = auth()->check()
-            ? DB::table('book_favorites')->where('user_id', auth()->id())->pluck('book_id')->flip()
-            : collect();
-        $books = Book::with(['author', 'genre', 'availability'])
-            ->withReaderCount()
-            ->withAvg('ratings', 'rating')
-            ->get()
-            ->map(function ($book) use ($favoriteIds) {
-                return [
-                    'id' => $book->id,
-                    'is_favorite' => $favoriteIds->has($book->id),
-                    'title' => $book->title,
-                    'page_count' => $book->page_count,
-                    'publication_year' => $book->publication_year,
-                    'publisher' => $book->publisher,
-                    'readers_count' => $book->readers_count,
-                    'description' => $book->description,
-                    'rating' => (float) ($book->ratings_avg_rating ?? 0),
-                    'cover_url' => $book->cover_url
-                        ? (str_starts_with($book->cover_url, 'http') ? $book->cover_url : asset('storage/'.$book->cover_url))
-                        : null,
-                    'author' => $book->author,
-                    'genre' => $book->genre,
-                    'availability' => $book->availability,
-                ];
-            });
-
-        return Inertia::render('catalogo', [
-            'books' => $books,
-            'genres' => Genre::query()
-                ->orderBy('name')
-                ->get()
-                ->map(fn ($genre) => [
-                    'label' => $genre->name,
-                    'icon' => 'fa-solid fa-bookmark',
-                ]),
-        ]);
-    })->name('catalogo');
+    Route::get('catalogo', [PublicBookController::class, 'catalog'])->name('catalogo');
 
     Route::middleware('auth')->group(function () {
 
@@ -107,7 +70,9 @@ Route::middleware(['RoleMiddleware'])->group(function () {
         // ============================================================
         Route::get('/social', [SocialController::class, 'index'])->name('list');
         Route::get('historico', [ReaderAccountController::class, 'history'])->name('reading.history');
-        Route::get('regras', fn () => Inertia::render('readingRules'))->name('reading.rules');
+        Route::get('regras', fn () => Inertia::render('readingRules', [
+            'readingRules' => ReadingRule::displayList()->get(),
+        ]))->name('reading.rules');
         Route::get('privacidade', [ReaderAccountController::class, 'privacy'])->name('privacy');
         Route::patch('privacidade', [ReaderAccountController::class, 'updatePrivacy'])->name('privacy.update');
         Route::get('notificacoes', [ReaderAccountController::class, 'notifications'])->name('notifications');
@@ -151,14 +116,28 @@ Route::middleware(['RoleMiddleware'])->group(function () {
         // ========================================================
 
         Route::middleware(['FirstLoginMiddleware'])->group(function () {
+            Route::prefix('admin')->name('admin.')->group(function () {
+                Route::get('comunicados/livros', [AdminLibraryNoticeController::class, 'books'])->name('library-notices.books');
+                Route::resource('comunicados', AdminLibraryNoticeController::class)
+                    ->only(['index', 'create', 'store', 'edit', 'update', 'destroy'])
+                    ->names('library-notices')->parameters(['comunicados' => 'notice']);
+                Route::get('notificacoes', [ReaderAccountController::class, 'notifications'])->name('notifications');
+                Route::post('notificacoes/lidas', [ReaderAccountController::class, 'readNotifications'])->name('notifications.read');
+                Route::post('notificacoes/{id}/abrir', [ReaderAccountController::class, 'openNotification'])->name('notifications.open');
+            });
 
             Route::get('admin/dashboard', [AdminDashboardController::class, 'index'])
                 ->name('admin.dashboard');
 
+            Route::name('admin.')->prefix('admin')->group(function () {
+                Route::resource('reading-rules', AdminReadingRuleController::class)
+                    ->only(['index', 'store', 'update', 'destroy'])
+                    ->parameters(['reading-rules' => 'readingRule']);
+            });
+
             Route::get('admin/reports', [AdminReportController::class, 'index'])->name('admin.reports.index');
             Route::patch('admin/reports/{report}', [AdminReportController::class, 'update'])->name('admin.reports.update');
             Route::delete('admin/reports/{report}/target', [AdminReportController::class, 'removeTarget'])->name('admin.reports.target.destroy');
-            Route::post('admin/reports/{report}/moderation', [AdminReportController::class, 'moderate'])->middleware('throttle:6,1')->name('admin.reports.moderate');
 
             // ========================================================
             // CATEGORIES
@@ -236,6 +215,12 @@ Route::middleware(['RoleMiddleware'])->group(function () {
 
             Route::get('admin/catalog/books/{id}/edit', [BookController::class, 'edit'])
                 ->name('admin.books.edit');
+
+            Route::get('admin/catalog/books/{book}/availability', [BookController::class, 'editAvailability'])
+                ->name('admin.books.availability.edit');
+
+            Route::patch('admin/catalog/books/{book}/availability', [BookController::class, 'updateAvailability'])
+                ->name('admin.books.availability.update');
 
             Route::post('admin/catalog/books', [BookController::class, 'store'])
                 ->name('admin.books.store');

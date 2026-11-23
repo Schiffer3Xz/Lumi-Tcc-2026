@@ -6,6 +6,8 @@ use App\Models\Post;
 use App\Models\Report;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Queue;
 use Inertia\Testing\AssertableInertia as Assert;
 use Tests\TestCase;
 
@@ -31,6 +33,9 @@ class ReportsTest extends TestCase
 
     public function test_reader_submits_a_report_and_cannot_spoof_identity_or_review(): void
     {
+        Queue::fake();
+        Http::fake();
+        config(['services.openai.key' => 'test-key', 'services.openai.moderation_enabled' => true]);
         $reader = User::factory()->create();
         $post = $this->publication();
         $this->actingAs($reader)->from(route('list'))->post(route('posts.report', $post), [
@@ -38,11 +43,14 @@ class ReportsTest extends TestCase
             'status' => 'reviewed', 'reviewed_by' => $post->fk_user_id,
         ])->assertRedirect(route('list'))->assertSessionHasNoErrors();
         $report = Report::firstOrFail();
+        $this->assertSame('Conteúdo ofensivo', $report->content);
         $this->assertSame($reader->id, $report->fk_user_id);
         $this->assertSame($post->id, $report->fk_post_id);
         $this->assertNull($report->fk_comment_id);
         $this->assertSame('pending', $report->status);
         $this->assertNull($report->reviewed_by);
+        Queue::assertNothingPushed();
+        Http::assertNothingSent();
         $this->assertSame('Texto original', $report->target_snapshot['content']);
         $this->assertDatabaseCount('post_saves', 0);
         $this->post(route('posts.report', $post), ['content' => 'Tentativa repetida'])->assertSessionHasNoErrors();
@@ -85,7 +93,7 @@ class ReportsTest extends TestCase
         $this->actingAs($admin)->get(route('admin.reports.index'))->assertInertia(fn (Assert $page) => $page
             ->component('admin/reports/index')->has('reports.data', 15)->where('reports.total', 17)
             ->where('counts.pending', 17)->missing('reports.data.0.reporter')
-            ->missing('reports.data.0.fk_user_id'));
+            ->missing('reports.data.0.fk_user_id')->missing('reports.data.0.moderation'));
         $this->get(route('admin.reports.index', ['page' => 2]))->assertInertia(fn (Assert $page) => $page->has('reports.data', 2));
         $this->get(route('admin.reports.index', ['q' => 'Relato 17']))->assertInertia(fn (Assert $page) => $page->where('reports.total', 1));
         $this->get(route('admin.reports.index', ['q' => 'Leitora']))->assertInertia(fn (Assert $page) => $page->where('reports.total', 0));

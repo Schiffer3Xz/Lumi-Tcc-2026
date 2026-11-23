@@ -2,6 +2,14 @@
 
 return [
 
+    'library_notices' => [
+        'manager_ids' => array_filter(array_map('trim', explode(',', (string) env('LIBRARY_NOTICE_MANAGER_IDS', '')))),
+    ],
+
+    'google_books' => [
+        'key' => env('GOOGLE_BOOKS_API_KEY'),
+    ],
+
     'gemini' => [
         'key' => env('GEMINI_API_KEY'),
         'model' => env('GEMINI_MODEL', 'gemini-3.5-flash-lite'),
@@ -9,7 +17,6 @@ return [
 
     'openai' => [
         'key' => env('OPENAI_API_KEY'),
-        'moderation_enabled' => env('OPENAI_MODERATION_ENABLED', false),
         'moderation_model' => 'omni-moderation-latest',
         'image_sexual_threshold' => (float) env('OPENAI_IMAGE_SEXUAL_THRESHOLD', 0.05),
     ],

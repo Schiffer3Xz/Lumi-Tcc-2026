@@ -1,4 +1,4 @@
-import { defaultPersonalProfile, readingRules } from '@/features/profile/profile-data';
+import { defaultPersonalProfile } from '@/features/profile/profile-data';
 import ProfilePosts from '@/features/profile/ProfilePosts';
 import ProfileStatCard from '@/features/profile/ProfileStatCard';
 import ProfileSummary from '@/features/profile/ProfileSummary';
@@ -6,7 +6,7 @@ import ReadingRules from '@/features/profile/ReadingRules';
 import ReaderLayout from '@/layouts/reader-layout';
 import { Link } from '@inertiajs/react';
 
-export default function ConfigPage({ auth, posts = [], profileUser }) {
+export default function ConfigPage({ auth, posts = [], profileUser, readingRules }) {
     const user = auth?.user ?? defaultPersonalProfile;
 
     return (

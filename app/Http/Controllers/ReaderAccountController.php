@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Post;
+use App\Services\ReaderNotificationService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
@@ -55,12 +57,19 @@ class ReaderAccountController extends Controller
 
     public function notifications(Request $request)
     {
-        $notifications = DB::table('reader_notifications as notifications')
+        $notifications = ReaderNotificationService::visibleFor($request->user()->id)
             ->join('users as actors', 'actors.id', '=', 'notifications.actor_id')
-            ->where('notifications.user_id', $request->user()->id)
+            ->leftJoin('posts as notice', 'notice.id', '=', 'notifications.post_id')
             ->orderByDesc('notifications.id')
-            ->select('notifications.id', 'notifications.kind', 'notifications.read_at', 'notifications.created_at', 'actors.name as actor')
-            ->paginate(20);
+            ->select('notifications.id', 'notifications.kind', 'notifications.read_at', 'notifications.created_at', 'actors.name as actor', 'notice.content')
+            ->paginate(20)->through(function ($notification) {
+                $notification->excerpt = $notification->kind === 'library_notice'
+                    ? \Illuminate\Support\Str::limit(\Illuminate\Support\Str::squish($notification->content ?? ''), 120)
+                    : null;
+                unset($notification->content);
+
+                return $notification;
+            });
 
         if ($request->expectsJson() && ! $request->header('X-Inertia')) {
             return response()->json(['notifications' => $notifications]);
@@ -71,8 +80,13 @@ class ReaderAccountController extends Controller
 
     public function openNotification(Request $request, int $id)
     {
-        $notification = DB::table('reader_notifications')->where('user_id', $request->user()->id)->where('id', $id)->first();
+        $notification = ReaderNotificationService::visibleFor($request->user()->id)->where('notifications.id', $id)->first();
         abort_unless($notification, 404);
+        if ($notification->kind === ReaderNotificationService::LIBRARY_NOTICE) {
+            $notice = Post::activeLibraryNotices()->findOrFail($notification->post_id);
+
+            return to_route($request->user()->is_admin ? 'admin.library-notices.index' : 'list', ['notice' => $notice->id]);
+        }
         if ($notification->kind === 'message') {
             $conversation = \App\Models\Conversation::whereKey($notification->conversation_id)
                 ->whereHas('participants', fn ($query) => $query->where('users.id', $request->user()->id))->first();

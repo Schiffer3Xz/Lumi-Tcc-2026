@@ -1,3 +1,4 @@
+import BookCover from '@/features/books/BookCover';
 import { Dialog, DialogContent, DialogDescription, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { useForm } from '@inertiajs/react';
 import { useState } from 'react';
@@ -45,11 +46,7 @@ function BookSelection({ books }) {
                 {filtered.map((book) => (
                     <div key={book.id} className="flex items-center gap-3 rounded-xl border border-slate-200 p-3">
                         <div className="flex h-16 w-11 shrink-0 items-center justify-center overflow-hidden rounded-md bg-slate-100 text-slate-400">
-                            {book.cover_url ? (
-                                <img src={book.cover_url} alt="" className="h-full w-full object-cover" />
-                            ) : (
-                                <i className="fa-solid fa-book" aria-hidden="true" />
-                            )}
+                            <BookCover book={book} />
                         </div>
                         <div className="min-w-0 flex-1">
                             <h3 className="text-sm font-semibold text-slate-800">{book.title}</h3>

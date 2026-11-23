@@ -3,7 +3,7 @@ import AdminField from './AdminField';
 import AdminForm from './AdminForm';
 import BookCoverUpload from './BookCoverUpload';
 
-export default function BookForm({ book, authors, genres, availabilities }) {
+export default function BookForm({ book, authors, genres, availabilities, listQuery = {} }) {
     const form = useForm({
         title: book?.title ?? '',
         page_count: book?.page_count ?? '',
@@ -16,14 +16,14 @@ export default function BookForm({ book, authors, genres, availabilities }) {
     });
     const submit = () => {
         form.transform((data) => ({ ...data, ...(book ? { _method: 'put' } : {}) }));
-        form.post(book ? route('admin.books.update', book.id) : route('admin.books.store'), { forceFormData: true });
+        form.post(book ? route('admin.books.update', { id: book.id, _query: listQuery }) : route('admin.books.store'), { forceFormData: true });
     };
     return (
         <AdminForm
             form={form}
             onSubmit={submit}
             submitLabel={book ? 'Salvar alterações' : 'Cadastrar livro'}
-            cancelHref={route('admin.books.list')}
+            cancelHref={route('admin.books.list', listQuery)}
             className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm sm:p-8"
         >
             <div className="grid gap-8 md:grid-cols-[minmax(0,2fr)_minmax(0,3fr)]">

@@ -32,8 +32,10 @@ class RegisteredUserController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:255',
-            'email' => 'required|string|lowercase|email|max:255|unique:'.User::class,
+            'email' => ['bail', 'required', 'string', 'email', 'ends_with:@aluno.cps.sp.gov.br', 'lowercase', 'max:255', 'unique:'.User::class],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
+        ], [
+            'email.ends_with' => 'Use um e-mail institucional que termine em @aluno.cps.sp.gov.br.',
         ]);
 
         app(\App\Services\Moderation\PublicationModeration::class)->validateProfile($request->only('name'));

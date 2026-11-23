@@ -1,4 +1,4 @@
-export default function ReadingRules({ rules }) {
+export default function ReadingRules({ rules = [] }) {
     return (
         <div className="border-lumi-paper-border bg-lumi-paper space-y-4 rounded-2xl border p-6 text-slate-800">
             <div className="flex items-center gap-3">
@@ -11,13 +11,14 @@ export default function ReadingRules({ rules }) {
                 </div>
             </div>
 
+            {rules.length === 0 && <p className="text-xs text-slate-500">Nenhuma regra cadastrada.</p>}
             <ol className="space-y-2 text-xs text-slate-700">
                 {rules.map((rule, idx) => (
-                    <li key={rule} className="flex items-start gap-2.5">
+                    <li key={rule.id} className="flex items-start gap-2.5">
                         <span className="mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-yellow-400/40 text-caption-sm font-bold text-yellow-900">
                             {idx + 1}
                         </span>
-                        <span>{rule}</span>
+                        <span className="min-w-0 whitespace-pre-line break-words">{rule.text}</span>
                     </li>
                 ))}
             </ol>

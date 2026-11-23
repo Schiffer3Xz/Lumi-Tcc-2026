@@ -1,3 +1,4 @@
+import NotificationPopover from '@/components/layout/NotificationPopover';
 import { Link, usePage } from '@inertiajs/react';
 import * as Dropdown from '@radix-ui/react-dropdown-menu';
 
@@ -25,6 +26,11 @@ export default function AdminTopbar({ isMenuOpen, onMenuToggle }) {
                 </div>
             </div>
             <div className="flex items-center gap-3">
+                <NotificationPopover
+                    routePrefix="admin."
+                    className="relative rounded-lg p-2 text-slate-600 hover:bg-slate-100"
+                    iconClassName="fa-regular fa-bell text-lg"
+                />
                 <span className="hidden rounded-full border border-blue-100 bg-blue-50 px-3 py-1 text-caption-sm font-bold text-blue-600 sm:block">
                     ADMINISTRADOR
                 </span>

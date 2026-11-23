@@ -2,6 +2,8 @@
 
 namespace App\Http\Resources;
 
+use App\Models\Book;
+use App\Services\BookListing;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -22,16 +24,7 @@ class PostResource extends JsonResource
                 'profile_photo' => $this->user?->profile_photo,
                 'username' => ltrim($this->user?->nickname ?? '', '@'),
             ],
-            'book' => $this->book ? [
-                'id' => $this->book->id,
-                'cover_url' => $this->book->cover_url
-                    ? (str_starts_with($this->book->cover_url, 'http') ? $this->book->cover_url : asset('storage/'.$this->book->cover_url))
-                    : null,
-                'title' => $this->book->title,
-                'author' => $this->book->author?->name,
-                'badge' => 'Livro mencionado',
-                'coverBg' => 'bg-slate-800',
-            ] : null,
+            'book' => $this->book ? self::bookData($this->book) : null,
             'likesCount' => $this->likes_count,
             'commentsCount' => $this->comments_count,
             'isLiked' => (bool) $this->is_liked,
@@ -43,6 +36,18 @@ class PostResource extends JsonResource
                 'time' => $comment->created_at?->locale('pt_BR')->diffForHumans(),
                 'canDelete' => $comment->user_id === $request->user()->id || $this->fk_user_id === $request->user()->id,
             ])->all(),
+        ];
+    }
+
+    public static function bookData(Book $book): array
+    {
+        return [
+            'id' => $book->id,
+            'cover_url' => app(BookListing::class)->coverUrl($book),
+            'title' => $book->title,
+            'author' => $book->author?->name,
+            'badge' => 'Livro mencionado',
+            'coverBg' => 'bg-slate-800',
         ];
     }
 }

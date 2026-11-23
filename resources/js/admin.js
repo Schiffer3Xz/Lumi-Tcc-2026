@@ -1,7 +1,3 @@
-import BookAvailabilityManager from '@/features/admin/BookAvailabilityManager';
-import { createElement } from 'react';
-import { createRoot } from 'react-dom/client';
-
 const sidebar = document.querySelector('#admin-sidebar');
 const trigger = document.querySelector('[data-admin-menu]');
 const overlay = document.querySelector('[data-admin-overlay]');
@@ -63,13 +59,3 @@ account?.addEventListener('keydown', (event) => {
         account.querySelector('summary')?.focus();
     }
 });
-
-const availabilityRoot = document.querySelector('[data-admin-availability]');
-if (availabilityRoot) {
-    createRoot(availabilityRoot).render(
-        createElement(BookAvailabilityManager, {
-            books: JSON.parse(availabilityRoot.dataset.books),
-            dashboardUrl: availabilityRoot.dataset.dashboardUrl,
-        }),
-    );
-}

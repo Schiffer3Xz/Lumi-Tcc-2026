@@ -4,12 +4,39 @@ namespace App\Http\Controllers;
 
 use App\Models\Book;
 use App\Models\BookRating;
+use App\Services\BookListing;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 
 class BookController extends Controller
 {
+    public function catalog(Request $request, BookListing $listing)
+    {
+        $filters = $listing->filters($request);
+        $matching = $listing->query($filters);
+        $books = $listing->cards($matching)->orderBy('id')->paginate(BookListing::PAGE_SIZE);
+        if ($books->currentPage() > $books->lastPage()) {
+            return to_route('catalogo', array_filter([...$filters, 'page' => $books->lastPage()]));
+        }
+
+        $favoriteIds = $request->user()
+            ? DB::table('book_favorites')->where('user_id', $request->user()->id)
+                ->whereIn('book_id', $books->pluck('id'))->pluck('book_id')->flip()
+            : collect();
+
+        return Inertia::render('catalogo', [
+            'books' => $books->getCollection()->map(fn (Book $book) => [
+                ...$listing->card($book),
+                'is_favorite' => $favoriteIds->has($book->id),
+            ]),
+            'filters' => $filters,
+            'pagination' => $listing->pagination($books),
+            'catalogTotal' => $filters !== ['q' => '', 'genre' => ''] ? Book::count() : $books->total(),
+            'genres' => fn () => $listing->genres(),
+        ]);
+    }
+
     public function favorites(Request $request)
     {
         $books = Book::with(['author', 'genre', 'availability'])
@@ -24,6 +51,7 @@ class BookController extends Controller
                 'id' => $book->id,
                 'title' => $book->title,
                 'page_count' => $book->page_count,
+                'page_count_estimated' => $book->page_count_estimated,
                 'publication_year' => $book->publication_year,
                 'publisher' => $book->publisher,
                 'readers_count' => $book->readers_count,
@@ -91,6 +119,7 @@ class BookController extends Controller
                 'title' => $book->title,
                 'description' => $book->description,
                 'page_count' => $book->page_count,
+                'page_count_estimated' => $book->page_count_estimated,
                 'publication_year' => $book->publication_year,
                 'publisher' => $book->publisher,
                 'rating' => (float) ($book->ratings_avg_rating ?? 0),

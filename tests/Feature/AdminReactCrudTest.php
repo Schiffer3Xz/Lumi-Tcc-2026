@@ -6,6 +6,7 @@ use App\Models\Author;
 use App\Models\Availability;
 use App\Models\Book;
 use App\Models\Genre;
+use App\Models\ReadingRule;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
@@ -22,6 +23,55 @@ class AdminReactCrudTest extends TestCase
     {
         parent::setUp();
         $this->withoutVite()->actingAs(User::factory()->create(['is_admin' => true, 'first_login' => false]));
+    }
+
+    public function test_admin_catalog_and_status_paginate_and_filter_on_the_server(): void
+    {
+        $author = Author::create(['name' => 'João Leitor']);
+        $genre = Genre::create(['name' => 'Romance']);
+        $available = Availability::create(['availability' => 'Disponível']);
+        $unavailable = Availability::create(['availability' => 'Indisponível']);
+        $books = collect(range(1, 22))->map(fn (int $number) => Book::create([
+            'title' => 'Edição '.$number,
+            'page_count' => 100,
+            'description' => 'Detalhes reservados ao editor',
+            'fk_author_id' => $author->id,
+            'fk_genre_id' => $genre->id,
+            'fk_availability_id' => $number === 22 ? $unavailable->id : $available->id,
+        ]));
+        $filters = ['q' => 'joao', 'status' => 'Disponível'];
+
+        foreach (['admin.books.list' => 'admin/books/index', 'admin.books.create' => 'admin/books/availability'] as $route => $component) {
+            $initial = $this->get(route($route))->assertInertia(fn (Assert $page) => $page
+                ->component($component)->has('books', 20)->where('pagination.total', 22)
+                ->where('books.0.id', $books->last()->id)->missing('books.0.description')->missing('books.0.readers_count'));
+            $this->get(route($route, [...$filters, 'page' => 2]))->assertInertia(fn (Assert $page) => $page
+                ->has('books', 1)->where('books.0.id', $books->first()->id)
+                ->where('pagination', ['currentPage' => 2, 'totalPages' => 2, 'first' => 21, 'last' => 21, 'total' => 21])
+                ->where('filters', $filters)->has('statuses', 2));
+            $this->get(route($route, ['q' => 'edicao 22 joao']))->assertInertia(fn (Assert $page) => $page
+                ->has('books', 1)->where('books.0.id', $books->last()->id));
+            $this->get(route($route, [...$filters, 'page' => 2]), [
+                'X-Inertia' => 'true',
+                'X-Inertia-Version' => $initial->inertiaPage()['version'],
+                'X-Inertia-Partial-Component' => $component,
+                'X-Inertia-Partial-Data' => 'books,filters,pagination',
+            ])->assertOk()->assertJsonCount(1, 'props.books')
+                ->assertJsonPath('props.pagination.currentPage', 2)->assertJsonMissingPath('props.statuses');
+            $this->get(route($route, [...$filters, 'page' => 99]))
+                ->assertRedirect(route($route, [...$filters, 'page' => 2]));
+        }
+
+        $context = [...$filters, 'page' => 2];
+        $this->patch(route('admin.books.availability.update', ['book' => $books->first()->id, ...$context]), [
+            'fk_availability_id' => $unavailable->id,
+        ])->assertRedirect(route('admin.books.create', $context));
+
+        foreach (['admin.books.list', 'admin.books.create'] as $route) {
+            $this->get(route($route, $context))->assertRedirect(route($route, [...$filters, 'page' => 1]));
+            $this->get(route($route, $filters))->assertInertia(fn (Assert $page) => $page
+                ->has('books', 20)->where('pagination.total', 20));
+        }
     }
 
     public function test_book_upload_edit_and_delete_keep_the_existing_contract(): void
@@ -53,6 +103,34 @@ class AdminReactCrudTest extends TestCase
 
         $this->delete(route('admin.books.destroy', $book->id))->assertRedirect(route('admin.books.list'));
         $this->assertDatabaseMissing('books', ['id' => $book->id]);
+    }
+
+    public function test_book_status_has_a_dedicated_editor_and_only_updates_availability(): void
+    {
+        $available = Availability::create(['availability' => 'Disponível']);
+        $unavailable = Availability::create(['availability' => 'Indisponível']);
+        $book = Book::create([
+            'title' => 'Livro de teste',
+            'page_count' => 200,
+            'fk_author_id' => Author::create(['name' => 'Autor'])->id,
+            'fk_genre_id' => Genre::create(['name' => 'Romance'])->id,
+            'fk_availability_id' => $available->id,
+        ]);
+        $editor = route('admin.books.availability.edit', $book);
+        $update = route('admin.books.availability.update', $book);
+
+        $this->get($editor)->assertInertia(fn (Assert $page) => $page
+            ->component('admin/books/edit-availability')->where('book.availability.id', $available->id)
+            ->has('availabilities', 2));
+        $this->from($editor)->patch($update, ['fk_availability_id' => 999999])
+            ->assertRedirect($editor)->assertSessionHasErrors('fk_availability_id');
+        $this->patch($update, ['fk_availability_id' => $unavailable->id, 'title' => 'Alteração indevida'])
+            ->assertRedirect(route('admin.books.create'))->assertSessionHasNoErrors();
+        $this->assertDatabaseHas('books', [
+            'id' => $book->id,
+            'title' => 'Livro de teste',
+            'fk_availability_id' => $unavailable->id,
+        ]);
     }
 
     public function test_categories_return_to_their_react_list_after_writes(): void
@@ -96,8 +174,34 @@ class AdminReactCrudTest extends TestCase
     public function test_reader_cannot_view_or_write_admin_resources(): void
     {
         $this->actingAs(User::factory()->create(['is_admin' => false]));
+        $this->get(route('admin.reading-rules.index'))->assertRedirect(route('dashboard'));
+        $this->post(route('admin.reading-rules.store'), ['text' => 'Não autorizado'])->assertRedirect(route('dashboard'));
         $this->get(route('admin.books.index'))->assertRedirect(route('dashboard'));
         $this->post(route('admin.authors.store'), ['name' => 'Não autorizado'])->assertRedirect(route('dashboard'));
         $this->assertDatabaseMissing('authors', ['name' => 'Não autorizado']);
+    }
+
+    public function test_reading_rules_crud_is_reflected_on_reader_pages(): void
+    {
+        $admin = auth()->user();
+        $index = route('admin.reading-rules.index');
+        $this->get($index)->assertInertia(fn (Assert $page) => $page->component('admin/reading-rules/index')->has('rules', 6));
+        $this->from($index)->post(route('admin.reading-rules.store'), ['text' => ''])->assertSessionHasErrors('text');
+        $this->post(route('admin.reading-rules.store'), ['text' => 'Regra nova'])->assertRedirect($index);
+        $rule = ReadingRule::where('text', 'Regra nova')->firstOrFail();
+        $this->patch(route('admin.reading-rules.update', $rule), ['text' => 'Regra atualizada'])->assertRedirect($index);
+
+        $reader = User::factory()->create(['is_admin' => false]);
+        $this->actingAs($reader);
+        foreach (['reading.rules', 'dashboard', 'profile'] as $name) {
+            $this->get(route($name))->assertInertia(fn (Assert $page) => $page
+                ->has('readingRules', 7)->where('readingRules.6.text', 'Regra atualizada'));
+        }
+        $this->delete(route('admin.reading-rules.destroy', $rule))->assertRedirect(route('dashboard'));
+        $this->assertModelExists($rule);
+
+        $this->actingAs($admin)->delete(route('admin.reading-rules.destroy', $rule))->assertRedirect($index);
+        $this->actingAs($reader)->get(route('reading.rules'))
+            ->assertInertia(fn (Assert $page) => $page->has('readingRules', 6));
     }
 }

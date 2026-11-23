@@ -27,7 +27,7 @@ class LoginRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'email' => ['required', 'string', 'email'],
+            'email' => ['bail', 'required', 'string', 'email'],
             'password' => ['required', 'string'],
         ];
     }
@@ -41,11 +41,19 @@ class LoginRequest extends FormRequest
     {
         $this->ensureIsNotRateLimited();
 
-        if (! Auth::attempt($this->only('email', 'password'), $this->boolean('remember'))) {
+        $credentials = $this->only('email', 'password');
+        $institutional = Str::endsWith($credentials['email'], '@aluno.cps.sp.gov.br');
+        if (! $institutional) {
+            $credentials['is_admin'] = true;
+        }
+
+        if (! Auth::attempt($credentials, $this->boolean('remember'))) {
             RateLimiter::hit($this->throttleKey());
 
             throw ValidationException::withMessages([
-                'email' => __('auth.failed'),
+                'email' => $institutional
+                    ? __('auth.failed')
+                    : 'Confira suas credenciais. Para contas de leitor, use um e-mail @aluno.cps.sp.gov.br.',
             ]);
         }
 

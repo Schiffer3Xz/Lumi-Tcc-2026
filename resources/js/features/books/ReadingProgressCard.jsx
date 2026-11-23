@@ -1,3 +1,4 @@
+import BookCover from '@/features/books/BookCover';
 import { cn } from '@/lib/utils';
 
 export default function ReadingProgressCard({ title, description, eyebrow, progressLabel, actionLabel, onAction, className, books = [] }) {
@@ -35,14 +36,7 @@ export default function ReadingProgressCard({ title, description, eyebrow, progr
                                         title={book.title}
                                         className="flex h-12 w-8 shrink-0 items-center justify-center overflow-hidden rounded-sm border border-white/40 bg-white/15 text-white/80 shadow-md transition-transform hover:-translate-y-1 motion-reduce:transform-none"
                                     >
-                                        {book.cover_url ? (
-                                            <img src={book.cover_url} alt={book.title} className="h-full w-full object-cover" />
-                                        ) : (
-                                            <>
-                                                <i className="fa-solid fa-book text-sm" aria-hidden="true" />
-                                                <span className="sr-only">{book.title}</span>
-                                            </>
-                                        )}
+                                        <BookCover book={book} />
                                     </li>
                                 ))}
                             </ul>
