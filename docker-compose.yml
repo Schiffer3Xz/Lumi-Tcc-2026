@@ -1,0 +1,57 @@
+x-lumi-app: &lumi-app
+  build:
+    context: .
+    target: app
+    args: &vite-build-args
+      VITE_REVERB_APP_KEY: ${REVERB_APP_KEY:-}
+      VITE_REVERB_HOST: ${VITE_REVERB_HOST:-}
+      VITE_REVERB_PORT: ${VITE_REVERB_PORT:-80}
+      VITE_REVERB_SCHEME: ${VITE_REVERB_SCHEME:-http}
+  env_file:
+    - .env
+  environment:
+    DB_CONNECTION: sqlite
+    DB_DATABASE: /var/lib/lumi/database.sqlite
+    REVERB_HOST: reverb
+    REVERB_PORT: "8080"
+    REVERB_SCHEME: http
+    REVERB_SERVER_HOST: 0.0.0.0
+    REVERB_SERVER_PORT: "8080"
+  volumes:
+    - lumi_storage:/var/www/html/storage
+    - lumi_data:/var/lib/lumi
+  restart: unless-stopped
+
+services:
+  app:
+    <<: *lumi-app
+
+  worker:
+    <<: *lumi-app
+    command: ["php", "artisan", "queue:work", "--sleep=3", "--tries=3", "--timeout=90"]
+    depends_on:
+      - app
+
+  reverb:
+    <<: *lumi-app
+    command: ["php", "artisan", "reverb:start", "--host=0.0.0.0", "--port=8080"]
+    depends_on:
+      - app
+
+  nginx:
+    build:
+      context: .
+      target: web
+      args: *vite-build-args
+    ports:
+      - "80:80"
+    volumes:
+      - lumi_storage:/var/www/html/storage:ro
+    depends_on:
+      - app
+      - reverb
+    restart: unless-stopped
+
+volumes:
+  lumi_storage:
+  lumi_data:
