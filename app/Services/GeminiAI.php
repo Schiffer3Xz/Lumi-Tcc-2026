@@ -2,15 +2,27 @@
 
 namespace App\Services;
 
+use App\Exceptions\GeminiUnavailable;
 use App\Models\Book;
+use Closure;
 use Gemini;
 use Gemini\Data\Content;
 use Gemini\Enums\Role;
+use Gemini\Exceptions\TransporterException;
+use Gemini\Exceptions\UnserializableResponse;
+use GuzzleHttp\Client;
+use GuzzleHttp\HandlerStack;
+use GuzzleHttp\Middleware;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
+use Psr\Http\Message\ResponseInterface;
 
 class GeminiAI
 {
+    private const RETRYABLE_STATUSES = [500, 502, 503, 504];
+
+    public function __construct(private readonly ?Closure $httpHandler = null) {}
+
     private const SYSTEM_INSTRUCTION = <<<'TXT'
             Você é a Lumi, uma assistente virtual inteligente da plataforma
             Lumi Sala de Leitura, um sistema de biblioteca escolar e
@@ -96,7 +108,20 @@ class GeminiAI
         $message = $request->input('message');
 
         // Envia a pergunta ao Gemini e devolve o texto da resposta.
-        $client = Gemini::client(config('services.gemini.key'));
+        // Capture gateway errors even when their body is not Gemini JSON.
+        $handler = HandlerStack::create($this->httpHandler);
+        $handler->push(Middleware::mapResponse(function (ResponseInterface $response) {
+            $status = $response->getStatusCode();
+            if (in_array($status, self::RETRYABLE_STATUSES, true)) {
+                throw new GeminiUnavailable($status);
+            }
+
+            return $response;
+        }));
+        $client = Gemini::factory()
+            ->withApiKey(config('services.gemini.key'))
+            ->withHttpClient(new Client(['handler' => $handler, 'connect_timeout' => 3, 'timeout' => 8]))
+            ->make();
         $model = $client->generativeModel(config('services.gemini.model'))
             ->withSystemInstruction(Content::parse(self::SYSTEM_INSTRUCTION."\nCATÁLOGO DA BIBLIOTECA:\n".$catalog));
 
@@ -106,8 +131,22 @@ class GeminiAI
             $contents[] = Content::parse($item['text'], $item['role'] === 'user' ? Role::USER : Role::MODEL);
         }
         $contents[] = Content::parse($message);
-        $response = $model->generateContent(...$contents);
-        $answer = trim($response->text());
+        try {
+            $response = retry(
+                [500, 1000],
+                fn () => $model->generateContent(...$contents),
+                when: fn (\Throwable $exception) => $exception instanceof GeminiUnavailable,
+            );
+        } catch (TransporterException | UnserializableResponse $exception) {
+            throw new GeminiUnavailable(failureType: $exception::class);
+        }
+        $answer = '';
+        foreach ($response->candidates[0]->content->parts ?? [] as $part) {
+            if (! $part->thought && $part->text !== null) {
+                $answer .= $part->text;
+            }
+        }
+        $answer = trim($answer);
         if ($answer === '') {
             throw new \RuntimeException('A IA não retornou uma resposta.');
         }
