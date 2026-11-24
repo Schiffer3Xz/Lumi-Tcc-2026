@@ -21,7 +21,16 @@ class SocialController extends Controller
 {
     public function index(Request $request)
     {
-        $request->validate(['post' => ['nullable', 'integer'], 'saved' => ['nullable', 'boolean'], 'group' => ['nullable', 'integer'], 'notice' => ['nullable', 'integer']]);
+        $request->validate([
+            'post' => ['nullable', 'integer'],
+            'saved' => ['nullable', 'boolean'],
+            'group' => ['nullable', 'integer'],
+            'notice' => ['nullable', 'integer'],
+            'sort' => ['nullable', 'in:following,recent'],
+        ]);
+        $sort = $request->boolean('saved') || $request->filled('post')
+            ? 'recent'
+            : ($request->input('sort') ?? 'following');
         if ($request->filled('post')) {
             Post::social()->findOrFail($request->integer('post'));
         }
@@ -85,7 +94,7 @@ class SocialController extends Controller
         ];
 
         return Inertia::render('social', [
-            'filters' => ['saved' => $request->boolean('saved'), 'post' => $request->input('post'), 'group' => $request->integer('group'), 'chat' => $request->integer('chat')],
+            'filters' => ['saved' => $request->boolean('saved'), 'post' => $request->input('post'), 'group' => $request->integer('group'), 'chat' => $request->integer('chat'), 'sort' => $sort],
             'selectedNotice' => $selectedNotice ? LibraryNotices::data($selectedNotice, $user) : null,
             'libraryNotices' => fn () => $notices
                 ->withExists(['noticeReaders as has_read' => fn ($query) => $query->where('users.id', $user->id)])
@@ -116,7 +125,7 @@ class SocialController extends Controller
                 ])
                 ->when($request->filled('post'), fn ($query) => $query->whereKey($request->integer('post')))
                 ->when($request->boolean('saved'), fn ($query) => $query->whereHas('saves', fn ($saved) => $saved->where('users.id', $user->id)))
-                ->when(! $request->boolean('saved') && ! $request->filled('post'), fn ($query) => $query->orderByRaw(
+                ->when($sort === 'following', fn ($query) => $query->orderByRaw(
                     'CASE WHEN EXISTS (SELECT 1 FROM follows WHERE follows.fk_follower_id = ? AND follows.fk_followed_id = posts.fk_user_id) THEN 0 ELSE 1 END',
                     [$user->id],
                 ))

@@ -48,7 +48,7 @@ export default function UserProfilePage({ auth, targetUser, users = [], isFollow
 
     return (
         <ReaderLayout
-            title={`Perfil de ${profile.name} - Sala de Leitura`}
+            title={`Perfil de ${profile.name}`}
             user={user}
             activeItem="usuarios"
             variant="profile"

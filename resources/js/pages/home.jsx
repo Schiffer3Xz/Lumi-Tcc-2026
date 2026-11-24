@@ -67,7 +67,7 @@ export default function Home({ books = [], bookCount, filters, auth, genres = []
 
     return (
         <ReaderLayout
-            title="Sala de Leitura"
+            title="Início da sala de leitura"
             user={user}
             activeItem="home"
             variant="library"

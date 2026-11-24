@@ -52,18 +52,6 @@ class AdminSettingsController extends Controller
         return redirect()->route('admin.dashboard')->with('success', 'E-mail verificado com sucesso.');
     }
 
-    public function resendVerification(Request $request): RedirectResponse
-    {
-        if (! is_null($request->user()->email_verified_at)) {
-            return redirect()->route('admin.dashboard');
-        }
-        $sent = $this->sendVerificationEmail($request->user());
-
-        return $sent
-            ? back()->with('status', 'verification-link-sent')
-            : back()->withErrors(['verification' => 'Não foi possível enviar o e-mail de verificação.']);
-    }
-
     public function editEmail()
     {
         return Inertia::render('admin/settings/email');
@@ -89,7 +77,7 @@ class AdminSettingsController extends Controller
 
     // Update do first Access
 
-    public function update(Request $request)
+    public function update(Request $request, VerificationEmailSender $sender)
     {
         $request->validate([
             'name' => 'required|string|max:255',
@@ -111,7 +99,7 @@ class AdminSettingsController extends Controller
 
         $user->save();
 
-        $sent = $this->sendVerificationEmail($user);
+        $sent = $sender->send($user);
         $response = redirect()->route('verification.notice');
 
         return $sent

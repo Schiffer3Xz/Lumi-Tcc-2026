@@ -43,7 +43,7 @@ export default function Catalogo({ books = [], auth, genres = [], filters, pagin
 
     return (
         <ReaderLayout
-            title="Sala de Leitura"
+            title="Catálogo de livros"
             user={user}
             activeItem="biblioteca"
             variant="library"

@@ -12,7 +12,7 @@ export default function ConfigPage({ auth, posts = [], profileUser, readingRules
     return (
         <>
             <ReaderLayout
-                title="Sala de Leitura - Perfil & Configurações"
+                title="Meu perfil"
                 user={user}
                 activeItem="config"
                 variant="profile"

@@ -13,9 +13,9 @@ class EmailVerificationTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_email_verification_screen_can_be_rendered()
+    public function test_email_verification_screen_can_be_rendered_for_admin()
     {
-        $user = User::factory()->unverified()->create();
+        $user = User::factory()->unverified()->create(['is_admin' => true, 'first_login' => false]);
 
         $response = $this->actingAs($user)->get('/verify-email');
 

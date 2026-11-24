@@ -87,7 +87,7 @@ export default function Feed({
 
     return (
         <>
-            <ReaderLayout title="Sala de Leitura - Feed da Comunidade" user={user} activeItem="usuarios" variant="social">
+            <ReaderLayout title="Comunidade literária" user={user} activeItem="usuarios" variant="social">
                 <div className="flex min-h-0 min-w-0 flex-1 overflow-hidden">
                     {/* FEED PRINCIPAL */}
                     <main id="reader-main-content" tabIndex={-1} className="min-w-0 flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8">
@@ -103,10 +103,17 @@ export default function Feed({
                                 </div>
 
                                 <div className="flex w-full flex-wrap items-center gap-3 sm:w-auto">
-                                    <div className="flex items-center gap-2 rounded-xl border border-slate-200/60 bg-slate-50 px-3 py-1.5 text-xs font-medium text-slate-600">
-                                        <i className="fa-solid fa-arrow-down-wide-short text-blue-500" aria-hidden="true" />
-                                        <span>Mais recentes</span>
-                                    </div>
+                                    {!filters.saved && !filters.post && (
+                                        <select
+                                            aria-label="Ordenar publicações"
+                                            value={filters.sort ?? 'following'}
+                                            onChange={(event) => router.get(route('list'), { sort: event.target.value }, { preserveScroll: true })}
+                                            className="rounded-xl border border-slate-200 bg-slate-50 py-1.5 pl-3 pr-8 text-xs font-medium text-slate-600 focus-visible:outline-2 focus-visible:outline-blue-600"
+                                        >
+                                            <option value="following">Priorizar quem sigo</option>
+                                            <option value="recent">Mais recentes</option>
+                                        </select>
+                                    )}
                                     <Link
                                         href={route('post')}
                                         className="inline-flex items-center justify-center gap-2 rounded-xl bg-blue-600 px-4 py-2.5 text-xs font-bold text-white shadow-xs transition-colors hover:bg-blue-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600"

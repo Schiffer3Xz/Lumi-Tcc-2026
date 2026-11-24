@@ -41,7 +41,7 @@ Route::middleware(['auth', 'RoleMiddleware'])->group(function () {
     Route::get('admin/verification', [AdminSettingsController::class, 'emailVerification'])
         ->name('admin.email-verification');
 
-    Route::post('admin/verification/resend', [AdminSettingsController::class, 'resendVerification'])
+    Route::post('admin/verification/resend', [\App\Http\Controllers\Auth\EmailVerificationNotificationController::class, 'store'])
         ->middleware('throttle:6,1')
         ->name('admin.email.resend');
 

@@ -4,7 +4,7 @@ import ReaderLayout from '@/layouts/reader-layout';
 export default function BookDetails({ book, similarBooks = [], comments = [], auth }) {
     return (
         <ReaderLayout
-            title="Detalhes do livro"
+            title={book.title || 'Detalhes do livro'}
             user={auth.user}
             activeItem="biblioteca"
             variant="library"

@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sala de Leitura</title>
+    <title>Início da sala de leitura - Lumi</title>
+    <link rel="icon" type="image/png" href="{{ Vite::asset('resources/images/lumi-firefly.png') }}">
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- FontAwesome for Icons -->

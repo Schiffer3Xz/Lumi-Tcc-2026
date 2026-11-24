@@ -82,6 +82,11 @@ class SocialFeedTest extends TestCase
             ->has('posts', 4)->where('posts.0.id', $followedNew->id)->where('posts.1.id', $followedOld->id)
             ->where('posts.2.id', $otherNew->id)->where('posts.3.id', $otherOld->id));
 
+        $this->get(route('list', ['sort' => 'recent']))->assertInertia(fn (Assert $page) => $page
+            ->where('filters.sort', 'recent')->has('posts', 4)
+            ->where('posts.0.id', $otherNew->id)->where('posts.1.id', $otherOld->id)
+            ->where('posts.2.id', $followedNew->id)->where('posts.3.id', $followedOld->id));
+
         // Following is personal: another viewer still gets chronological order.
         $this->actingAs($other)->get(route('list'))->assertInertia(fn (Assert $page) => $page
             ->where('posts.0.id', $otherNew->id)->where('posts.1.id', $otherOld->id)

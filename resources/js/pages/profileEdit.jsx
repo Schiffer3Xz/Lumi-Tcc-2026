@@ -42,7 +42,7 @@ export default function ProfileEdit() {
 
     return (
         <ReaderLayout
-            title="Editar perfil - Sala de Leitura"
+            title="Editar perfil"
             user={user}
             activeItem="config"
             variant="profile"

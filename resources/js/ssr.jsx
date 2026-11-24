@@ -2,10 +2,12 @@ import { createInertiaApp } from '@inertiajs/react';
 import createServer from '@inertiajs/react/server';
 import { MotionConfig } from 'framer-motion';
 import ReactDOMServer from 'react-dom/server';
+import { formatPageTitle } from './lib/page-title';
 
 createServer((page) =>
     createInertiaApp({
         page,
+        title: formatPageTitle,
         render: ReactDOMServer.renderToString,
         resolve: (name) => {
             const pages = import.meta.glob('./pages/**/*.{js,jsx,ts,tsx}', {

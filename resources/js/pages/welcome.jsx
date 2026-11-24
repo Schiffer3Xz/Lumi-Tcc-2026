@@ -24,7 +24,7 @@ const fireflies = [
 export default function LandingPage() {
     return (
         <>
-            <Head title="Lumi - Sala de Leitura Digital" />
+            <Head title="Sala de leitura digital" />
             <div className="bg-lumi-landing relative flex min-h-screen flex-col justify-between overflow-hidden font-sans text-white selection:bg-amber-300 selection:text-slate-900">
                 {fireflies.map(({ id, className }) => (
                     <div key={id} aria-hidden="true" className={className} />

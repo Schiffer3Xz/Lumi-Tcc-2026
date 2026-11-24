@@ -7,15 +7,14 @@ import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
 import { createRoot } from 'react-dom/client';
 import { route as routeFn } from 'ziggy-js';
 import { initializeTheme } from './hooks/use-appearance';
+import { formatPageTitle } from './lib/page-title';
 
 declare global {
     const route: typeof routeFn;
 }
 
-const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
-
 createInertiaApp({
-    title: (title) => `${title} - ${appName}`,
+    title: formatPageTitle,
     resolve: (name) => {
         const pages = import.meta.glob('./pages/**/*.{js,jsx,ts,tsx}');
         const path = ['jsx', 'tsx', 'js', 'ts'].map((extension) => `./pages/${name}.${extension}`).find((candidate) => candidate in pages);
