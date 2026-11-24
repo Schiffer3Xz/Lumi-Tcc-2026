@@ -81,10 +81,6 @@ export default function BookCard({
                             <span>{Number(book.rating || 0).toFixed(1)}</span>
                         </div>
                         <div className="mt-auto grid grid-cols-2 gap-x-2 gap-y-2 border-t border-slate-200/80 pt-3 text-caption-sm text-slate-500">
-                            <span className="flex min-w-0 items-center gap-1">
-                                <i className="fa-solid fa-building text-caption-xs text-slate-400" />
-                                <span className="truncate">{book.publisher ?? 'Editora não informada'}</span>
-                            </span>
                             <span className="flex items-center gap-1">
                                 <i className="fa-solid fa-file-lines text-caption-xs text-slate-400" />
                                 {book.page_count_estimated && '≈ '}

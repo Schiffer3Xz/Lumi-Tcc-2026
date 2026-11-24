@@ -126,8 +126,6 @@ export default function BookDetailsContent({ book, similarBooks = [], comments =
                                     <span className="rounded-md bg-blue-50 px-2.5 py-1 text-caption font-bold tracking-wider text-blue-600 uppercase">
                                         {relationName(book.genre)}
                                     </span>
-                                    <span className="text-slate-300">•</span>
-                                    <span className="text-xs font-medium text-slate-500">{book.publisher || 'Editora não informada'}</span>
                                 </div>
                                 <h1 className="mt-3 text-3xl leading-tight font-extrabold tracking-tight text-slate-900 sm:text-4xl">{book.title}</h1>
                                 <p className="mt-2 text-base font-medium text-slate-600">

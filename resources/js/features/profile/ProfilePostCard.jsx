@@ -106,10 +106,6 @@ export default function ProfilePostCard({ post, user, variant = 'grid' }) {
                             <i className="fa-solid fa-star mr-1 text-yellow-400" aria-hidden="true" />
                             {Number(post.book.rating || 0).toFixed(1)}
                         </span>
-                        <span className="break-words">
-                            <i className="fa-solid fa-building mr-1" aria-hidden="true" />
-                            {post.book.publisher ?? 'Editora não informada'}
-                        </span>
                         <span>
                             <i className="fa-solid fa-file-lines mr-1" aria-hidden="true" />
                             {post.book.page_count ?? '-'} páginas
