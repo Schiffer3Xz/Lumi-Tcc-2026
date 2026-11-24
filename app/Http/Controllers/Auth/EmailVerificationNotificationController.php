@@ -3,25 +3,18 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
-use App\Services\VerificationEmailSender;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 
 class EmailVerificationNotificationController extends Controller
 {
-    /**
-     * Send a new email verification notification.
-     */
-    public function store(Request $request, VerificationEmailSender $verificationEmail): RedirectResponse
+    /** Keep regular users outside the administrator-only verification flow. */
+    public function store(Request $request): RedirectResponse
     {
-        if ($request->user()->hasVerifiedEmail()) {
-            return redirect()->route($request->user()->is_admin ? 'admin.dashboard' : 'dashboard');
+        if (! $request->user()->is_admin) {
+            return redirect()->route('dashboard');
         }
 
-        if (! $verificationEmail->send($request->user())) {
-            return back()->withErrors(['verification' => VerificationEmailSender::ERROR_MESSAGE]);
-        }
-
-        return back()->with('status', 'verification-link-sent');
+        return redirect()->route('admin.email-verification');
     }
 }

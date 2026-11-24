@@ -28,7 +28,7 @@ export default function VerifyEmail({ status }) {
                 <form
                     onSubmit={(event) => {
                         event.preventDefault();
-                        form.post(route('verification.send'));
+                        form.post(route('admin.email.resend'));
                     }}
                     className="my-4"
                 >

@@ -54,7 +54,7 @@ class AdminSettingsController extends Controller
 
     public function resendVerification(Request $request): RedirectResponse
     {
-        if ($request->user()->hasVerifiedEmail()) {
+        if (! is_null($request->user()->email_verified_at)) {
             return redirect()->route('admin.dashboard');
         }
         $sent = $this->sendVerificationEmail($request->user());
@@ -111,7 +111,7 @@ class AdminSettingsController extends Controller
 
         $user->save();
 
-        $sent = app(VerificationEmailSender::class)->send($user);
+        $sent = $this->sendVerificationEmail($user);
         $response = redirect()->route('verification.notice');
 
         return $sent
