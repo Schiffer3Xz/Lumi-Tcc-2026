@@ -19,7 +19,7 @@ class OpenAiModeration
 
     //Joga um erro se der algum erro com o serviço
         if(! $this->available()){
-            throw new ModerationUnavailable();
+            throw new ModerationUnavailable('Serviço de moderação indisponível. Confira a configuração da chave da API.');
         }
 
         //Tenta conexao
@@ -39,7 +39,10 @@ class OpenAiModeration
 
         //Esse if pega erros de status invalidos como api fora de ar
         if(! $response->successful()){
-            Log::warning('Moderation API request failed.', ['status' => $response->status()]);
+            Log::warning('Moderation API request failed.', [
+                'status' => $response->status(),
+                'code' => $response->json('error.code'),
+            ]);
             throw new ModerationUnavailable('Serviço de moderação indisponível.');
         }
 
@@ -130,10 +133,8 @@ class OpenAiModeration
                     ],
                 ]);
 
-        } catch (Throwable $e) {
-            Log::warning('Extremist content analysis failed.', [
-                'error' => $e->getMessage(),
-            ]);
+        } catch (Throwable) {
+            Log::warning('Extremist content analysis failed.');
 
             throw new ModerationUnavailable(
                 'Não foi possível analisar a imagem.'
@@ -143,8 +144,7 @@ class OpenAiModeration
         if (! $response->successful()) {
             Log::warning('Image analysis API request failed.', [
                 'status' => $response->status(),
-                'body' => $response->body(),
-                'json' => $response->json(),
+                'code' => $response->json('error.code'),
             ]);
 
             throw new ModerationUnavailable(

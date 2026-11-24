@@ -89,7 +89,7 @@ export default function Sidebar({ id, items, activeItem, isOpen, onClose, onNavi
                 }}
             >
                 <Dialog.Portal>
-                    <Dialog.Overlay className={clsx('reader-sidebar-backdrop fixed inset-0 z-40 lg:hidden', isSocial ? 'bg-slate-900/40 backdrop-blur-xs' : 'bg-black/50')} />
+                    <Dialog.Overlay className="reader-sidebar-backdrop fixed inset-0 z-40 bg-slate-900/40 data-[state=open]:backdrop-blur-xs lg:hidden" />
                     <Dialog.Content
                         id={id}
                         aria-describedby={undefined}

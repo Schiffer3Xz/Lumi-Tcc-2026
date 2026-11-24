@@ -7,7 +7,6 @@ use App\Http\Resources\PostResource;
 use App\Models\Post;
 use App\Services\BookListing;
 use App\Services\LibraryNotices;
-use App\Services\Moderation\ModerationUnavailable;
 use App\Services\Moderation\PublicationModeration;
 use App\Services\PostImages;
 use App\Services\ReaderNotificationService;
@@ -121,12 +120,8 @@ class AdminLibraryNoticeController extends Controller
         $keptUrls = $data['keep_images'] ?? [];
         $duration = $data['duration'] ?? ($post ? null : '24h');
         $moderation->validate($content);
-        try {
-            foreach ($uploads as $image) {
-                $moderation->moderateImage($image);
-            }
-        } catch (ModerationUnavailable) {
-            throw ValidationException::withMessages(['images' => 'A análise de imagens está indisponível. Tente novamente em instantes.']);
+        foreach ($uploads as $image) {
+            $moderation->moderateImage($image, 'images');
         }
 
         $stored = [];

@@ -9,6 +9,7 @@ use App\Events\UserTyping;
 use App\Models\Conversation;
 use App\Models\Message;
 use App\Models\User;
+use App\Services\Moderation\PublicationModeration;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Cache;
@@ -53,7 +54,7 @@ class DirectMessageController extends Controller
         return response()->noContent();
     }
 
-    public function start(Request $request)
+    public function start(Request $request, PublicationModeration $moderation)
     {
         $validated = $request->validate([
             'user_id' => ['required', 'integer', 'exists:users,id'],
@@ -64,6 +65,7 @@ class DirectMessageController extends Controller
         $userId = (int) $validated['user_id'];
         abort_if($myId === $userId, 422);
         User::whereKey($userId)->where('is_admin', false)->firstOrFail();
+        $moderation->validateLocally($validated['content']);
 
         $conversation = DB::transaction(function () use ($myId, $userId) {
             $conversation = Conversation::where('is_group', false)
@@ -83,7 +85,7 @@ class DirectMessageController extends Controller
         return $this->sendMessage($request, $conversation, $validated['content']);
     }
 
-    public function createGroup(Request $request)
+    public function createGroup(Request $request, PublicationModeration $moderation)
     {
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:100'],
@@ -94,6 +96,8 @@ class DirectMessageController extends Controller
                 Rule::exists('users', 'id')->where('is_admin', 0),
             ],
         ]);
+
+        $moderation->validateLocally($validated['name'], 'name', 'nickname');
 
         $conversation = DB::transaction(function () use ($request, $validated) {
             $conversation = Conversation::create([
@@ -109,11 +113,12 @@ class DirectMessageController extends Controller
         return to_route('list', ['group' => $conversation->id]);
     }
 
-    public function sendToGroup(Request $request, Conversation $conversation)
+    public function sendToGroup(Request $request, Conversation $conversation, PublicationModeration $moderation)
     {
         abort_unless($conversation->is_group, 404);
         abort_unless($conversation->participants()->where('users.id', $request->user()->id)->exists(), 403);
         $validated = $request->validate(['content' => ['required', 'string', 'max:5000']]);
+        $moderation->validateLocally($validated['content']);
 
         return $this->sendMessage($request, $conversation, $validated['content']);
     }

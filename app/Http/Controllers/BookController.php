@@ -7,6 +7,7 @@ use App\Models\BookRating;
 use App\Services\BookListing;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 
 class BookController extends Controller
@@ -93,9 +94,8 @@ class BookController extends Controller
             ->latest()
             ->limit(3)
             ->get();
-        $userRating = DB::table('book_ratings')
+        $userRating = $book->ratings()
             ->where('user_id', $request->user()->id)
-            ->where('book_id', $book->id)
             ->first(['rating', 'comment']);
         $comments = BookRating::with('user:id,name')
             ->where(fn ($query) => $query->where('user_id', $request->user()->id)
@@ -130,6 +130,7 @@ class BookController extends Controller
                     ->exists(),
                 'user_rating' => $userRating?->rating,
                 'user_comment' => $userRating?->comment,
+                'has_user_comment' => filled($userRating?->comment),
                 'cover_url' => $book->cover_url
                     ? (str_starts_with($book->cover_url, 'http') ? $book->cover_url : asset('storage/'.$book->cover_url))
                     : null,
@@ -202,21 +203,28 @@ class BookController extends Controller
             'comment' => ['nullable', 'string', 'max:1000'],
         ]);
 
+        $key = ['user_id' => $request->user()->id, 'book_id' => $id];
         $values = [
             'rating' => $validated['rating'],
             'updated_at' => now(),
-            'created_at' => now(),
         ];
+        $ratings = DB::table('book_ratings');
+        $comment = trim($validated['comment'] ?? '');
 
-        if ($request->has('comment')) {
-            app(\App\Services\Moderation\PublicationModeration::class)->validate($validated['comment'] ?? null, 'comment', 'book_comment');
-            $values['comment'] = blank($validated['comment'] ?? null) ? null : trim($validated['comment']);
+        if ($comment === '') {
+            $ratings->upsert([$key + $values + ['created_at' => now()]], array_keys($key), array_keys($values));
+
+            return back();
         }
 
-        DB::table('book_ratings')->updateOrInsert(
-            ['user_id' => $request->user()->id, 'book_id' => $id],
-            $values,
-        );
+        app(\App\Services\Moderation\PublicationModeration::class)->validate($comment, 'comment', 'book_comment');
+        $values['comment'] = $comment;
+
+        if ($ratings->insertOrIgnore($key + $values + ['created_at' => now()]) === 0
+            && $ratings->where($key)->where(fn ($query) => $query->whereNull('comment')
+                ->orWhereRaw("TRIM(comment) = ''"))->update($values) === 0) {
+            throw ValidationException::withMessages(['comment' => 'Você já publicou um comentário para este livro.']);
+        }
 
         return back();
     }

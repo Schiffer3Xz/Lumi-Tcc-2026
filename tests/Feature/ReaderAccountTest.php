@@ -11,6 +11,7 @@ use App\Models\Post;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Http;
 use Inertia\Testing\AssertableInertia as Assert;
 use Tests\TestCase;
 
@@ -121,22 +122,55 @@ class ReaderAccountTest extends TestCase
 
     public function test_book_popup_loads_details_and_refreshes_actions_without_leaving_catalog(): void
     {
+        config(['moderation.enabled' => true, 'services.openai.key' => 'test-key']);
+        Http::fake(['api.openai.com/v1/moderations' => Http::response([
+            'model' => 'omni-moderation-latest',
+            'results' => [[
+                'flagged' => false,
+                'categories' => ['harassment' => false],
+                'category_scores' => ['harassment' => 0.01],
+            ]],
+        ])]);
         $book = $this->book();
-        $reader = User::factory()->create();
+        $otherBook = $book->replicate()->fill(['title' => 'Outro livro']);
+        $otherBook->save();
+        $reader = User::factory()->create(['public_reviews' => true]);
         $privateReviewer = User::factory()->create(['public_reviews' => false]);
         BookRating::create(['user_id' => $privateReviewer->id, 'book_id' => $book->id, 'rating' => 3, 'comment' => 'Privado']);
         $this->getJson('/books/'.$book->id)->assertUnauthorized();
         $this->actingAs($reader)->getJson('/books/'.$book->id)->assertOk()
             ->assertJsonPath('book.id', $book->id)->assertJsonPath('book.is_favorite', false)
+            ->assertJsonPath('book.has_user_comment', false)
             ->assertJsonCount(0, 'comments')->assertJsonStructure(['book', 'comments', 'similarBooks']);
         $this->from('/catalogo')->post('/books/'.$book->id.'/favorite')->assertRedirect('/catalogo');
+        $this->post('/books/'.$book->id.'/rating', ['rating' => 5])->assertRedirect('/catalogo');
+        $this->getJson('/books/'.$book->id)->assertJsonPath('book.user_rating', 5)
+            ->assertJsonPath('book.has_user_comment', false);
         $this->post('/books/'.$book->id.'/rating', ['rating' => 5, 'comment' => 'Excelente'])->assertRedirect('/catalogo');
         $response = $this->getJson('/books/'.$book->id)->assertOk()
             ->assertJsonPath('book.is_favorite', true)->assertJsonPath('book.user_rating', 5)
+            ->assertJsonPath('book.has_user_comment', true)
             ->assertJsonPath('comments.0.comment', 'Excelente')->assertJsonPath('comments.0.can_delete', true)
             ->assertJsonCount(1, 'comments');
+
+        $otherReader = User::factory()->create();
+        $this->actingAs($otherReader)->getJson(route('book.show', $book))->assertJsonPath('book.has_user_comment', false)
+            ->assertJsonPath('comments.0.comment', 'Excelente');
+        $this->actingAs($reader)->getJson(route('book.show', $otherBook))->assertJsonPath('book.has_user_comment', false);
+        $this->withoutVite()->get(route('book.show', $book))->assertInertia(fn (Assert $page) => $page
+            ->component('bookDetails')->where('book.has_user_comment', true)->where('comments.0.comment', 'Excelente'));
+
+        $this->postJson(route('book.rating', $book), ['rating' => 1, 'comment' => 'Outra avaliação'])
+            ->assertUnprocessable()->assertJsonValidationErrors('comment');
+        $this->getJson(route('book.show', $book))->assertJsonPath('book.user_rating', 5)
+            ->assertJsonPath('comments.0.comment', 'Excelente')->assertJsonCount(1, 'comments');
+        $this->post(route('book.rating', $book), ['rating' => 4])->assertSessionHasNoErrors();
+        $this->getJson(route('book.show', $book))->assertJsonPath('book.user_rating', 4)
+            ->assertJsonPath('book.has_user_comment', true)->assertJsonPath('comments.0.comment', 'Excelente');
+        $this->assertDatabaseCount('book_ratings', 2);
+
         $this->delete('/books/'.$book->id.'/comments/'.$response->json('comments.0.id'))->assertRedirect('/catalogo');
-        $this->getJson('/books/'.$book->id)->assertJsonCount(0, 'comments');
+        $this->getJson('/books/'.$book->id)->assertJsonPath('book.has_user_comment', false)->assertJsonCount(0, 'comments');
         $this->getJson('/books/999999')->assertNotFound();
     }
 

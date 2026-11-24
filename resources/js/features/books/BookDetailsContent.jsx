@@ -11,8 +11,9 @@ export default function BookDetailsContent({ book, similarBooks = [], comments =
     const [isFavorite, setIsFavorite] = useState(book.is_favorite || false);
     const [activeTab, setActiveTab] = useState('synopsis');
     const [userRating, setUserRating] = useState(book.user_rating || 0);
-    const [comment, setComment] = useState(book.user_comment || '');
-    const [isCommentFormOpen, setIsCommentFormOpen] = useState(Boolean(book.user_rating));
+    const [comment, setComment] = useState('');
+    const [isCommentFormOpen, setIsCommentFormOpen] = useState(Boolean(book.user_rating) && !book.has_user_comment);
+    const showCommentForm = isCommentFormOpen && !book.has_user_comment;
     const [openCommentMenuId, setOpenCommentMenuId] = useState(null);
     const [busy, setBusy] = useState(false);
     const [error, setError] = useState('');
@@ -44,10 +45,10 @@ export default function BookDetailsContent({ book, similarBooks = [], comments =
     const rateBook = (rating) =>
         mutate('post', route('book.rating', book.id), { rating }, () => {
             setUserRating(rating);
-            setIsCommentFormOpen(true);
+            setIsCommentFormOpen(!book.has_user_comment);
         });
     const submitComment = () => {
-        if (!comment.trim() || !userRating) return;
+        if (!showCommentForm || !comment.trim() || !userRating) return;
         mutate('post', route('book.rating', book.id), { rating: userRating, comment: comment.trim() }, () => {
             setComment('');
             setIsCommentFormOpen(false);
@@ -243,7 +244,7 @@ export default function BookDetailsContent({ book, similarBooks = [], comments =
                                 ))}
                             </div>
                         </div>
-                        {isCommentFormOpen && (
+                        {showCommentForm && (
                             <div className="mt-4 rounded-2xl border border-slate-200 bg-slate-50 p-4">
                                 <label htmlFor="book-comment" className="block text-sm font-semibold text-slate-800">
                                     Quer deixar algum comentário?

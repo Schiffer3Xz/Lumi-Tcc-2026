@@ -28,6 +28,12 @@ class ContentPolicyTest extends TestCase
 
     public function test_book_comments_are_checked_before_rating_or_comment_changes_are_saved(): void
     {
+        config(['services.openai.key' => 'test-key', 'moderation.enabled' => true]);
+        Http::fake(['api.openai.com/v1/moderations' => Http::response([
+            'model' => 'omni-moderation-latest', 'results' => [[
+                'flagged' => false, 'categories' => ['hate' => false], 'category_scores' => ['hate' => 0.01],
+            ]],
+        ])]);
         $book = \App\Models\Book::create([
             'title' => 'Discussão histórica', 'page_count' => 100,
             'fk_author_id' => \App\Models\Author::create(['name' => 'Autor'])->id,
@@ -96,7 +102,7 @@ class ContentPolicyTest extends TestCase
 
     public function test_book_discussion_still_rejects_hate_flagged_by_provider(): void
     {
-        config(['services.openai.key' => 'test-key', 'services.openai.moderation_enabled' => true]);
+        config(['services.openai.key' => 'test-key', 'moderation.enabled' => true]);
         Http::fake(['api.openai.com/*' => Http::response([
             'model' => 'omni-moderation-latest', 'results' => [[
                 'flagged' => true, 'categories' => ['hate' => true], 'category_scores' => ['hate' => 0.99],
@@ -108,7 +114,7 @@ class ContentPolicyTest extends TestCase
 
     public function test_mild_words_do_not_hide_surrounding_content_from_provider(): void
     {
-        config(['services.openai.key' => 'test-key', 'services.openai.moderation_enabled' => true]);
+        config(['services.openai.key' => 'test-key', 'moderation.enabled' => true]);
         Http::fake(['api.openai.com/*' => Http::response([
             'model' => 'omni-moderation-latest', 'results' => [[
                 'flagged' => false, 'categories' => ['hate' => false], 'category_scores' => ['hate' => 0.01],

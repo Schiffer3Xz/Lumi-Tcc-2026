@@ -2,6 +2,7 @@
 
 namespace App\Services\Moderation;
 
+use App\Models\User;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Validation\ValidationException;
 
@@ -17,22 +18,44 @@ class PublicationModeration
         $this->openAiModeration = new OpenAiModeration();
     }
 
-    public function validate(?string $text): void
+    public function validate(?string $text, string $field = 'content', string $context = 'post'): void
     {
-        if (config('moderation.enabled') !== true || $text === null) {
+        if (config('moderation.enabled') !== true || blank($text)) {
             return;
         }
 
-        $violation = $this->policy->violation(strtolower($text));
+        $this->validateLocally($text, $field, $context);
 
-        if ($violation) {
-            throw ValidationException::withMessages(['content' => $violation]);
+        try {
+            $analysis = $this->openAiModeration->analyze($this->policy->analysisText($text));
+        } catch (ModerationUnavailable $exception) {
+            throw ValidationException::withMessages([$field => $exception->getMessage()]);
+        }
+
+        if ($analysis['result']['flagged']) {
+            $message = 'Texto não permitido pela moderação.';
+            throw ValidationException::withMessages([$field => $message, 'moderation' => $message]);
         }
     }
 
-    public function validateProfile(): void
+    public function validateLocally(?string $text, string $field = 'content', string $context = 'post'): void
     {
-        // Profile text currently has no moderation rules.
+        if (config('moderation.enabled') !== true || blank($text)) {
+            return;
+        }
+
+        if ($violation = $this->policy->violation($text, $context)) {
+            throw ValidationException::withMessages([$field => $violation, 'moderation' => $violation]);
+        }
+    }
+
+    public function validateProfile(array $fields, ?User $user = null): void
+    {
+        foreach (['name', 'nickname', 'description'] as $field) {
+            if (array_key_exists($field, $fields) && $fields[$field] !== $user?->{$field}) {
+                $this->validateLocally($fields[$field], $field, $field);
+            }
+        }
     }
 
     public function validateImage(?UploadedFile $image, string $field = 'image'): void
@@ -55,19 +78,44 @@ class PublicationModeration
             'violence/graphic' => ['image_graphic_violence_threshold', 0.05],
         ];
 
-        $analysis = $this->openAiModeration->analyze([
-            ['type' => 'image_url', 'image_url' => ['url' => $imageDataUrl]],
-        ]);
+        try {
+            $analysis = $this->openAiModeration->analyze([
+                ['type' => 'image_url', 'image_url' => ['url' => $imageDataUrl]],
+            ]);
+        } catch (ModerationUnavailable $exception) {
+            throw ValidationException::withMessages([$field => $exception->getMessage()]);
+        }
+
         $scores = $analysis['result']['category_scores'];
+        if (array_diff_key($limits, $scores) !== []) {
+            throw ValidationException::withMessages([$field => 'Resposta de moderação de imagem incompleta.']);
+        }
 
         foreach ($limits as $category => [$configKey, $default]) {
-            $threshold = config("moderation.{$configKey}", $default);
-            if (($scores[$category] ?? 0) >= $threshold) {
-                throw ValidationException::withMessages([$field => "Imagem não permitida: {$category}"]);
+            $threshold = config("moderation.{$configKey}", config("services.openai.{$configKey}", $default));
+            if ($scores[$category] >= $threshold) {
+                $message = "Imagem não permitida: {$category}";
+                throw ValidationException::withMessages([$field => $message, 'moderation' => $message]);
             }
         }
 
-        $extremistAnalysis = $this->openAiModeration->analyzeExtremistContent($imageDataUrl);
+        $categories = $analysis['result']['categories'];
+        foreach (['self-harm', 'self-harm/intent', 'self-harm/instructions'] as $category) {
+            if ($categories[$category] ?? false) {
+                $message = "Imagem não permitida: {$category}";
+                throw ValidationException::withMessages([$field => $message, 'moderation' => $message]);
+            }
+        }
+
+        if (config('moderation.extremist_image_analysis_enabled') !== true) {
+            return;
+        }
+
+        try {
+            $extremistAnalysis = $this->openAiModeration->analyzeExtremistContent($imageDataUrl);
+        } catch (ModerationUnavailable $exception) {
+            throw ValidationException::withMessages([$field => $exception->getMessage()]);
+        }
         if ($extremistAnalysis['promotes_nazism'] && $extremistAnalysis['confidence'] >= 0.85) {
             throw ValidationException::withMessages([$field => 'Imagem não permitida: apologia ao nazismo.']);
         }
